@@ -1,49 +1,23 @@
-#include <stdio.h>
-#include <unistd.h>
-#include <sys/time.h>
-#include <sys/select.h>
+#include <iostream>
+#include <vector>
 
-#define BUF_SIZE 30
+#include "Receiver.hpp"
 
-int main(int argc, char *argv[])
-{
-	fd_set reads, temps;
-	int result, str_len;
-	char buf[BUF_SIZE];
-	struct timeval timeout;
+int main(int argc, char **argv) {
+  std::vector<Receiver> receivers;
 
-	FD_ZERO(&reads);
-	FD_SET(0, &reads);
+  if (argc < 2) {
+    std::cerr << "Usage: " << argv[0] << " <port>" << std::endl;
+    return 1;
+  }
 
-	/*
-	timeout.tv_sec=5;
-	timeout.tv_usec=5000;
-	*/
+  int port;
 
-	while(1)
-	{
-		temps=reads;
-		timeout.tv_sec = 5;
-		timeout.tv_usec = 0;
-		result = select(1, &temps, 0, 0, &timeout);
-		if(result == -1)
-		{
-			puts("select() error!");
-			break;
-		}
-		else if(result == 0)
-		{
-			puts("Time-out!");
-		}
-		else 
-		{
-			if(FD_ISSET(0, &temps)) 
-			{
-				str_len=read(0, buf, BUF_SIZE);
-				buf[str_len] = 0;
-				printf("message from console: %s", buf);
-			}
-		}
-	}
-	return 0;
+  for (int i = 1; i <= argc; i++) {
+    std::cout << "port: " << argv[i] << std::endl;
+    port = atoi(argv[i]);
+    receivers.push_back(Receiver(port));
+    receivers[i - 1].run();
+  }
+  return 0;
 }
