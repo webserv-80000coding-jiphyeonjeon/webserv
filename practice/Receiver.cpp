@@ -4,20 +4,16 @@
 
 #include <iostream>
 
-Receiver::Receiver(int port) : port_(port) {}
+Receiver::Receiver(int port) : port_(port) { FD_ZERO(&read_fds_); }
 
 void Receiver::error_handling(const char* buf) {
   std::cerr << buf << std::endl;
   exit(1);
 }
 
-void Receiver::run() {
-  socklen_t addr_size;
-  int       fd_max, str_len, fd_num, i;
-  char      buf[BUF_SIZE];
-  bool      is_on = true;
+void Receiver::bind_and_listen() {
+  bool is_on = true;
 
-  // 이렇게 private 멤버 변수 초기화는 생성자에서 하는 게 좋을까나...?
   server_socket_ = socket(PF_INET, SOCK_STREAM, 0);
   memset(&server_address_, 0, sizeof(server_address_));
   server_address_.sin_family = AF_INET;
@@ -27,15 +23,23 @@ void Receiver::run() {
   fcntl(server_socket_, F_SETFL, O_NONBLOCK);
   setsockopt(server_socket_, SOL_SOCKET, SO_REUSEADDR, &is_on, sizeof(int));
 
-  std::cout << port_ << std::endl;
-  if (bind(server_socket_, (struct sockaddr*)&server_address_, sizeof(server_address_)) == -1)
+  if (bind(server_socket_, (struct sockaddr*)&server_address_, sizeof(server_address_)) == -1) {
     error_handling("bind() error");
-  if (listen(server_socket_, 5) == -1)
+  }
+  if (listen(server_socket_, 5) == -1) {
     error_handling("listen() error");
+  }
 
   FD_ZERO(&read_fds_);                 // set reads to the null set
   FD_SET(server_socket_, &read_fds_);  // include serv_sock in reads
-  fd_max = server_socket_;             // check max fd to use in select()
+}
+
+void Receiver::run() {
+  socklen_t addr_size;
+  int       fd_max, str_len, fd_num, i;
+  char      buf[BUF_SIZE];
+
+  fd_max = server_socket_;  // check max fd to use in select()
 
   while (1) {
     cp_read_fds_ = read_fds_;

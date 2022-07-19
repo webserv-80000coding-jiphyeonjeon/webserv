@@ -13,11 +13,16 @@ int main(int argc, char **argv) {
 
   int port;
 
-  for (int i = 1; i <= argc; i++) {
-    std::cout << "port: " << argv[i] << std::endl;
+  std::cout << argc << std::endl;
+
+  for (int i = 1; i < argc; i++) {
     port = atoi(argv[i]);
     receivers.push_back(Receiver(port));
-    receivers[i - 1].run();
+    receivers[i - 1].bind_and_listen();
+  }
+  for (int i = 0; i < receivers.size(); i++) {
+    std::cout << "Receiver " << i << " is listening" << std::endl;
+    receivers[i].run();
   }
   return 0;
 }

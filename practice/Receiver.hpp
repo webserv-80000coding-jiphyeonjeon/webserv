@@ -25,9 +25,8 @@ class Receiver {
   void error_handling(const char *buf);
 
  public:
-  // Receiver();
   Receiver(int port);
-  // ~Receiver();
+  void bind_and_listen();
   void run();
 
   struct BindException : public std::exception {
