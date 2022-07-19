@@ -7,7 +7,9 @@
 #include <sys/time.h>
 #include <unistd.h>
 
-#define BUF_SIZE 100
+#define BUF_SIZE 1024
+// if BUF_SIZE is too small, the program terminate sometimes.
+// (error occurs on select())
 
 void error_handling(char *buf);
 
@@ -18,7 +20,7 @@ int main(int argc, char **argv) {
   fd_set             reads, cpy_reads;      // fd_set for select()
 
   socklen_t adr_sz;  // on return, It will contain the actual length of address
-  int       fd_max, str_len, fd_num, i;
+  int       fd_max, str_len, fd_num, i, call = 0;
   char      buf[BUF_SIZE];
 
   if (argc != 2) {
@@ -45,32 +47,36 @@ int main(int argc, char **argv) {
   fd_max = serv_sock;         // check max fd to use in select()
 
   while (1) {
-    cpy_reads = reads;
+    printf("%d\n", call++);
+    cpy_reads = reads;  // set cpy_reads to use on select()
+    // set timeout
     timeout.tv_sec = 5;
     timeout.tv_usec = 5000;
 
+    // check fd sets to read from fd which is ready for reading
+    // 0 to nfds - 1, timeout is maximum interval to wait.
     if ((fd_num = select(fd_max + 1, &cpy_reads, 0, 0, &timeout)) == -1)
       break;
-    if (fd_num == 0)
+    if (fd_num == 0)  // means time limit is expired
       continue;
-    for (i = 0; i < fd_max + 1; i++) {
-      if (FD_ISSET(i, &cpy_reads)) {
-        if (i == serv_sock) {
-          adr_sz = sizeof(clnt_adr);
+    for (i = 0; i < fd_max + 1; i++) {  // check all fd
+      if (FD_ISSET(i, &cpy_reads)) {    // if fd is ready for reading
+        if (i == serv_sock) {           // if it is a new connection
+          adr_sz = sizeof(clnt_adr);    // accept a connection on a socket
           clnt_sock = accept(serv_sock, (struct sockaddr *)&clnt_adr, &adr_sz);
-          FD_SET(clnt_sock, &reads);
+          FD_SET(clnt_sock, &reads);  // add new socket to reads
           if (fd_max < clnt_sock)
             fd_max = clnt_sock;
           printf("connected client: %d\n", clnt_sock);
-        } else {
-          str_len = read(i, buf, BUF_SIZE);
-          if (str_len == 0) {
-            FD_CLR(i, &reads);
+        } else {                             // if it is a data from a client
+          str_len = read(i, buf, BUF_SIZE);  // read data from a socket
+          if (str_len == 0) {                // if no data to read
+            FD_CLR(i, &reads);               // remove fd from read and close the fd
             close(i);
             printf("closed client: %d\n", i);
           } else {
-            write(1, buf, str_len);
-            write(i, buf, str_len);
+            write(1, buf, str_len);  // print data to stdout
+            write(i, buf, str_len);  // send data to a client
           }
         }
       }
