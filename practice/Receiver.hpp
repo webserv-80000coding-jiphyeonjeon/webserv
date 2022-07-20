@@ -17,24 +17,30 @@
 class Receiver {
  private:
   int                port_;
-  int                server_socket_, client_socket_;
-  struct sockaddr_in server_address_, client_address_;
-  struct timeval     timeout_;
-  fd_set             read_fds_, cp_read_fds_;
+  int                server_socket_;
+  struct sockaddr_in server_address_;
 
-  void error_handling(const char *buf);
+  static fd_set read_fds_;
+  static int    fd_max_;
+
+  void error_handling(const char* buf);
 
  public:
   Receiver(int port);
   void bind_and_listen();
-  void run();
+
+  int&       get_server_socket();
+  const int& get_server_socket() const;
+
+  static fd_set& get_read_fds();
+  static int&    get_fd_max();
 
   struct BindException : public std::exception {
-    const char *what() const throw() { return "BindException"; }
+    const char* what() const throw() { return "BindException"; }
   };
 
   struct ListenException : public std::exception {
-    const char *what() const throw() { return "ListenException"; }
+    const char* what() const throw() { return "ListenException"; }
   };
 };
 
