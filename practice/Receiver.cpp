@@ -29,7 +29,11 @@ void Receiver::bind_and_listen() {
   server_address_.sin_addr.s_addr = htonl(INADDR_ANY);
   server_address_.sin_port = htons(port_);
 
+  // set socket to non-blocking mode
+  // F_SETFL: set file status flags
   fcntl(server_socket_, F_SETFL, O_NONBLOCK);
+
+  // set socket to reusable address
   setsockopt(server_socket_, SOL_SOCKET, SO_REUSEADDR, &is_on, sizeof(int));
 
   if (bind(server_socket_, (struct sockaddr*)&server_address_, sizeof(server_address_)) == -1) {
