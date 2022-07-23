@@ -27,14 +27,14 @@ class ConfigLocation {
   ~ConfigLocation();
   ConfigLocation& operator=(const ConfigLocation& other);
 
-  const LimitExceptType getLimitExcept() const;
-  const Common          getCommon() const;
+  const LimitExceptType& getLimitExcept() const;
+  const Common&          getCommon() const;
 
-  const AutoindexType            getAutoindexType() const;
-  const ClientBodyBufferSizeType getClientBodyBufferSize() const;
-  const ErrorCodeType            getErrorCode() const;
-  const IndexType                getIndex() const;
-  const RootType                 getRoot() const;
+  const AutoindexType&            getAutoindexType() const;
+  const ClientBodyBufferSizeType& getClientBodyBufferSize() const;
+  const ErrorPageType&            getErrorPage() const;
+  const IndexType&                getIndex() const;
+  const RootType&                 getRoot() const;
 
  private:
   LimitExceptType limit_except_;

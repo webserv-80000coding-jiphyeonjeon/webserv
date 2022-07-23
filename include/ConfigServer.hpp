@@ -28,16 +28,16 @@ class ConfigServer {
   ~ConfigServer();
   ConfigServer& operator=(const ConfigServer& other);
 
-  const ServerNameType getServerName() const;
-  const ListenListType getListen() const;
-  const LocationType   getLocation() const;
-  const Common         getCommon() const;
+  const ServerNameType& getServerName() const;
+  const ListenListType& getListen() const;
+  const LocationType&   getLocation() const;
+  const Common&         getCommon() const;
 
-  const AutoindexType            getAutoindexType() const;
-  const ClientBodyBufferSizeType getClientBodyBufferSize() const;
-  const ErrorCodeType            getErrorCode() const;
-  const IndexType                getIndex() const;
-  const RootType                 getRoot() const;
+  const AutoindexType&            getAutoindexType() const;
+  const ClientBodyBufferSizeType& getClientBodyBufferSize() const;
+  const ErrorPageType&            getErrorPage() const;
+  const IndexType&                getIndex() const;
+  const RootType&                 getRoot() const;
 
  private:
   ServerNameType server_name_;
