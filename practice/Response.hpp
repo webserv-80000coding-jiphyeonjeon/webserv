@@ -1,4 +1,6 @@
 #ifndef WEBSERV_PRACTICE_RESPONSE_HPP_
 #define WEBSERV_PRACTICE_RESPONSE_HPP_
 
+class Response {};
+
 #endif
