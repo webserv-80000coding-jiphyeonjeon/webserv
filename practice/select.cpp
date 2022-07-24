@@ -42,7 +42,8 @@ void run(std::map<int, bool>& server_socket_map) {
             break;
           } else {
             write(1, buf, str_len);
-            write(i, buf, str_len);
+            write(i, "HTTP/1.1 200 OK\r\nContent-Length:4\r\n\r\nabcd",
+                  strlen("HTTP/1.1 200 OK\r\nContent-Length:4\r\n\r\nabcd"));
           }
         }
       }
