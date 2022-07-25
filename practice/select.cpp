@@ -1,8 +1,13 @@
 #include <iostream>
 #include <map>
+#include <string>
 #include <vector>
 
 #include "Receiver.hpp"
+
+namespace ft {
+std::vector<std::string> split_by_string(std::string str, std::string delimiter);
+}
 
 void run(std::map<int, bool>& server_socket_map) {
   int&           fd_max = Receiver::get_fd_max();
@@ -41,7 +46,7 @@ void run(std::map<int, bool>& server_socket_map) {
             std::cout << "closed client: " << i << std::endl;
             break;
           } else {
-            write(1, buf, str_len);
+            std::vector<std::string> v = ft::split_by_string(buf, "\r\n");
             write(i, "HTTP/1.1 200 OK\r\nContent-Length:4\r\n\r\nabcd",
                   strlen("HTTP/1.1 200 OK\r\nContent-Length:4\r\n\r\nabcd"));
           }
