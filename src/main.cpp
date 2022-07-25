@@ -12,9 +12,9 @@ int main(int argc, char* argv[]) {
 
   try {
     std::string filename = (argc == 2) ? argv[1] : "./config/default.conf";
-    Scanner     scanner;
+    Scanner     scanner(filename);
 
-    std::cout << scanner.readFile(filename) << std::endl;
+    std::cout << scanner.getTokens() << std::endl;
   } catch (std::exception& e) {
     std::cout << e.what() << std::endl;
     return 1;
