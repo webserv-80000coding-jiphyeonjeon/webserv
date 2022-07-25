@@ -1,18 +1,26 @@
 #ifndef WEBSERV_PRACTICE_REQUEST_HPP_
 #define WEBSERV_PRACTICE_REQUEST_HPP_
 
+#include <map>
+#include <string>
+
+enum Method { kNone, kGet, kPost, kDelete };
+enum TransferCoding { kDefault, kChunked };
+enum STATE { kContinuous, kEnd };
+
 class Request {
  private:
   typedef int Flag;
 
-  std::string                        method;
-  std::string                        path;
-  std::string                        version;
-  std::map<std::string, std::string> headers;
-  std::string                        body;
-  int                                status_code;
-  Flag                               header_flag;
-  Flag                               transfer_coding_flag;
+  std::string                        request_message_;
+  std::string                        method_;
+  std::string                        path_;
+  std::string                        version_;
+  std::map<std::string, std::string> headers_;
+  std::string                        body_;
+  Flag                               state_;
+  Flag                               header_flag_;
+  Flag                               transfer_flag_;
 
  public:
   Request();
@@ -22,14 +30,17 @@ class Request {
   std::string                        getVersion();
   std::string                        getHeader(std::string key);
   std::string                        getBody();
-  std::vector<std::string>           getBodyLines();
   std::map<std::string, std::string> getHeaders();
+  Flag                               getState();
+  Flag                               getHeaderFlag();
+  Flag                               getTransferFlag();
   void                               setMethod(std::string method);
   void                               setPath(std::string path);
   void                               setVersion(std::string version);
   void                               setHeader(std::string key, std::string value);
   void                               setBody(std::string body);
 
+  void parse(std::string request_message);
   void print();
 };
 
