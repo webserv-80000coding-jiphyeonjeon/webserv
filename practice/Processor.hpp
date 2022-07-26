@@ -14,14 +14,21 @@ class Processor {
 
   static std::map<int, std::string> createStatusCodes();
 
-  int      status_code;
-  Request  request;
-  Response response;
+  int      status_code_;
+  Request  request_;
+  Response response_;
 
  public:
   Processor();
+  ~Processor();
 
   void Process();
+
+  int&      get_status_code();
+  Request&  get_request();
+  Response& get_response();
+
+  void set_status_code(int status_code);
 };
 
 #endif

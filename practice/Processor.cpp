@@ -28,3 +28,10 @@ std::map<int, std::string> Processor::createStatusCodes() {
 }
 
 const std::map<int, std::string> Processor::kStatusCodes = createStatusCodes();
+
+Processor::Processor() : status_code_(200), request_(), response_() {}
+Processor::~Processor() {}
+
+int&      Processor::get_status_code() { return status_code_; }
+Request&  Processor::get_request() { return request_; }
+Response& Processor::get_response() { return response_; }

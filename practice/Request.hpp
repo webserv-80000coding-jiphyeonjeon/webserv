@@ -12,6 +12,10 @@ class Request {
  private:
   typedef int Flag;
 
+  void parse_start_line(std::string start_line);
+  void parse_header(std::string& header, size_t& pos);
+  void parse_body(std::string& body_line, size_t& pos);
+
   std::string                        request_message_;
   std::string                        method_;
   std::string                        path_;
@@ -40,6 +44,7 @@ class Request {
   void                               setHeader(std::string key, std::string value);
   void                               setBody(std::string body);
 
+  void concatenate_request(std::string request_message);
   void parse(std::string request_message);
   void print();
 };

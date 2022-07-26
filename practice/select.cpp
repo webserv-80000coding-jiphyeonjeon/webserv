@@ -3,10 +3,13 @@
 #include <string>
 #include <vector>
 
+#include "Processor.hpp"
 #include "Receiver.hpp"
+#include "Request.hpp"
 
 namespace ft {
-std::vector<std::string> split_by_string(std::string str, std::string delimiter);
+std::vector<std::string> split_by_string(std::string str,
+                                         std::string delimiter);
 }
 
 void run(std::map<int, bool>& server_socket_map) {
@@ -18,9 +21,10 @@ void run(std::map<int, bool>& server_socket_map) {
   struct timeval timeout;
   int            client_socket, str_len, fd_num, i;
   char           buf[BUF_SIZE];
+  Processor      processor;
 
   while (1) {
-    std::cout << fd_max << std::endl;
+    // std::cout << fd_max << std::endl;
     cp_read_fds = read_fds;
 
     timeout.tv_sec = 5;
@@ -34,8 +38,10 @@ void run(std::map<int, bool>& server_socket_map) {
       if (FD_ISSET(i, &cp_read_fds)) {
         if (server_socket_map[i]) {
           addr_size = sizeof(client_address);
-          client_socket = accept(i, (struct sockaddr*)&client_address, &addr_size);
+          client_socket =
+              accept(i, (struct sockaddr*)&client_address, &addr_size);
           FD_SET(client_socket, &read_fds);
+          FD_CLR(i, &read_fds);
           if (fd_max < client_socket)
             fd_max = client_socket;
           std::cout << "connected client: " << i << std::endl;
@@ -46,9 +52,17 @@ void run(std::map<int, bool>& server_socket_map) {
             std::cout << "closed client: " << i << std::endl;
             break;
           } else {
-            std::vector<std::string> v = ft::split_by_string(buf, "\r\n");
+            // std::vector<std::string> v = ft::split_by_string(buf, "\r\n");
+            // int i = 0;
+            // while (buf[i] != '\0')
+            //   write(1, buf + i++, 1);
+            // std::string cp = buf;
+            processor.get_request().parse(buf);
+            processor.get_request().print();
+            // write(1, buf, str_len);
             write(i, "HTTP/1.1 200 OK\r\nContent-Length:4\r\n\r\nabcd",
                   strlen("HTTP/1.1 200 OK\r\nContent-Length:4\r\n\r\nabcd"));
+            memset(buf, 0, sizeof(buf));
           }
         }
       }
