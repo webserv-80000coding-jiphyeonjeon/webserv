@@ -11,6 +11,8 @@ std::vector<std::string> split_by_string(std::string str,
 std::string split_until_delimiter(std::string& str, std::string delimiter);
 std::string get_until_delimiter(std::string& str, std::string delimiter,
                                 size_t& pos);
+void        str_ltrim(std::string& str, const std::string& charset);
+void        str_rtrim(std::string& str, const std::string& charset);
 }  // namespace ft
 
 Request::Request() {}
@@ -64,6 +66,8 @@ void Request::parse_header(std::string& request_message, size_t& pos) {
   while ((header_field =
               ft::get_until_delimiter(request_message, "\r\n", pos)) != "") {
     field_name = ft::split_until_delimiter(header_field, ":");
+    ft::str_ltrim(header_field, " ");
+    ft::str_rtrim(header_field, " ");
     headers_[field_name] = header_field;
   }
 }

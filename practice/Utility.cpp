@@ -7,7 +7,9 @@ namespace ft {
 void str_ltrim(std::string& str, const std::string& charset) {
   str.erase(0, str.find_first_not_of(charset));
 }
-void str_rtrim(std::string& str);
+void str_rtrim(std::string& str, const std::string& charset) {
+  str.erase(str.find_last_not_of(charset) + 1);
+}
 
 std::string get_until_delimiter(std::string& str, std::string delimiter,
                                 size_t& pos) {
