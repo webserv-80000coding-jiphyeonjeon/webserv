@@ -1,9 +1,17 @@
 #include "ConfigLocation.hpp"
 
-ConfigLocation::ConfigLocation() {}
-ConfigLocation::ConfigLocation(const ConfigLocation& other) {}
+ConfigLocation::ConfigLocation() : limit_except_(), common_config_() {}
+
+ConfigLocation::ConfigLocation(const ConfigLocation& other)
+    : limit_except_(other.limit_except_), common_config_(other.common_config_) {}
+
 ConfigLocation::~ConfigLocation() {}
-ConfigLocation& ConfigLocation::operator=(const ConfigLocation& other) {}
+
+ConfigLocation& ConfigLocation::operator=(const ConfigLocation& other) {
+  limit_except_ = other.limit_except_;
+  common_config_ = other.common_config_;
+  return *this;
+}
 
 const ConfigLocation::LimitExceptType& ConfigLocation::getLimitExcept() const {
   return limit_except_;

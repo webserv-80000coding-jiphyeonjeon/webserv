@@ -9,17 +9,22 @@
 
 class Config {
  public:
-  typedef std::vector<std::string> ServerType;
-  // typedef std::vector<ConfigServer> ServerType;
+  typedef std::vector<ConfigServer>    ServersType;
+  typedef ConfigServer::ServerNameType ServerNameType;
+  typedef ConfigServer::ListenListType ListenListType;
+  typedef ConfigServer::LocationType   LocationType;
 
   Config();
   ~Config();
 
-  const ServerType& getServers() const;
-  void              setServers(const ServerType& servers);
+  const ServersType& getServers() const;
+  void               addServers(const ConfigServer& server);
+
+  void printConfig() const;
+  void printServer(const ConfigServer& server) const;
 
  private:
-  ServerType servers_;
+  ServersType servers_;
 };
 
 // std::ostream& operator<<(std::ostream& os, const Config& config);

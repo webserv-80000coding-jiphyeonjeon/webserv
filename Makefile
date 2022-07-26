@@ -13,10 +13,13 @@ RM			:= rm -rf
 INCD			:=	-I ./include
 
 SRCS_DIR	:=	src
-SRCS_NAME	:=	main.cpp		\
-							Scanner.cpp	\
-							Parser.cpp	\
-							Config.cpp
+SRCS_NAME	:=	main.cpp						\
+							Scanner.cpp					\
+							Parser.cpp					\
+							Config.cpp					\
+							ConfigCommon.cpp		\
+							ConfigLocation.cpp	\
+							ConfigServer.cpp
 SRCS			:= $(addprefix $(SRCS_DIR)/, $(SRCS_NAME))
 
 OBJS			:=	$(SRCS:.cpp=.o)

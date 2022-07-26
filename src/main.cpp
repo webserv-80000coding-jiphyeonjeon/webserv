@@ -16,7 +16,7 @@ int main(int argc, char* argv[]) {
   try {
     Parser parser(filename);
     parser.parse(config);
-    std::cout << config.getServers() << std::endl;
+    // config.printConfig();
   } catch (std::exception& e) {
     std::cout << e.what() << std::endl;
     return 1;

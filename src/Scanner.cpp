@@ -59,7 +59,7 @@ void Scanner::checkMetaCharacter(Scanner::TokensType& tokens, const std::string&
 std::ostream& operator<<(std::ostream& os, const Scanner::TokensType& tokens) {
   char delimiter[2] = {'\0', '\0'};
 
-  for (std::vector<const std::string>::iterator it = tokens.begin(); it != tokens.end(); ++it) {
+  for (Scanner::TokensType::const_iterator it = tokens.begin(); it != tokens.end(); ++it) {
     os << delimiter << *it;
     if (*it == "{" || *it == "}" || *it == ";") {
       delimiter[0] = '\n';

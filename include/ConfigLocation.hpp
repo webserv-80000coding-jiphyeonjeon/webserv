@@ -16,6 +16,7 @@ class ConfigLocation {
   typedef Common::ClientBodyBufferSizeType ClientBodyBufferSizeType;
   typedef Common::ErrorCodeType            ErrorCodeType;
   typedef Common::ErrorUriType             ErrorUriType;
+  typedef Common::ErrorPairType            ErrorPairType;
   typedef Common::ErrorPageType            ErrorPageType;
   typedef Common::IndexFileType            IndexFileType;
   typedef Common::IndexType                IndexType;
@@ -35,6 +36,12 @@ class ConfigLocation {
   const ErrorPageType&            getErrorPage() const;
   const IndexType&                getIndex() const;
   const RootType&                 getRoot() const;
+
+  void setAutoindexType(const AutoindexType& value);
+  void setClientBodyBufferSize(const ClientBodyBufferSizeType& value);
+  void addErrorPage(const ErrorPairType& value);
+  void addIndex(const IndexFileType& value);
+  void setRoot(const RootType& value);
 
  private:
   LimitExceptType limit_except_;
