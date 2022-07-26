@@ -10,16 +10,9 @@ class Scanner {
  public:
   typedef std::vector<std::string> TokensType;
 
-  Scanner(const std::string& filename);
-
-  const TokensType& getTokens() const;
-
- private:
-  TokensType tokens_;
-
-  void readFile(const std::string& filename);
-  void tokenize(const std::string& str);
-  void checkMetaCharacter(const std::string& str);
+  static void readFile(TokensType& tokens, const std::string& filename);
+  static void tokenize(TokensType& tokens, const std::string& str);
+  static void checkMetaCharacter(TokensType& tokens, const std::string& str);
 };
 
 std::ostream& operator<<(std::ostream& os, const Scanner::TokensType& tokens);

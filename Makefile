@@ -14,7 +14,9 @@ INCD			:=	-I ./include
 
 SRCS_DIR	:=	src
 SRCS_NAME	:=	main.cpp		\
-							Scanner.cpp
+							Scanner.cpp	\
+							Parser.cpp	\
+							Config.cpp
 SRCS			:= $(addprefix $(SRCS_DIR)/, $(SRCS_NAME))
 
 OBJS			:=	$(SRCS:.cpp=.o)

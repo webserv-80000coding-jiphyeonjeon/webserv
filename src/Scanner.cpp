@@ -7,11 +7,7 @@
 
 #include "color.hpp"
 
-Scanner::Scanner(const std::string& filename) : tokens_() { readFile(filename); }
-
-const Scanner::TokensType& Scanner::getTokens() const { return tokens_; }
-
-void Scanner::readFile(const std::string& filename) {
+void Scanner::readFile(Scanner::TokensType& tokens, const std::string& filename) {
   if (filename.rfind(".conf") != filename.size() - 5)
     throw std::invalid_argument(RED "Config: File name must end with '.conf'" END);
 
@@ -23,11 +19,12 @@ void Scanner::readFile(const std::string& filename) {
   buffer << file.rdbuf();
   file.close();
 
-  tokenize(buffer.str());
+  Scanner::tokenize(tokens, buffer.str());
 }
 
-void Scanner::tokenize(const std::string& str) {
+void Scanner::tokenize(Scanner::TokensType& tokens, const std::string& str) {
   std::size_t start = str.find_first_not_of(" \t\n");
+
   while (start != std::string::npos) {
     // remove comment
     if (str[start] == '#') {
@@ -44,19 +41,19 @@ void Scanner::tokenize(const std::string& str) {
       end = str.size();
 
     std::string token = str.substr(start, end - start);
-    checkMetaCharacter(token);
+    checkMetaCharacter(tokens, token);
     start = str.find_first_not_of(" \t\n", end);
   }
 }
 
 // TODO: meta character "{};" 앞뒤 공백이 없을 때도 구분할 수 있는 기능 추가 필요
 // 현재는 문자열 맨 뒤에 ;가 붙어있는 경우만 처리
-void Scanner::checkMetaCharacter(const std::string& str) {
+void Scanner::checkMetaCharacter(Scanner::TokensType& tokens, const std::string& str) {
   if (str.rfind(";") == str.size() - 1) {
-    tokens_.push_back(str.substr(0, str.size() - 1));
-    tokens_.push_back(";");
+    tokens.push_back(str.substr(0, str.size() - 1));
+    tokens.push_back(";");
   } else
-    tokens_.push_back(str);
+    tokens.push_back(str);
 }
 
 std::ostream& operator<<(std::ostream& os, const Scanner::TokensType& tokens) {

@@ -1,7 +1,7 @@
 #include <iostream>
 #include <string>
 
-#include "Scanner.hpp"
+#include "Parser.hpp"
 #include "color.hpp"
 
 int main(int argc, char* argv[]) {
@@ -10,11 +10,13 @@ int main(int argc, char* argv[]) {
     return 1;
   }
 
-  try {
-    std::string filename = (argc == 2) ? argv[1] : "./config/default.conf";
-    Scanner     scanner(filename);
+  Config      config;
+  std::string filename = (argc == 2) ? argv[1] : "./config/default.conf";
 
-    std::cout << scanner.getTokens() << std::endl;
+  try {
+    Parser parser(filename);
+    parser.parse(config);
+    std::cout << config.getServers() << std::endl;
   } catch (std::exception& e) {
     std::cout << e.what() << std::endl;
     return 1;
