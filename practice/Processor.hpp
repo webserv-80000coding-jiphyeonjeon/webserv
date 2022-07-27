@@ -26,11 +26,15 @@ class Processor {
   void printRequest();
   void Process();
 
-  const int&      get_status_code();
-  const Request&  get_request();
-  const Response& get_response();
+  const int&      getStatusCode();
+  const Request&  getRequest();
+  const Response& getResponse();
 
   void set_status_code(int status_code);
+
+  void methodGet();
+  void methodPost();
+  void methodDelete();
 };
 
 #endif

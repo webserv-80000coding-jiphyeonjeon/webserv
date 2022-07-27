@@ -37,6 +37,6 @@ void Processor::parseRequest(std::string request_message) {
 }
 void Processor::printRequest() { request_.print(); }
 
-const int&      Processor::get_status_code() { return status_code_; }
-const Request&  Processor::get_request() { return request_; }
-const Response& Processor::get_response() { return response_; }
+const int&      Processor::getStatusCode() { return status_code_; }
+const Request&  Processor::getRequest() { return request_; }
+const Response& Processor::getResponse() { return response_; }
