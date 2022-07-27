@@ -10,6 +10,13 @@ void str_ltrim(std::string& str, const std::string& charset) {
 void str_rtrim(std::string& str, const std::string& charset) {
   str.erase(str.find_last_not_of(charset) + 1);
 }
+std::string str_bidirectional_trim(std::string&       str,
+                                   const std::string& charset) {
+  size_t left_edge = str.find_first_not_of(charset);
+  size_t right_edge = str.find_last_not_of(charset);
+
+  return str.substr(left_edge, right_edge - left_edge + 1);
+}
 
 std::string get_until_delimiter(std::string& str, std::string delimiter,
                                 size_t& pos) {
