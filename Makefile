@@ -62,3 +62,10 @@ INDEX = 0
 		echo -en "$(FG_TEXT)◼︎︎︎︎︎︎◼︎︎︎︎︎◼︎︎︎︎︎︎◼︎︎︎︎︎" ; \
 	fi
 	@$(CXX) $(CXXFLAGS) $(INCD) -c $< -o $@ -g
+
+
+# ===== Custom =====
+.PHONY : test
+
+test : re
+	@./$(NAME) ./config/test.conf

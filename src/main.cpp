@@ -16,7 +16,7 @@ int main(int argc, char* argv[]) {
   try {
     Parser parser(filename);
     parser.parse(config);
-    // config.printConfig();
+    config.printConfig();
   } catch (std::exception& e) {
     std::cout << e.what() << std::endl;
     return 1;

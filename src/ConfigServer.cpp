@@ -49,3 +49,5 @@ void ConfigServer::setServerName(const ConfigServer::ServerNameType& server_name
 void ConfigServer::addServerName(const std::string& value) { server_name_.push_back(value); }
 
 void ConfigServer::setListen(const ConfigServer::ListenListType& listen) { listen_ = listen; }
+
+void ConfigServer::addListen(const ConfigServer::ListenType& value) { listen_.push_back(value); }

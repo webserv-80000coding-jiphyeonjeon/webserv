@@ -43,6 +43,7 @@ class ConfigServer {
   void setServerName(const ServerNameType& server_name);
   void addServerName(const std::string& value);
   void setListen(const ListenListType& listen);
+  void addListen(const ListenType& value);
 
   void setAutoindexType(const AutoindexType& value);
   void setClientBodyBufferSize(const ClientBodyBufferSizeType& value);
