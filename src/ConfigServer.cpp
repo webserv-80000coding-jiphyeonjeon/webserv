@@ -26,8 +26,8 @@ const ConfigServer::LocationType& ConfigServer::getLocation() const { return loc
 
 const ConfigServer::Common& ConfigServer::getCommon() const { return common_config_; }
 
-const ConfigServer::AutoindexType& ConfigServer::getAutoindexType() const {
-  return common_config_.getAutoindexType();
+const ConfigServer::AutoindexType& ConfigServer::getAutoindex() const {
+  return common_config_.getAutoindex();
 }
 
 const ConfigServer::ClientBodyBufferSizeType& ConfigServer::getClientBodyBufferSize() const {
@@ -51,3 +51,7 @@ void ConfigServer::addServerName(const std::string& value) { server_name_.push_b
 void ConfigServer::setListen(const ConfigServer::ListenListType& listen) { listen_ = listen; }
 
 void ConfigServer::addListen(const ConfigServer::ListenType& value) { listen_.push_back(value); }
+
+void ConfigServer::setCommon(const ConfigServer::Common& common) { common_config_ = common; }
+
+void ConfigServer::setLocation(const ConfigServer::LocationType& location) { location_ = location; }

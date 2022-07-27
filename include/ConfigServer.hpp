@@ -34,7 +34,7 @@ class ConfigServer {
   const LocationType&   getLocation() const;
   const Common&         getCommon() const;
 
-  const AutoindexType&            getAutoindexType() const;
+  const AutoindexType&            getAutoindex() const;
   const ClientBodyBufferSizeType& getClientBodyBufferSize() const;
   const ErrorPageType&            getErrorPage() const;
   const IndexType&                getIndex() const;
@@ -45,7 +45,10 @@ class ConfigServer {
   void setListen(const ListenListType& listen);
   void addListen(const ListenType& value);
 
-  void setAutoindexType(const AutoindexType& value);
+  void setLocation(const LocationType& location);
+  void setCommon(const Common& common);
+
+  void setAutoindex(const AutoindexType& value);
   void setClientBodyBufferSize(const ClientBodyBufferSizeType& value);
   void addErrorPage(const ErrorPairType& value);
   void addIndex(const IndexFileType& value);

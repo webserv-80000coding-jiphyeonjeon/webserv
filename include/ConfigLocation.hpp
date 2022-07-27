@@ -31,13 +31,13 @@ class ConfigLocation {
   const LimitExceptType& getLimitExcept() const;
   const Common&          getCommon() const;
 
-  const AutoindexType&            getAutoindexType() const;
+  const AutoindexType&            getAutoindex() const;
   const ClientBodyBufferSizeType& getClientBodyBufferSize() const;
   const ErrorPageType&            getErrorPage() const;
   const IndexType&                getIndex() const;
   const RootType&                 getRoot() const;
 
-  void setAutoindexType(const AutoindexType& value);
+  void setAutoindex(const AutoindexType& value);
   void setClientBodyBufferSize(const ClientBodyBufferSizeType& value);
   void addErrorPage(const ErrorPairType& value);
   void addIndex(const IndexFileType& value);

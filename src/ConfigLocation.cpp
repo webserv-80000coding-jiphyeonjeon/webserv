@@ -19,8 +19,8 @@ const ConfigLocation::LimitExceptType& ConfigLocation::getLimitExcept() const {
 
 const ConfigLocation::Common& ConfigLocation::getCommon() const { return common_config_; }
 
-const ConfigLocation::AutoindexType& ConfigLocation::getAutoindexType() const {
-  return common_config_.getAutoindexType();
+const ConfigLocation::AutoindexType& ConfigLocation::getAutoindex() const {
+  return common_config_.getAutoindex();
 }
 
 const ConfigLocation::ClientBodyBufferSizeType& ConfigLocation::getClientBodyBufferSize() const {

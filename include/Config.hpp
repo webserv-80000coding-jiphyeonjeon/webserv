@@ -13,6 +13,8 @@ class Config {
   typedef ConfigServer::ServerNameType ServerNameType;
   typedef ConfigServer::ListenListType ListenListType;
   typedef ConfigServer::LocationType   LocationType;
+  typedef ConfigServer::IndexType      IndexType;
+  typedef ConfigServer::ErrorPageType  ErrorPageType;
 
   Config();
   ~Config();
@@ -22,6 +24,7 @@ class Config {
 
   void printConfig() const;
   void printServer(const ConfigServer& server) const;
+  void printCommon(const ConfigCommon& common, const std::string& indent) const;
 
  private:
   ServersType servers_;

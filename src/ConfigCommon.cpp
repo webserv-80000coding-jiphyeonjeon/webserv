@@ -21,7 +21,7 @@ ConfigCommon& ConfigCommon::operator=(const ConfigCommon& other) {
   return *this;
 }
 
-const ConfigCommon::AutoindexType& ConfigCommon::getAutoindexType() const { return autoindex_; }
+const ConfigCommon::AutoindexType& ConfigCommon::getAutoindex() const { return autoindex_; }
 
 const ConfigCommon::ClientBodyBufferSizeType& ConfigCommon::getClientBodyBufferSize() const {
   return client_body_buffer_size_;
@@ -33,9 +33,7 @@ const ConfigCommon::IndexType& ConfigCommon::getIndex() const { return index_; }
 
 const ConfigCommon::RootType& ConfigCommon::getRoot() const { return root_; }
 
-void ConfigCommon::setAutoindexType(const ConfigCommon::AutoindexType& value) {
-  autoindex_ = value;
-}
+void ConfigCommon::setAutoindex(const ConfigCommon::AutoindexType& value) { autoindex_ = value; }
 
 void ConfigCommon::setClientBodyBufferSize(const ConfigCommon::ClientBodyBufferSizeType& value) {
   client_body_buffer_size_ = value;
