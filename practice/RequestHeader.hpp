@@ -49,7 +49,7 @@ class RequestHeader {
   HeaderParseFuncMap createHeaderParseFuncMap();
 
   HeaderMap headers_;
-  int       host_port_;
+  int       host_port_;  // 없으면 400
   int       content_length_;
   Flag      content_type_;
   Flag      transfer_coding_;

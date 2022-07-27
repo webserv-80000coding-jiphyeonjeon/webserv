@@ -67,15 +67,16 @@ void Request::parse_start_line(std::string start_line) {
   size_t      pos = 0;
   std::string method;
 
+  // parse method and switch to flag.
   method = ft::get_until_delimiter(start_line, " ", pos);
   if (method == "GET")
-    method_ = kGet;
+    method_ = kGet;  // 1
   else if (method == "POST")
-    method_ = kPost;
+    method_ = kPost;  // 2
   else if (method == "DELETE")
-    method_ = kDelete;
+    method_ = kDelete;  // 3
   else
-    method_ = kNone;
+    method_ = kNone;  // 0
 
   path_ = ft::get_until_delimiter(start_line, " ", pos);
   version_ = start_line.erase(0, pos);
@@ -97,6 +98,7 @@ void Request::parse_header(std::string& request_message, size_t& pos) {
 }
 
 void Request::parse_body(std::string& request_message, size_t& pos) {
+  // Get a body trimmed CL/RF.
   size_t new_pos = request_message.find_first_not_of("\r\n", pos);
   body_ = request_message.erase(0, new_pos);
 }
