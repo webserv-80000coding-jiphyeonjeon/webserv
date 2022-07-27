@@ -32,6 +32,11 @@ const std::map<int, std::string> Processor::kStatusCodes = createStatusCodes();
 Processor::Processor() : status_code_(200), request_(), response_() {}
 Processor::~Processor() {}
 
-int&      Processor::get_status_code() { return status_code_; }
-Request&  Processor::get_request() { return request_; }
-Response& Processor::get_response() { return response_; }
+void Processor::parseRequest(std::string request_message) {
+  request_.parse(request_message);
+}
+void Processor::printRequest() { request_.print(); }
+
+const int&      Processor::get_status_code() { return status_code_; }
+const Request&  Processor::get_request() { return request_; }
+const Response& Processor::get_response() { return response_; }

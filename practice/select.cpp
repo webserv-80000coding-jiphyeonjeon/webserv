@@ -57,8 +57,8 @@ void run(std::map<int, bool>& server_socket_map) {
             // while (buf[i] != '\0')
             //   write(1, buf + i++, 1);
             // std::string cp = buf;
-            processor.get_request().parse(buf);
-            processor.get_request().print();
+            processor.parseRequest(buf);
+            processor.printRequest();
             // write(1, buf, str_len);
             write(i, "HTTP/1.1 200 OK\r\nContent-Length:4\r\n\r\nabcd",
                   strlen("HTTP/1.1 200 OK\r\nContent-Length:4\r\n\r\nabcd"));

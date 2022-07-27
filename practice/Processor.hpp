@@ -22,11 +22,13 @@ class Processor {
   Processor();
   ~Processor();
 
+  void parseRequest(std::string request_message);
+  void printRequest();
   void Process();
 
-  int&      get_status_code();
-  Request&  get_request();
-  Response& get_response();
+  const int&      get_status_code();
+  const Request&  get_request();
+  const Response& get_response();
 
   void set_status_code(int status_code);
 };
