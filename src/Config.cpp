@@ -19,7 +19,7 @@ void Config::printConfig() const {
   int i = 0;
   for (ServersType::const_iterator server = servers_.begin(); server != servers_.end();
        ++server, ++i) {
-    std::cout << BWHT "📮 server [" << i << "]" END << std::endl;
+    std::cout << BGRN "📮 server [" << i << "]" END << std::endl;
     printServer(*server);
     std::cout << std::endl;
   }
@@ -42,26 +42,46 @@ void Config::printServer(const ConfigServer& server) const {
   }
   std::cout << std::endl;
 
-  printCommon(server.getCommon(), "  ");
+  printCommon(server.getCommon(), "  ", GRN);
   std::cout << std::endl;
+
+  const LocationType locations = server.getLocation();
+  for (LocationType::const_iterator loc = locations.begin(); loc != locations.end(); ++loc) {
+    std::cout << BYEL "  📂 location " << loc->first << END << std::endl;
+    printLocation(loc->second, "    ");
+    std::cout << std::endl;
+  }
 }
 
-void Config::printCommon(const ConfigCommon& common, const std::string& indent) const {
-  std::cout << indent << YEL "[autoindex] " END << (common.getAutoindex() ? "on" : "off") << "\n"
-            << std::endl;
-  std::cout << indent << YEL "[client_body_buffer_size] " END << common.getClientBodyBufferSize()
+void Config::printLocation(const ConfigLocation& location, const std::string& indent) const {
+  std::cout << indent << YEL "  [limit_except]" END << std::endl;
+  const LimitExceptType limit_except = location.getLimitExcept();
+  for (LimitExceptType::const_iterator it = limit_except.begin(); it != limit_except.end(); ++it) {
+    std::cout << indent << "    " << *it << "\n";
+  }
+  std::cout << std::endl;
+
+  printCommon(location.getCommon(), indent + "  ", YEL);
+}
+
+void Config::printCommon(const ConfigCommon& common, const std::string& indent,
+                         const std::string& color) const {
+  std::cout << indent << color << "[autoindex] " END << (common.getAutoindex() ? "on" : "off")
             << "\n"
             << std::endl;
-  std::cout << indent << YEL "[root] " END << common.getRoot() << "\n" << std::endl;
+  std::cout << indent << color << "[client_body_buffer_size] " END
+            << common.getClientBodyBufferSize() << "\n"
+            << std::endl;
+  std::cout << indent << color << "[root] " END << common.getRoot() << "\n" << std::endl;
 
-  std::cout << indent << YEL "[index]" END << std::endl;
+  std::cout << indent << color << "[index]" END << std::endl;
   const IndexType index = common.getIndex();
   for (IndexType::const_iterator it = index.begin(); it != index.end(); ++it) {
     std::cout << indent << "  " << *it << "\n";
   }
   std::cout << std::endl;
 
-  std::cout << indent << YEL "[error_page]" END << std::endl;
+  std::cout << indent << color << "[error_page]" END << std::endl;
   const ErrorPageType error_page = common.getErrorPage();
   for (ErrorPageType::const_iterator it = error_page.begin(); it != error_page.end(); ++it) {
     std::cout << indent << "  " << it->first << " -> " << it->second << "\n";

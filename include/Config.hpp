@@ -9,12 +9,13 @@
 
 class Config {
  public:
-  typedef std::vector<ConfigServer>    ServersType;
-  typedef ConfigServer::ServerNameType ServerNameType;
-  typedef ConfigServer::ListenListType ListenListType;
-  typedef ConfigServer::LocationType   LocationType;
-  typedef ConfigServer::IndexType      IndexType;
-  typedef ConfigServer::ErrorPageType  ErrorPageType;
+  typedef std::vector<ConfigServer>       ServersType;
+  typedef ConfigServer::ServerNameType    ServerNameType;
+  typedef ConfigServer::ListenListType    ListenListType;
+  typedef ConfigServer::LocationType      LocationType;
+  typedef ConfigServer::IndexType         IndexType;
+  typedef ConfigServer::ErrorPageType     ErrorPageType;
+  typedef ConfigLocation::LimitExceptType LimitExceptType;
 
   Config();
   ~Config();
@@ -24,7 +25,9 @@ class Config {
 
   void printConfig() const;
   void printServer(const ConfigServer& server) const;
-  void printCommon(const ConfigCommon& common, const std::string& indent) const;
+  void printLocation(const ConfigLocation& location, const std::string& indent) const;
+  void printCommon(const ConfigCommon& common, const std::string& indent,
+                   const std::string& color) const;
 
  private:
   ServersType servers_;

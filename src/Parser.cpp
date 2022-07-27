@@ -9,7 +9,7 @@
 Parser::Parser(const std::string& filename) : tokens_() {
   Scanner::readFile(tokens_, filename);
   initServerParsingMap();
-  // initLocationParsingMap();
+  initLocationParsingMap();
   initCommonParsingMap();
 }
 
@@ -46,7 +46,9 @@ void Parser::initServerParsingMap() {
   server_parsing_map_["listen"] = &Parser::parseListen;
 }
 
-// void Parser::initLocationParsingMap() { location_parsing_map_["limit_except"] = true; }
+void Parser::initLocationParsingMap() {
+  location_parsing_map_["limit_except"] = &Parser::parseLimitExcept;
+}
 
 void Parser::initCommonParsingMap() {
   common_parsing_map_["autoindex"] = &Parser::parseAutoindex;
@@ -57,8 +59,7 @@ void Parser::initCommonParsingMap() {
 }
 
 Parser::ResultType Parser::parseServer(ConfigServer& server, size_t& idx) {
-  ConfigCommon   common;
-  ConfigLocation location;
+  ConfigCommon common;
 
   ServerParserFuncMapIterator it_server;
   CommonParserFuncMapIterator it_common;
@@ -66,16 +67,15 @@ Parser::ResultType Parser::parseServer(ConfigServer& server, size_t& idx) {
   std::string                 directive;
   TokensType                  args;
 
-  std::cout << "\n" BLU "--- parseServer ---" END << std::endl;
+  std::cout << "\n" GRN "--- parseServer ---" END << std::endl;
   for (; idx < tokens_.size() && tokens_[idx] != "}"; ++idx) {
-    std::cout << "token: " << tokens_[idx] << std::endl;
+    // std::cout << "token: " << tokens_[idx] << std::endl;
 
-    // TODO 내부 directive들을 처리하는 부분 처리 -> it 체크용 함수 구현 필요
     if (((it_server = server_parsing_map_.find(tokens_[idx])) != server_parsing_map_.end()) ||
         ((it_common = common_parsing_map_.find(tokens_[idx])) != common_parsing_map_.end())) {
       // set directive
       if (directive != "") {
-        std::cout << YEL "[" << directive << "] " END << args << std::endl;
+        std::cout << GRN "[" << directive << "] " END << args << std::endl;
         if (args.back() != ";")
           throw std::invalid_argument(RED "Config: Directive must end with ';'" END);
         if (type == kServer)
@@ -86,8 +86,34 @@ Parser::ResultType Parser::parseServer(ConfigServer& server, size_t& idx) {
       }
       type = (it_server != server_parsing_map_.end()) ? kServer : kCommon;
       directive = tokens_[idx];
+
     } else if (tokens_[idx] == "location") {
+      if (directive != "") {
+        std::cout << GRN "[" << directive << "] " END << args << std::endl;
+        if (args.back() != ";")
+          throw std::invalid_argument(RED "Config: Directive must end with ';'" END);
+        if (type == kServer)
+          (this->*server_parsing_map_[directive])(server, args);
+        else
+          (this->*common_parsing_map_[directive])(common, args);
+        args.clear();
+        directive = "";
+      }
       // TODO location parsing
+      // location uri('/'로 시작) {}
+      if (tokens_[++idx][0] != '/')
+        throw std::invalid_argument(RED "Config: Location uri must start with '/'" END);
+      ConfigLocation location;
+      std::string    location_uri = tokens_[idx];
+
+      if (tokens_[++idx] != "{")
+        throw std::invalid_argument(RED "Config: Location block must start with '{'" END);
+
+      if (parseLocation(location, ++idx) == kError)
+        throw std::invalid_argument(RED "Config: Location block parsing error" END);
+
+      server.addLocation(std::make_pair(location_uri, location));
+
     } else {
       // set args
       args.push_back(tokens_[idx]);
@@ -95,7 +121,7 @@ Parser::ResultType Parser::parseServer(ConfigServer& server, size_t& idx) {
   }
 
   if (directive != "") {
-    std::cout << YEL "[" << directive << "] " END << args << std::endl;
+    std::cout << GRN "[" << directive << "] " END << args << std::endl;
     if (args.back() != ";")
       throw std::invalid_argument(RED "Config: Directive must end with ';'" END);
     if (type == kServer)
@@ -111,9 +137,62 @@ Parser::ResultType Parser::parseServer(ConfigServer& server, size_t& idx) {
     return kError;
   }
 
-  std::cout << BLU "------------------ " END "\n" << std::endl;
+  std::cout << GRN "------------------ " END "\n" << std::endl;
   // parsing이 끝났으니 ConfigServer내부에 연결해주기
   server.setCommon(common);
+  return kOk;
+}
+
+Parser::ResultType Parser::parseLocation(ConfigLocation& location, size_t& idx) {
+  ConfigCommon common;
+
+  LocationParserFuncMapIterator it_location;
+  CommonParserFuncMapIterator   it_common;
+  FunctionType                  type;
+  std::string                   directive;
+  TokensType                    args;
+
+  std::cout << "\n  " YEL "--- parseLocation ---" END << std::endl;
+  for (; idx < tokens_.size() && tokens_[idx] != "}"; ++idx) {
+    // std::cout << "  tokens: " << tokens_[idx] << std::endl;
+
+    if (((it_location = location_parsing_map_.find(tokens_[idx])) != location_parsing_map_.end()) ||
+        ((it_common = common_parsing_map_.find(tokens_[idx])) != common_parsing_map_.end())) {
+      if (directive != "") {
+        std::cout << YEL "  [" << directive << "] " END << args << std::endl;
+        if (args.back() != ";")
+          throw std::invalid_argument(RED "Config: Directive must end with ';'" END);
+        if (type == kLocation)
+          (this->*location_parsing_map_[directive])(location, args);
+        else
+          (this->*common_parsing_map_[directive])(common, args);
+        args.clear();
+      }
+      type = (it_location != location_parsing_map_.end()) ? kLocation : kCommon;
+      directive = tokens_[idx];
+
+    } else {
+      args.push_back(tokens_[idx]);
+    }
+  }
+
+  if (directive != "") {
+    std::cout << YEL "  [" << directive << "] " END << args << std::endl;
+    if (args.back() != ";")
+      throw std::invalid_argument(RED "Config: Directive must end with ';'" END);
+    if (type == kLocation)
+      (this->*location_parsing_map_[directive])(location, args);
+    else
+      (this->*common_parsing_map_[directive])(common, args);
+    args.clear();
+  }
+
+  if (tokens_[idx] != "}") {
+    return kError;
+  }
+
+  std::cout << YEL "  --------------------- " END "\n" << std::endl;
+  location.setCommon(common);
   return kOk;
 }
 
@@ -177,6 +256,14 @@ void Parser::parseListen(ConfigServer& server, const Parser::TokensType& args) {
   if (addr == INADDR_NONE)
     throw std::invalid_argument(RED "Config: listen: Invalid address (host)." END);
   server.addListen(std::make_pair(addr, port));
+}
+
+void Parser::parseLimitExcept(ConfigLocation& location, const Parser::TokensType& args) {
+  if (args.size() < 2)
+    throw std::invalid_argument(RED "Config: limit_except: Invalid arguments." END
+                                    "\nUsage: limit_except method ...");
+  for (size_t i = 0; i < args.size() - 1; ++i)
+    location.addLimitExcept(args[i]);
 }
 
 void Parser::parseAutoindex(ConfigCommon& common, const Parser::TokensType& args) {

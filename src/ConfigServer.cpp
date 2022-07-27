@@ -52,6 +52,10 @@ void ConfigServer::setListen(const ConfigServer::ListenListType& listen) { liste
 
 void ConfigServer::addListen(const ConfigServer::ListenType& value) { listen_.push_back(value); }
 
-void ConfigServer::setCommon(const ConfigServer::Common& common) { common_config_ = common; }
-
 void ConfigServer::setLocation(const ConfigServer::LocationType& location) { location_ = location; }
+
+void ConfigServer::addLocation(const ConfigServer::LocationPairType& value) {
+  location_.insert(value);
+}
+
+void ConfigServer::setCommon(const ConfigServer::Common& common) { common_config_ = common; }

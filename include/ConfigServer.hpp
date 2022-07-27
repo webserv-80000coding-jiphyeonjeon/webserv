@@ -7,22 +7,23 @@
 
 class ConfigServer {
  public:
-  typedef std::vector<std::string>              ServerNameType;
-  typedef std::uint32_t                         AddressType;
-  typedef std::uint16_t                         PortType;
-  typedef std::pair<AddressType, PortType>      ListenType;
-  typedef std::vector<ListenType>               ListenListType;
-  typedef std::map<std::string, ConfigLocation> LocationType;
-  typedef ConfigCommon                          Common;
-  typedef Common::AutoindexType                 AutoindexType;
-  typedef Common::ClientBodyBufferSizeType      ClientBodyBufferSizeType;
-  typedef Common::ErrorCodeType                 ErrorCodeType;
-  typedef Common::ErrorUriType                  ErrorUriType;
-  typedef Common::ErrorPairType                 ErrorPairType;
-  typedef Common::ErrorPageType                 ErrorPageType;
-  typedef Common::IndexFileType                 IndexFileType;
-  typedef Common::IndexType                     IndexType;
-  typedef Common::RootType                      RootType;
+  typedef std::vector<std::string>                                              ServerNameType;
+  typedef std::uint32_t                                                         AddressType;
+  typedef std::uint16_t                                                         PortType;
+  typedef std::pair<AddressType, PortType>                                      ListenType;
+  typedef std::vector<ListenType>                                               ListenListType;
+  typedef std::pair<std::string, ConfigLocation>                                LocationPairType;
+  typedef std::map<LocationPairType::first_type, LocationPairType::second_type> LocationType;
+  typedef ConfigCommon                                                          Common;
+  typedef Common::AutoindexType                                                 AutoindexType;
+  typedef Common::ClientBodyBufferSizeType ClientBodyBufferSizeType;
+  typedef Common::ErrorCodeType            ErrorCodeType;
+  typedef Common::ErrorUriType             ErrorUriType;
+  typedef Common::ErrorPairType            ErrorPairType;
+  typedef Common::ErrorPageType            ErrorPageType;
+  typedef Common::IndexFileType            IndexFileType;
+  typedef Common::IndexType                IndexType;
+  typedef Common::RootType                 RootType;
 
   ConfigServer();
   ConfigServer(const ConfigServer& other);
@@ -46,6 +47,7 @@ class ConfigServer {
   void addListen(const ListenType& value);
 
   void setLocation(const LocationType& location);
+  void addLocation(const LocationPairType& value);
   void setCommon(const Common& common);
 
   void setAutoindex(const AutoindexType& value);

@@ -36,3 +36,9 @@ const ConfigLocation::IndexType& ConfigLocation::getIndex() const {
 }
 
 const ConfigLocation::RootType& ConfigLocation::getRoot() const { return common_config_.getRoot(); }
+
+void ConfigLocation::addLimitExcept(const ConfigLocation::MethodType& value) {
+  limit_except_.insert(value);
+}
+
+void ConfigLocation::setCommon(const ConfigLocation::Common& common) { common_config_ = common; }

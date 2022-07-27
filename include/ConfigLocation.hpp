@@ -37,6 +37,9 @@ class ConfigLocation {
   const IndexType&                getIndex() const;
   const RootType&                 getRoot() const;
 
+  void addLimitExcept(const MethodType& value);
+  void setCommon(const Common& common);
+
   void setAutoindex(const AutoindexType& value);
   void setClientBodyBufferSize(const ClientBodyBufferSizeType& value);
   void addErrorPage(const ErrorPairType& value);
