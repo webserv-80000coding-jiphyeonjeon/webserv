@@ -4,22 +4,21 @@
 
 namespace ft {
 
-void str_ltrim(std::string& str, const std::string& charset) {
+void strLeftTrim(std::string& str, const std::string& charset) {
   str.erase(0, str.find_first_not_of(charset));
 }
-void str_rtrim(std::string& str, const std::string& charset) {
+void strRightTrim(std::string& str, const std::string& charset) {
   str.erase(str.find_last_not_of(charset) + 1);
 }
-std::string str_bidirectional_trim(std::string&       str,
-                                   const std::string& charset) {
+std::string strBidirectionalTrim(std::string& str, const std::string& charset) {
   size_t left_edge = str.find_first_not_of(charset);
   size_t right_edge = str.find_last_not_of(charset);
 
   return str.substr(left_edge, right_edge - left_edge + 1);
 }
 
-std::string get_until_delimiter(std::string& str, std::string delimiter,
-                                size_t& pos) {
+std::string getUntilDelimiter(std::string& str, std::string delimiter,
+                              size_t& pos) {
   std::string line;
   size_t      new_pos;
 
@@ -32,7 +31,7 @@ std::string get_until_delimiter(std::string& str, std::string delimiter,
   return line;
 }
 
-std::string split_until_delimiter(std::string& str, std::string delimiter) {
+std::string splitUntilDelimiter(std::string& str, std::string delimiter) {
   size_t      pos;
   std::string line;
 
@@ -47,8 +46,7 @@ std::string split_until_delimiter(std::string& str, std::string delimiter) {
   return line;
 }
 
-std::vector<std::string> split_by_string(std::string str,
-                                         std::string delimiter) {
+std::vector<std::string> splitByString(std::string str, std::string delimiter) {
   std::vector<std::string> str_vector;
   size_t                   pos;
 

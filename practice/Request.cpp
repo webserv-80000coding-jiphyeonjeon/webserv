@@ -5,16 +5,17 @@
 #include <string>
 #include <vector>
 
+#include "Utility.hpp"
+
 namespace ft {
 std::vector<std::string> split_by_string(std::string str,
                                          std::string delimiter);
-std::string split_until_delimiter(std::string& str, std::string delimiter);
-std::string get_until_delimiter(std::string& str, std::string delimiter,
-                                size_t& pos);
+std::string splitUntilDelimiter(std::string& str, std::string delimiter);
+std::string getUntilDelimiter(std::string& str, std::string delimiter,
+                              size_t& pos);
 void        str_ltrim(std::string& str, const std::string& charset);
 void        str_rtrim(std::string& str, const std::string& charset);
-std::string str_bidirectional_trim(std::string&       str,
-                                   const std::string& charset);
+std::string strBidirectionalTrim(std::string& str, const std::string& charset);
 }  // namespace ft
 
 Request::Request() {}
@@ -58,7 +59,7 @@ void Request::concatenate_request(std::string request_message) {
 void Request::parse(std::string request_message) {
   size_t pos = 0;
 
-  parse_start_line(ft::get_until_delimiter(request_message, "\r\n", pos));
+  parse_start_line(ft::getUntilDelimiter(request_message, "\r\n", pos));
   parse_header(request_message, pos);
   parse_body(request_message, pos);
 }
@@ -68,7 +69,7 @@ void Request::parse_start_line(std::string start_line) {
   std::string method;
 
   // parse method and switch to flag.
-  method = ft::get_until_delimiter(start_line, " ", pos);
+  method = ft::getUntilDelimiter(start_line, " ", pos);
   if (method == "GET")
     method_ = kGet;  // 1
   else if (method == "POST")
@@ -78,7 +79,7 @@ void Request::parse_start_line(std::string start_line) {
   else
     method_ = kNone;  // 0
 
-  path_ = ft::get_until_delimiter(start_line, " ", pos);
+  path_ = ft::getUntilDelimiter(start_line, " ", pos);
   version_ = start_line.erase(0, pos);
 }
 
@@ -87,12 +88,12 @@ void Request::parse_header(std::string& request_message, size_t& pos) {
   std::string field_name;
 
   // Iterate until the end of the header.
-  while ((header_field =
-              ft::get_until_delimiter(request_message, "\r\n", pos)) != "") {
+  while ((header_field = ft::getUntilDelimiter(request_message, "\r\n", pos)) !=
+         "") {
     // split field name and value.
-    field_name = ft::split_until_delimiter(header_field, ":");
+    field_name = ft::splitUntilDelimiter(header_field, ":");
     // trim spaces from value.
-    header_field = ft::str_bidirectional_trim(header_field, " ");
+    header_field = ft::strBidirectionalTrim(header_field, " ");
     setHeader(field_name, header_field);
   }
 }
