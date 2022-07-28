@@ -1,7 +1,11 @@
 #include "ConfigCommon.hpp"
 
 ConfigCommon::ConfigCommon()
-    : autoindex_(false), client_body_buffer_size_(0), error_page_(), index_(), root_("") {}
+    : autoindex_(kDefaultAutoindex),
+      client_body_buffer_size_(kDefaultClientBodyBufferSize),
+      error_page_(),
+      index_(),
+      root_("") {}
 
 ConfigCommon::ConfigCommon(const ConfigCommon& other)
     : autoindex_(other.autoindex_),
@@ -42,6 +46,8 @@ void ConfigCommon::setClientBodyBufferSize(const ConfigCommon::ClientBodyBufferS
 void ConfigCommon::addErrorPage(const ConfigCommon::ErrorPairType& value) {
   error_page_.insert(value);
 }
+
+void ConfigCommon::setIndex(const ConfigCommon::IndexType& index) { index_ = index; }
 
 void ConfigCommon::addIndex(const ConfigCommon::IndexFileType& value) { index_.push_back(value); }
 

@@ -43,6 +43,7 @@ class ConfigLocation {
   void setAutoindex(const AutoindexType& value);
   void setClientBodyBufferSize(const ClientBodyBufferSizeType& value);
   void addErrorPage(const ErrorPairType& value);
+  void setIndex(const IndexType& index);
   void addIndex(const IndexFileType& value);
   void setRoot(const RootType& value);
 

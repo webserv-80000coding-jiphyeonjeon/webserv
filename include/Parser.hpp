@@ -3,6 +3,8 @@
 #ifndef PARSER_HPP_
 #define PARSER_HPP_
 
+#include <arpa/inet.h>
+
 #include "Config.hpp"
 #include "Scanner.hpp"
 
@@ -12,6 +14,9 @@ enum FunctionType { kServer, kLocation, kCommon };
 class Parser {
  public:
   typedef Scanner::TokensType TokensType;
+
+  typedef ConfigServer::AddressType AddressType;
+  typedef ConfigServer::PortType    PortType;
 
   typedef void (Parser::*ServerParserFuncType)(ConfigServer&, const TokensType&);
   typedef std::map<std::string, ServerParserFuncType> ServerParserFuncMapType;
@@ -33,6 +38,10 @@ class Parser {
   void parse(Config& config);
 
  private:
+  static const AddressType kDefaultAddress = INADDR_ANY;
+  static const PortType    kDefaultPort = 4242;
+  static const AddressType kLocalhost = 2130706433;
+
   ServerParserFuncMapType   server_parsing_map_;
   LocationParserFuncMapType location_parsing_map_;
   CommonParserFuncMapType   common_parsing_map_;
@@ -44,6 +53,8 @@ class Parser {
 
   ResultType parseServer(ConfigServer& server, size_t& idx);
   ResultType parseLocation(ConfigLocation& location, size_t& idx);
+  void       fillDefaultConfigServer(ConfigServer& server);
+  void       fillDefaultConfigLocation(ConfigServer& server, ConfigServer::LocationType& locations);
 
   void parseServerName(ConfigServer& server, const TokensType& args);
   void parseListen(ConfigServer& server, const TokensType& args);

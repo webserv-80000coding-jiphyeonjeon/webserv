@@ -35,10 +35,14 @@ class ConfigCommon {
   void setAutoindex(const AutoindexType& value);
   void setClientBodyBufferSize(const ClientBodyBufferSizeType& value);
   void addErrorPage(const ErrorPairType& value);
+  void setIndex(const IndexType& index);
   void addIndex(const IndexFileType& value);
   void setRoot(const RootType& value);
 
  private:
+  static const AutoindexType            kDefaultAutoindex = false;
+  static const ClientBodyBufferSizeType kDefaultClientBodyBufferSize = 8000;
+
   AutoindexType            autoindex_;
   ClientBodyBufferSizeType client_body_buffer_size_;
   ErrorPageType            error_page_;

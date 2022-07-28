@@ -42,3 +42,28 @@ void ConfigLocation::addLimitExcept(const ConfigLocation::MethodType& value) {
 }
 
 void ConfigLocation::setCommon(const ConfigLocation::Common& common) { common_config_ = common; }
+
+void ConfigLocation::setAutoindex(const ConfigLocation::AutoindexType& value) {
+  common_config_.setAutoindex(value);
+}
+
+void ConfigLocation::setClientBodyBufferSize(
+    const ConfigLocation::ClientBodyBufferSizeType& value) {
+  common_config_.setClientBodyBufferSize(value);
+}
+
+void ConfigLocation::addErrorPage(const ConfigLocation::ErrorPairType& value) {
+  common_config_.addErrorPage(value);
+}
+
+void ConfigLocation::setIndex(const ConfigLocation::IndexType& index) {
+  common_config_.setIndex(index);
+}
+
+void ConfigLocation::addIndex(const ConfigLocation::IndexFileType& value) {
+  common_config_.addIndex(value);
+}
+
+void ConfigLocation::setRoot(const ConfigLocation::RootType& value) {
+  common_config_.setRoot(value);
+}

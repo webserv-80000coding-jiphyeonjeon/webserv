@@ -1,7 +1,5 @@
 #include "Parser.hpp"
 
-#include <arpa/inet.h>
-
 #include <iostream>
 
 #include "color.hpp"
@@ -59,7 +57,8 @@ void Parser::initCommonParsingMap() {
 }
 
 Parser::ResultType Parser::parseServer(ConfigServer& server, size_t& idx) {
-  ConfigCommon common;
+  ConfigServer::LocationType locations;
+  ConfigCommon               common;
 
   ServerParserFuncMapIterator it_server;
   CommonParserFuncMapIterator it_common;
@@ -112,7 +111,7 @@ Parser::ResultType Parser::parseServer(ConfigServer& server, size_t& idx) {
       if (parseLocation(location, ++idx) == kError)
         throw std::invalid_argument(RED "Config: Location block parsing error" END);
 
-      server.addLocation(std::make_pair(location_uri, location));
+      locations.insert(std::make_pair(location_uri, location));
 
     } else {
       // set args
@@ -140,6 +139,11 @@ Parser::ResultType Parser::parseServer(ConfigServer& server, size_t& idx) {
   std::cout << GRN "------------------ " END "\n" << std::endl;
   // parsing이 끝났으니 ConfigServer내부에 연결해주기
   server.setCommon(common);
+
+  // 비어있는 directive의 경우 default 값 채워주기
+  fillDefaultConfigServer(server);
+  fillDefaultConfigLocation(server, locations);
+  server.setLocation(locations);
   return kOk;
 }
 
@@ -196,6 +200,36 @@ Parser::ResultType Parser::parseLocation(ConfigLocation& location, size_t& idx) 
   return kOk;
 }
 
+void Parser::fillDefaultConfigServer(ConfigServer& server) {
+  if (server.getListen().empty())
+    server.addListen(std::make_pair(INADDR_ANY, 4242));
+  if (server.getIndex().empty())
+    server.addIndex("index.html");
+  if (server.getRoot() == "")
+    server.setRoot("www");
+}
+
+void Parser::fillDefaultConfigLocation(ConfigServer&               server,
+                                       ConfigServer::LocationType& locations) {
+  if (locations.empty())
+    locations.insert(std::make_pair("/", ConfigLocation()));
+
+  for (ConfigServer::LocationType::iterator it = locations.begin(); it != locations.end(); ++it) {
+    if (it->second.getLimitExcept().empty()) {
+      it->second.addLimitExcept("GET");
+      it->second.addLimitExcept("HEAD");
+      it->second.addLimitExcept("POST");
+      it->second.addLimitExcept("PUT");
+      it->second.addLimitExcept("DELETE");
+    }
+
+    if (it->second.getIndex().empty())
+      it->second.setIndex(server.getIndex());
+    if (it->second.getRoot() == "")
+      it->second.setRoot(server.getRoot());
+  }
+}
+
 void Parser::parseServerName(ConfigServer& server, const Parser::TokensType& args) {
   // 만약 args.size() == 1이면 ;만 있다는 뜻이므로 오류
   if (args.size() == 1)
@@ -213,10 +247,6 @@ bool isDigits(const std::string& str) {
 }
 
 void Parser::parseListen(ConfigServer& server, const Parser::TokensType& args) {
-  const ConfigServer::AddressType kLocalhost = 2130706433;
-  const ConfigServer::AddressType kDefaultAddress = 0;
-  const ConfigServer::PortType    kDefaultPort = 4242;
-
   ConfigServer::AddressType addr = kDefaultAddress;
   ConfigServer::PortType    port = kDefaultPort;
   size_t                    delimiter;
