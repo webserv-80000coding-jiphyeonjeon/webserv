@@ -50,7 +50,9 @@ void Scanner::tokenize(Scanner::TokensType& tokens, const std::string& str) {
 // 현재는 문자열 맨 뒤에 ;가 붙어있는 경우만 처리
 void Scanner::checkMetaCharacter(Scanner::TokensType& tokens, const std::string& str) {
   if (str.rfind(";") == str.size() - 1) {
-    tokens.push_back(str.substr(0, str.size() - 1));
+    std::string token = str.substr(0, str.size() - 1);
+    if (token != "")
+      tokens.push_back(token);
     tokens.push_back(";");
   } else
     tokens.push_back(str);
