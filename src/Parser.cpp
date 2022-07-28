@@ -136,7 +136,7 @@ Parser::ResultType Parser::parseServer(ConfigServer& server, size_t& idx) {
     return kError;
   }
 
-  std::cout << GRN "------------------ " END "\n" << std::endl;
+  std::cout << GRN "-------------------" END "\n" << std::endl;
   // parsing이 끝났으니 ConfigServer내부에 연결해주기
   server.setCommon(common);
 
@@ -236,7 +236,6 @@ void Parser::parseServerName(ConfigServer& server, const Parser::TokensType& arg
     throw std::invalid_argument(RED "Config: server_name: Invalid arguments" END
                                     "\nUsage: server_name name ...");
 
-  // server name은 여러개가 올 수 있음
   for (size_t i = 0; i < args.size() - 1; ++i)
     server.addServerName(args[i]);
 }
@@ -291,9 +290,14 @@ void Parser::parseListen(ConfigServer& server, const Parser::TokensType& args) {
 void Parser::parseLimitExcept(ConfigLocation& location, const Parser::TokensType& args) {
   if (args.size() < 2)
     throw std::invalid_argument(RED "Config: limit_except: Invalid arguments." END
-                                    "\nUsage: limit_except method ...");
-  for (size_t i = 0; i < args.size() - 1; ++i)
+                                    "\nUsage: limit_except method ..."
+                                    "\nmethod: GET, HEAD, POST, PUT, DELETE");
+  for (size_t i = 0; i < args.size() - 1; ++i) {
+    if (!location.isInMethodSet(args[i]))
+      throw std::invalid_argument(RED "Config: limit_except: Invalid method." END
+                                      "\nmethod: GET, HEAD, POST, PUT, DELETE");
     location.addLimitExcept(args[i]);
+  }
 }
 
 void Parser::parseAutoindex(ConfigCommon& common, const Parser::TokensType& args) {

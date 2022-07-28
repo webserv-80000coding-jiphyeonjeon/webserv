@@ -47,9 +47,14 @@ class ConfigLocation {
   void addIndex(const IndexFileType& value);
   void setRoot(const RootType& value);
 
+  bool isInMethodSet(const MethodType& method) const;
+
  private:
+  LimitExceptType method_set_;
   LimitExceptType limit_except_;
   Common          common_config_;
+
+  void initMethodSet();
 };
 
 #endif  // CONFIGLOCATION_HPP_

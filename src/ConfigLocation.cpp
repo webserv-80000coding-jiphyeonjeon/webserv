@@ -1,13 +1,18 @@
 #include "ConfigLocation.hpp"
 
-ConfigLocation::ConfigLocation() : limit_except_(), common_config_() {}
+ConfigLocation::ConfigLocation() : method_set_(), limit_except_(), common_config_() {
+  initMethodSet();
+}
 
 ConfigLocation::ConfigLocation(const ConfigLocation& other)
-    : limit_except_(other.limit_except_), common_config_(other.common_config_) {}
+    : method_set_(other.method_set_),
+      limit_except_(other.limit_except_),
+      common_config_(other.common_config_) {}
 
 ConfigLocation::~ConfigLocation() {}
 
 ConfigLocation& ConfigLocation::operator=(const ConfigLocation& other) {
+  method_set_ = other.method_set_;
   limit_except_ = other.limit_except_;
   common_config_ = other.common_config_;
   return *this;
@@ -66,4 +71,16 @@ void ConfigLocation::addIndex(const ConfigLocation::IndexFileType& value) {
 
 void ConfigLocation::setRoot(const ConfigLocation::RootType& value) {
   common_config_.setRoot(value);
+}
+
+bool ConfigLocation::isInMethodSet(const ConfigLocation::MethodType& method) const {
+  return method_set_.find(method) != method_set_.end();
+}
+
+void ConfigLocation::initMethodSet() {
+  method_set_.insert("GET");
+  method_set_.insert("HEAD");
+  method_set_.insert("POST");
+  method_set_.insert("PUT");
+  method_set_.insert("DELETE");
 }

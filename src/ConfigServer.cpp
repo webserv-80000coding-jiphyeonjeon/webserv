@@ -1,5 +1,7 @@
 #include "ConfigServer.hpp"
 
+#include "color.hpp"
+
 ConfigServer::ConfigServer() : server_name_(), listen_(), location_(), common_config_() {}
 
 ConfigServer::ConfigServer(const ConfigServer& other)
@@ -50,7 +52,14 @@ void ConfigServer::addServerName(const std::string& value) { server_name_.push_b
 
 void ConfigServer::setListen(const ConfigServer::ListenListType& listen) { listen_ = listen; }
 
-void ConfigServer::addListen(const ConfigServer::ListenType& value) { listen_.push_back(value); }
+void ConfigServer::addListen(const ConfigServer::ListenType& value) {
+  for (ListenListType::iterator it = listen_.begin(); it != listen_.end(); ++it) {
+    if (*it == value)
+      throw std::invalid_argument(RED "Config: listen: Duplicate host:port is not allowed." END);
+  }
+
+  listen_.push_back(value);
+}
 
 void ConfigServer::setLocation(const ConfigServer::LocationType& location) { location_ = location; }
 
@@ -59,3 +68,21 @@ void ConfigServer::addLocation(const ConfigServer::LocationPairType& value) {
 }
 
 void ConfigServer::setCommon(const ConfigServer::Common& common) { common_config_ = common; }
+
+void ConfigServer::setAutoindex(const ConfigServer::AutoindexType& value) {
+  common_config_.setAutoindex(value);
+}
+
+void ConfigServer::setClientBodyBufferSize(const ConfigServer::ClientBodyBufferSizeType& value) {
+  common_config_.setClientBodyBufferSize(value);
+}
+
+void ConfigServer::addErrorPage(const ConfigServer::ErrorPairType& value) {
+  common_config_.addErrorPage(value);
+}
+
+void ConfigServer::addIndex(const ConfigServer::IndexFileType& value) {
+  common_config_.addIndex(value);
+}
+
+void ConfigServer::setRoot(const ConfigServer::RootType& value) { common_config_.setRoot(value); }
