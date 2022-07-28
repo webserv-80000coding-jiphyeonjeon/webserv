@@ -7,17 +7,6 @@
 
 #include "Utility.hpp"
 
-namespace ft {
-std::vector<std::string> split_by_string(std::string str,
-                                         std::string delimiter);
-std::string splitUntilDelimiter(std::string& str, std::string delimiter);
-std::string getUntilDelimiter(std::string& str, std::string delimiter,
-                              size_t& pos);
-void        str_ltrim(std::string& str, const std::string& charset);
-void        str_rtrim(std::string& str, const std::string& charset);
-std::string strBidirectionalTrim(std::string& str, const std::string& charset);
-}  // namespace ft
-
 Request::Request() {}
 Request::~Request() {}
 
