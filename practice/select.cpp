@@ -60,8 +60,13 @@ void run(std::map<int, bool>& server_socket_map) {
             processor.parseRequest(buf);
             processor.printRequest();
             // write(1, buf, str_len);
-            write(i, "HTTP/1.1 200 OK\r\nContent-Length:4\r\n\r\nabcd",
-                  strlen("HTTP/1.1 200 OK\r\nContent-Length:4\r\n\r\nabcd"));
+            processor.process();
+            processor.printResponse();
+            std::string msg = processor.getResponse().getResponseMessage();
+
+            write(i, msg.c_str(), msg.size());
+            // write(i, "HTTP/1.1 200 OK\r\nContent-Length:4\r\n\r\nabcd",
+            //       strlen("HTTP/1.1 200 OK\r\nContent-Length:4\r\n\r\nabcd"));
             memset(buf, 0, sizeof(buf));
           }
         }

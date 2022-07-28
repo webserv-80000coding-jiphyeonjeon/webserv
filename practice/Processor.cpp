@@ -1,42 +1,64 @@
 #include "Processor.hpp"
 
-std::map<int, std::string> Processor::createStatusCodes() {
-  std::map<int, std::string> status_code;
-  status_code[200] = "OK";
-  status_code[201] = "Created";
-  status_code[204] = "No Content";
-  status_code[205] = "Reset Content";
-  status_code[301] = "Moved Permanently";
-  status_code[303] = "See Other";
-  status_code[307] = "Temporary Redirect";
-  status_code[400] = "Bad Request";
-  status_code[401] = "Unauthorized";
-  status_code[403] = "Forbidden";
-  status_code[404] = "Not Found";
-  status_code[405] = "Method Not Allowed";
-  status_code[408] = "Request Timeout";
-  status_code[410] = "Gone";
-  status_code[411] = "Length Required";
-  status_code[413] = "Payload Too Large";
-  status_code[414] = "URI Too Long";
-  status_code[500] = "Internal Server Error";
-  status_code[503] = "Service Unavailable";
-  status_code[504] = "Gateway Timeout";
-  status_code[505] = "HTTP Version Not Supported";
+#include <fcntl.h>
+#include <unistd.h>
 
-  return status_code;
-}
+#include <iostream>
 
-const std::map<int, std::string> Processor::kStatusCodes = createStatusCodes();
+#include "Utility.hpp"
 
-Processor::Processor() : status_code_(200), request_(), response_() {}
+Processor::Processor()
+    : status_code_(200),
+      request_(),
+      response_(),
+      methodMap_(createMethodMap()) {}
 Processor::~Processor() {}
 
 void Processor::parseRequest(std::string request_message) {
   request_.parse(request_message);
 }
+
 void Processor::printRequest() { request_.print(); }
+void Processor::printResponse() { response_.print(); }
+
+void Processor::process() { (this->*methodMap_[request_.getMethod()])(); }
 
 const int&      Processor::getStatusCode() { return status_code_; }
 const Request&  Processor::getRequest() { return request_; }
 const Response& Processor::getResponse() { return response_; }
+
+void Processor::methodGet() {
+  ssize_t     read_size = 0;
+  std::string content;
+  char        buffer[1024 + 1];
+
+  fd_ = ::open("./index.html", O_RDONLY);
+  while (true) {
+    read_size = read(fd_, buffer, 1024);
+    if (!read_size) {
+      break;
+    } else if (read_size == -1) {
+      content = "";
+      break;
+    } else {
+      buffer[read_size] = '\0';
+      content.append(buffer, read_size);
+    }
+  }
+  response_.setStatusCode(200);
+  response_.setHeader("Content-Type", "text/html");
+  response_.setHeader("Content-Length", ft::toString(content.size()));
+  response_.setBody(content);
+  response_.build();
+}
+void Processor::methodPost() {}
+void Processor::methodDelete() {}
+
+Processor::MethodMap Processor::createMethodMap() {
+  MethodMap method_map;
+  method_map[kGet] = &Processor::methodGet;
+  method_map[kPost] = &Processor::methodPost;
+  method_map[kDelete] = &Processor::methodDelete;
+
+  return method_map;
+}

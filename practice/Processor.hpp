@@ -9,22 +9,18 @@
 #include "Response.hpp"
 
 class Processor {
- private:
-  static const std::map<int, std::string> kStatusCodes;
-
-  static std::map<int, std::string> createStatusCodes();
-
-  int      status_code_;
-  Request  request_;
-  Response response_;
-
  public:
+  typedef void (Processor::*Method)();
+  typedef std::map<Request::Flag, Method> MethodMap;
+
   Processor();
   ~Processor();
 
   void parseRequest(std::string request_message);
   void printRequest();
-  void Process();
+  void printResponse();
+
+  void process();
 
   const int&      getStatusCode();
   const Request&  getRequest();
@@ -35,6 +31,16 @@ class Processor {
   void methodGet();
   void methodPost();
   void methodDelete();
+
+ private:
+  MethodMap methodMap_;
+
+  MethodMap createMethodMap();
+
+  int      fd_;
+  int      status_code_;
+  Request  request_;
+  Response response_;
 };
 
 #endif
