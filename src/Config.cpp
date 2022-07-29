@@ -17,6 +17,22 @@ void Config::addServers(const ConfigServer& server) {
   servers_.push_back(server);
 }
 
+Config::ListenListType Config::getAllListenList() const {
+  ListenListType                     all_listen_list;
+  std::set<ConfigServer::ListenType> unique_list;
+
+  for (ServersType::const_iterator server = servers_.begin();
+       server != servers_.end(); ++server) {
+    const ListenListType& listen_list = server->getListen();
+    for (ListenListType::const_iterator listen = listen_list.begin();
+         listen != listen_list.end(); ++listen) {
+      if ((unique_list.insert(*listen)).second)
+        all_listen_list.push_back(*listen);
+    }
+  }
+  return all_listen_list;
+}
+
 void Config::printConfig() const {
   int i = 0;
   for (ServersType::const_iterator server = servers_.begin();
@@ -37,15 +53,7 @@ void Config::printServer(const ConfigServer& server) const {
   std::cout << std::endl;
 
   std::cout << GRN "  [listen]" END << std::endl;
-  const ListenListType listen = server.getListen();
-  for (ListenListType::const_iterator it = listen.begin(); it != listen.end();
-       ++it) {
-    sockaddr_in addr;
-    addr.sin_addr.s_addr = it->first;
-    std::cout << "    " << inet_ntoa(addr.sin_addr) << ":" << it->second
-              << "\n";
-  }
-  std::cout << std::endl;
+  printListen(server.getListen(), "    ");
 
   printCommon(server.getCommon(), "  ", GRN);
   std::cout << std::endl;
@@ -95,6 +103,18 @@ void Config::printCommon(const ConfigCommon& common, const std::string& indent,
   for (ErrorPageType::const_iterator it = error_page.begin();
        it != error_page.end(); ++it) {
     std::cout << indent << "  " << it->first << " -> " << it->second << "\n";
+  }
+  std::cout << std::endl;
+}
+
+void Config::printListen(const Config::ListenListType& listen_list,
+                         const std::string&            indent) const {
+  for (ListenListType::const_iterator it = listen_list.begin();
+       it != listen_list.end(); ++it) {
+    sockaddr_in addr;
+    addr.sin_addr.s_addr = it->first;
+    std::cout << indent << inet_ntoa(addr.sin_addr) << ":" << it->second
+              << "\n";
   }
   std::cout << std::endl;
 }

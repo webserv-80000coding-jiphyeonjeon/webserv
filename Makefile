@@ -19,7 +19,9 @@ SRCS_NAME	:=	main.cpp						\
 							Config.cpp					\
 							ConfigCommon.cpp		\
 							ConfigLocation.cpp	\
-							ConfigServer.cpp
+							ConfigServer.cpp		\
+							Server.cpp					\
+							Webserv.cpp
 SRCS			:= $(addprefix $(SRCS_DIR)/, $(SRCS_NAME))
 
 OBJS			:=	$(SRCS:.cpp=.o)
