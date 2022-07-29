@@ -21,7 +21,10 @@ void Processor::parseRequest(std::string request_message) {
 void Processor::printRequest() { request_.print(); }
 void Processor::printResponse() { response_.print(); }
 
-void Processor::process() { (this->*methodMap_[request_.getMethod()])(); }
+void Processor::process() {
+  (this->*methodMap_[request_.getMethod()])();
+  response_.build();
+}
 
 const int&      Processor::getStatusCode() { return status_code_; }
 const Request&  Processor::getRequest() { return request_; }
@@ -49,12 +52,33 @@ void Processor::methodGet() {
   response_.setHeader("Content-Type", "text/html");
   response_.setHeader("Content-Length", ft::toString(content.size()));
   response_.setBody(content);
-  response_.build();
 }
 
-void Processor::methodPost() {}
+void Processor::methodPost() {
+  fd_ = ::open("./post", O_RDWR | O_CREAT | O_TRUNC, 0755);
+  write(fd_, request_.getBody().c_str(), request_.getBody().size());
 
-void Processor::methodDelete() {}
+  response_.setStatusCode(201);
+  response_.setBody(request_.getBody());
+  response_.setHeader("Content-Type", "text/plain");
+  response_.setHeader("Content-Length",
+                      ft::toString(request_.getBody().size()));
+}
+
+void Processor::methodDelete() {
+  std::string body;
+  body += "<html>\n";
+  body += "  <body>\n";
+  body += "    <h1>File deleted</h1>\n";
+  body += "  </body>\n";
+  body += "</html>\n";
+
+  ::unlink("./post");
+  response_.setStatusCode(200);
+  response_.setBody(body);
+  response_.setHeader("Content-Type", "text/html");
+  response_.setHeader("Content-Length", ft::toString(body.size()));
+}
 
 Processor::MethodMap Processor::createMethodMap() {
   MethodMap method_map;
