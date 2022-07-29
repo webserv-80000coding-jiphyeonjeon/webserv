@@ -76,6 +76,7 @@ void run(std::map<int, bool>& server_socket_map) {
         }
       }
     }
+    // system("leaks a.out");
   }
   close(i);
   return;

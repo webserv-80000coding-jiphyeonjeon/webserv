@@ -24,6 +24,7 @@ void Processor::printResponse() { response_.print(); }
 void Processor::process() {
   (this->*methodMap_[request_.getMethod()])();
   response_.build();
+  close(fd_);
 }
 
 const int&      Processor::getStatusCode() { return status_code_; }
