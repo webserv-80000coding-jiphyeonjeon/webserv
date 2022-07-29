@@ -13,15 +13,16 @@ std::vector<std::string> split_by_string(std::string str,
 }
 
 void run(std::map<int, bool>& server_socket_map) {
-  int&           fd_max = Receiver::get_fd_max();
-  fd_set&        read_fds = Receiver::get_read_fds();
-  fd_set         cp_read_fds;
-  sockaddr_in    client_address;
-  socklen_t      addr_size;
-  struct timeval timeout;
-  int            client_socket, str_len, fd_num, i;
-  char           buf[BUF_SIZE];
-  Processor      processor;
+  int&                     fd_max = Receiver::get_fd_max();
+  fd_set&                  read_fds = Receiver::get_read_fds();
+  fd_set                   cp_read_fds;
+  sockaddr_in              client_address;
+  socklen_t                addr_size;
+  struct timeval           timeout;
+  int                      client_socket, str_len, fd_num, i;
+  char                     buf[BUF_SIZE];
+  std::map<int, Processor> processor_map;
+  Processor                processor;
 
   while (1) {
     // std::cout << fd_max << std::endl;
@@ -41,14 +42,16 @@ void run(std::map<int, bool>& server_socket_map) {
           client_socket =
               accept(i, (struct sockaddr*)&client_address, &addr_size);
           FD_SET(client_socket, &read_fds);
-          FD_CLR(i, &read_fds);
+          FD_CLR(i, &cp_read_fds);
           if (fd_max < client_socket)
             fd_max = client_socket;
+          processor_map[client_socket] = Processor();
           std::cout << "connected client: " << i << std::endl;
         } else {
           if ((str_len = read(i, buf, BUF_SIZE)) == 0) {
             FD_CLR(i, &read_fds);
             close(i);
+            processor_map.erase(i);
             std::cout << "closed client: " << i << std::endl;
             break;
           } else {
@@ -57,12 +60,13 @@ void run(std::map<int, bool>& server_socket_map) {
             // while (buf[i] != '\0')
             //   write(1, buf + i++, 1);
             // std::string cp = buf;
-            processor.parseRequest(buf);
-            processor.printRequest();
+            processor_map[i].parseRequest(buf);
+            processor_map[i].printRequest();
             // write(1, buf, str_len);
-            processor.process();
-            processor.printResponse();
-            std::string msg = processor.getResponse().getResponseMessage();
+            processor_map[i].process();
+            processor_map[i].printResponse();
+            std::string msg =
+                processor_map[i].getResponse().getResponseMessage();
 
             write(i, msg.c_str(), msg.size());
             // write(i, "HTTP/1.1 200 OK\r\nContent-Length:4\r\n\r\nabcd",

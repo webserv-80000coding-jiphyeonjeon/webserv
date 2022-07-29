@@ -51,7 +51,9 @@ void Processor::methodGet() {
   response_.setBody(content);
   response_.build();
 }
+
 void Processor::methodPost() {}
+
 void Processor::methodDelete() {}
 
 Processor::MethodMap Processor::createMethodMap() {
