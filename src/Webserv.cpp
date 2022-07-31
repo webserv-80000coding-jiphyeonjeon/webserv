@@ -14,7 +14,9 @@ Webserv::~Webserv() {}
 
 void Webserv::initWebserv(const Config& config) {
   Config::ListenListType listen_list = config.getAllListenList();
+#if defined(PARSER_LOG)
   config.printListen(listen_list, "");
+#endif
 
   for (Config::ListenListType::const_iterator listen = listen_list.begin();
        listen != listen_list.end(); ++listen) {

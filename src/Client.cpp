@@ -37,11 +37,13 @@ int main(int argc, char* argv[]) {
   std::cout << GRN "Connected to server" END << std::endl;
 
   while (1) {
+    memset(message, 0, BUFFER_SIZE);
     std::cout << "> ";
     std::cin.getline(message, BUFFER_SIZE);
 
     if (strcmp(message, "exit") == 0)
       break;
+    std::cout << "send to server: " << message << " (" << strlen(message) << ")" << std::endl;
     send(client_socket, message, strlen(message), 0);
 
     str_len = recv(client_socket, message, BUFFER_SIZE, 0);

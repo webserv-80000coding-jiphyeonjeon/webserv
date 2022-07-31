@@ -8,6 +8,11 @@ CXX			:= c++
 CXXFLAGS	:= -std=c++98 -pedantic -Wall -Wextra -Werror
 RM			:= rm -rf
 
+ifdef PARSER_LOG
+	MACRO_NAME = PARSER_LOG
+else
+	MACRO_NAME = NONE
+endif
 
 # ===== Sources =====
 INCD			:=	-I ./include
@@ -63,11 +68,12 @@ INDEX = 0
 	else \
 		echo -en "$(FG_TEXT)◼︎︎︎︎︎︎◼︎︎︎︎︎◼︎︎︎︎︎︎◼︎︎︎︎︎" ; \
 	fi
-	@$(CXX) $(CXXFLAGS) $(INCD) -c $< -o $@ -g
+	@$(CXX) $(CXXFLAGS) $(INCD) -c $< -o $@ -g -D $(MACRO_NAME)
 
 
 # ===== Custom =====
 .PHONY : test
 
-test : re
+test :
+	@make PARSER_LOG=1 re
 	@./$(NAME) ./config/test.conf
