@@ -30,7 +30,7 @@ int Processor::parseRequest(MessageType request_message) {
     return request_.parse(request_message);
   } catch (RequestException& e) {
     std::cout << e.what() << std::endl;
-    // TODO: 응답 메세지 작성 및 응답 준비
+    // TODO 응답 메세지 작성 및 응답 준비
     // readyToResponse(e.getStatusCode());
     return -1;
   }

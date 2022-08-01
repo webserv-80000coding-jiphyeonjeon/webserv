@@ -1,5 +1,7 @@
 #include "Request.hpp"
 
+#include "Utilities.hpp"
+
 // ================================================================
 // RequestHeader
 // ================================================================
@@ -16,6 +18,11 @@ RequestHeader::~RequestHeader() {}
 
 const RequestHeader::HeaderMapType& RequestHeader::getHeaderMap() const {
   return header_map_;
+}
+
+const RequestHeader::HeaderValueType& RequestHeader::getHeader(
+    const RequestHeader::HeaderKeyType& key) const {
+  return header_map_.at(key);
 }
 
 const RequestHeader::PortType& RequestHeader::getPort() const { return port_; }
@@ -35,6 +42,11 @@ const TransferCoding& RequestHeader::getTransferCoding() const {
 
 void RequestHeader::setHeaderMap(const HeaderMapType& header_map) {
   header_map_ = header_map;
+}
+
+void RequestHeader::setHeader(const HeaderKeyType&   key,
+                              const HeaderValueType& value) {
+  header_map_[key] = value;
 }
 
 void RequestHeader::setPort(const PortType& port) { port_ = port; }
@@ -87,4 +99,85 @@ void RequestHeader::parseTransferCoding(Method method, HeaderValueType value) {
 // Request
 // ================================================================
 
-Request::Request() : version_("HTTP/1.1") {}
+Request::Request()
+    : method_(kNone),
+      version_("HTTP/1.1"),
+      state_(kContinuous),
+      level_(kStartLine),
+      position_(0) {}
+Request::~Request() {}
+
+const Request::MessageType& Request::getRequestMessage() const {
+  return request_message_;
+}
+
+const Method& Request::getMethod() const { return method_; }
+
+const Request::HeaderValueType& Request::getHeader(
+    const HeaderKeyType& key) const {
+  return header_.getHeader(key);
+}
+
+const Request::HeaderMapType& Request::getHeaderMap() const {
+  return header_.getHeaderMap();
+}
+
+const Request::PathType& Request::getPath() const { return path_; }
+
+const Request::VersionType& Request::getVersion() const { return version_; }
+
+const Request::BodyType& Request::getBody() const { return body_; }
+
+const State& Request::getState() const { return state_; }
+
+void Request::setRequestMessage(const MessageType& request_message) {
+  request_message_ = request_message;
+}
+
+void Request::setMethod(const Method& method) { method_ = method; }
+
+void Request::setHeader(const HeaderKeyType&   key,
+                        const HeaderValueType& value) {
+  header_.setHeader(key, value);
+}
+
+void Request::setPath(const PathType& path) { path_ = path; }
+
+void Request::setVersion(const VersionType& version) { version_ = version; }
+
+void Request::setBody(const BodyType& body) { body_ = body; }
+
+void Request::setState(const State& state) { state_ = state; }
+
+int Request::parse(MessageType& request_message) {
+  request_message_ += request_message;
+
+  size_t pos;
+  if ((pos = request_message_.find("\r\n")) == std::string::npos)
+    return kContinuous;
+  // FIXME error
+  parseStartLine(ft::getUntilDelimiter(request_message_, "\r\n", position_));
+  parseHeader(request_message);
+  parseBody(request_message);
+
+  return state_;
+}
+
+void Request::parseStartLine(MessageType& start_line) {
+  size_t      pos = position_;
+  std::string method;
+  std::string methods[] = {"GET", "POST", "PUT", "DELETE", "HEAD"};
+
+  if (level_ != kStartLine) return;
+  if ((pos = start_line.find("\r\n", position_)) == std::string::npos) return;
+
+  method = ft::getUntilDelimiter(start_line, " ", pos);
+  for (int i = 0; i < 5; i++) {
+    if (method == methods[i]) {
+      method_ = static_cast<Method>(i);
+      break;
+    }
+  }
+
+  path_ = ft::getUntilDelimiter(start_line, " ", pos);
+}

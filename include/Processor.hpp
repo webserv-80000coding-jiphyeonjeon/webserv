@@ -15,7 +15,7 @@ class Processor {
   typedef Request::MessageType      MessageType;
   typedef Request::StatusCodeType   StatusCodeType;
   typedef Request::RequestException RequestException;
-  // 현재는 Fd로 관리하지만, 추후에 File 클래스로 관리할 예정
+  // TODO 현재는 Fd로 관리하지만, 추후에 File 클래스로 관리할 예정
   typedef int FdType;
 
   Processor();

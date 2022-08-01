@@ -7,6 +7,11 @@
 enum Method { kNone, kGet, kPost, kPut, kDelete, kHead };
 enum TransferCoding { kDefault, kChunked };
 enum State { kContinuous, kEnd };
+enum Level { kStartLine, kHeader, kBody };
+
+// ================================================================
+// RequestHeader
+// ================================================================
 
 class RequestHeader {
  public:
@@ -26,12 +31,14 @@ class RequestHeader {
   ~RequestHeader();
 
   const HeaderMapType&     getHeaderMap() const;
+  const HeaderValueType&   getHeader(const HeaderKeyType& key) const;
   const PortType&          getPort() const;
   const ContentLengthType& getContentLength() const;
   const ContentTypeType&   getContentType() const;
   const TransferCoding&    getTransferCoding() const;
 
   void setHeaderMap(const HeaderMapType& header_map);
+  void setHeader(const HeaderKeyType& key, const HeaderValueType& value);
   void setPort(const PortType& port);
   void setContentLength(const ContentLengthType& content_length);
   void setContentType(const ContentTypeType& content_type);
@@ -54,6 +61,10 @@ class RequestHeader {
   ParseFuncMapType parse_func_map_;
 };
 
+// ================================================================
+// Request
+// ================================================================
+
 class Request {
  public:
   typedef RequestHeader::HeaderMapType   HeaderMapType;
@@ -63,6 +74,7 @@ class Request {
   typedef std::string                    PathType;
   typedef std::string                    VersionType;
   typedef std::string                    BodyType;
+  typedef size_t                         PositionType;
   typedef int                            StatusCodeType;
 
   Request();
@@ -86,6 +98,10 @@ class Request {
   void setState(const State& state);
 
   int  parse(MessageType& request_message);
+  void parseStartLine(MessageType& start_line);
+  void parseHeader(MessageType& header_field);
+  void parseBody(MessageType& body_field);
+
   void print() const;
 
   class RequestException : public std::exception {
@@ -110,6 +126,8 @@ class Request {
   VersionType   version_;
   BodyType      body_;
   State         state_;
+  Level         level_;
+  PositionType  position_;
 };
 
 #endif
