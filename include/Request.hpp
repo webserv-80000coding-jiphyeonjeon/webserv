@@ -63,6 +63,7 @@ class Request {
   typedef std::string                    PathType;
   typedef std::string                    VersionType;
   typedef std::string                    BodyType;
+  typedef int                            StatusCodeType;
 
   Request();
   ~Request();
@@ -86,6 +87,20 @@ class Request {
 
   int  parse(MessageType& request_message);
   void print() const;
+
+  class RequestException : public std::exception {
+   public:
+    RequestException(const std::string&    message,
+                     const StatusCodeType& status_code)
+        : message_(message), status_code_(status_code) {}
+    virtual ~RequestException() throw() {}
+    virtual const char*   what() const throw() { return message_.c_str(); }
+    const StatusCodeType& getStatusCode() const { return status_code_; }
+
+   private:
+    std::string    message_;
+    StatusCodeType status_code_;
+  };
 
  private:
   MessageType   request_message_;

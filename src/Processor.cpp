@@ -1,5 +1,8 @@
 #include "Processor.hpp"
 
+#include <exception>
+#include <iostream>
+
 Processor::Processor() : method_func_map_(initMethodFuncMap()) {}
 
 Processor::~Processor() {}
@@ -23,7 +26,14 @@ void Processor::setRequest(const Request& request) { request_ = request; }
 void Processor::process() { (this->*method_func_map_[request_.getMethod()])(); }
 
 int Processor::parseRequest(MessageType request_message) {
-  return request_.parse(request_message);
+  try {
+    return request_.parse(request_message);
+  } catch (RequestException& e) {
+    std::cout << e.what() << std::endl;
+    // TODO: 응답 메세지 작성 및 응답 준비
+    // readyToResponse(e.getStatusCode());
+    return -1;
+  }
 }
 
 void Processor::printRequest() { request_.print(); }
