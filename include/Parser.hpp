@@ -55,11 +55,11 @@ class Parser {
   void initLocationParsingMap();
   void initCommonParsingMap();
 
-  ResultType parseServer(ConfigServer& server, size_t& idx);
-  ResultType parseLocation(ConfigLocation& location, size_t& idx);
-  void       fillDefaultConfigServer(ConfigServer& server);
-  void       fillDefaultConfigLocation(ConfigServer&               server,
-                                       ConfigServer::LocationType& locations);
+  void parseServer(ConfigServer& server, size_t& idx);
+  void parseLocation(ConfigLocation& location, size_t& idx);
+  void fillDefaultConfigServer(ConfigServer& server);
+  void fillDefaultConfigLocation(ConfigServer&               server,
+                                 ConfigServer::LocationType& locations);
 
   void parseServerName(ConfigServer& server, const TokensType& args);
   void parseListen(ConfigServer& server, const TokensType& args);
@@ -71,6 +71,23 @@ class Parser {
   void parseErrorPage(ConfigCommon& common, const TokensType& args);
   void parseIndex(ConfigCommon& common, const TokensType& args);
   void parseRoot(ConfigCommon& common, const TokensType& args);
+
+  bool isServerDirective(ServerParserFuncMapIterator& it_server,
+                         CommonParserFuncMapIterator& it_common,
+                         const std::string&           token);
+
+  bool isLocationDirective(LocationParserFuncMapIterator& it_location,
+                           CommonParserFuncMapIterator&   it_common,
+                           const std::string&             token);
+
+  void serverParserFunctionCall(ConfigServer& server, ConfigCommon& common,
+                                TokensType& args, const std::string& directive,
+                                const FunctionType type);
+
+  void locationParserFunctionCall(ConfigLocation& location,
+                                  ConfigCommon& common, TokensType& args,
+                                  const std::string& directive,
+                                  const FunctionType type);
 };
 
 #endif  // PARSER_HPP_

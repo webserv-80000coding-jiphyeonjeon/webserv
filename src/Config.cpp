@@ -47,9 +47,8 @@ void Config::printServer(const ConfigServer& server) const {
   std::cout << GRN "  [server name]" END << std::endl;
   const ServerNameType server_name = server.getServerName();
   for (ServerNameType::const_iterator it = server_name.begin();
-       it != server_name.end(); ++it) {
+       it != server_name.end(); ++it)
     std::cout << "    " << *it << "\n";
-  }
   std::cout << std::endl;
 
   std::cout << GRN "  [listen]" END << std::endl;
@@ -72,9 +71,8 @@ void Config::printLocation(const ConfigLocation& location,
   std::cout << indent << YEL "  [limit_except]" END << std::endl;
   const LimitExceptType limit_except = location.getLimitExcept();
   for (LimitExceptType::const_iterator it = limit_except.begin();
-       it != limit_except.end(); ++it) {
+       it != limit_except.end(); ++it)
     std::cout << indent << "    " << *it << "\n";
-  }
   std::cout << std::endl;
 
   printCommon(location.getCommon(), indent + "  ", YEL);
@@ -93,17 +91,15 @@ void Config::printCommon(const ConfigCommon& common, const std::string& indent,
 
   std::cout << indent << color << "[index]" END << std::endl;
   const IndexType index = common.getIndex();
-  for (IndexType::const_iterator it = index.begin(); it != index.end(); ++it) {
+  for (IndexType::const_iterator it = index.begin(); it != index.end(); ++it)
     std::cout << indent << "  " << *it << "\n";
-  }
   std::cout << std::endl;
 
   std::cout << indent << color << "[error_page]" END << std::endl;
   const ErrorPageType error_page = common.getErrorPage();
   for (ErrorPageType::const_iterator it = error_page.begin();
-       it != error_page.end(); ++it) {
+       it != error_page.end(); ++it)
     std::cout << indent << "  " << it->first << " -> " << it->second << "\n";
-  }
   std::cout << std::endl;
 }
 

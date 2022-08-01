@@ -41,7 +41,7 @@ void Webserv::runWebserv() {
   while (1) {
     fd_set         read_fds;
     fd_set         write_fds;
-    struct timeval timeout = {1, 0};  // tv_sec = 5, tv_usec = 0
+    struct timeval timeout = {1, 0};  // tv_sec = 1, tv_usec = 0
     int            state = kTimeOut;
 
     std::string loading_dot[3] = {".  ", ".. ", "..."};
