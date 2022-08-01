@@ -4,9 +4,9 @@
 #include <map>
 #include <string>
 
-enum Method { kNone, kGet, kPost, kDelete };
+enum Method { kNone, kGet, kPost, kPut, kDelete, kHead };
 enum TransferCoding { kDefault, kChunked };
-enum STATE { kContinuous, kEnd };
+enum State { kContinuous, kEnd };
 
 class RequestHeader {
  public:
@@ -25,17 +25,17 @@ class RequestHeader {
   RequestHeader();
   ~RequestHeader();
 
-  const HeaderMapType&     getHeaders() const;
+  const HeaderMapType&     getHeaderMap() const;
   const PortType&          getPort() const;
   const ContentLengthType& getContentLength() const;
   const ContentTypeType&   getContentType() const;
   const TransferCoding&    getTransferCoding() const;
 
-  void setHeaders(const HeaderMapType& headers);
+  void setHeaderMap(const HeaderMapType& header_map);
   void setPort(const PortType& port);
-  void setContentLength(const ContentLengthType& contentLength);
-  void setContentType(const ContentTypeType& contentType);
-  void setTransferCoding(const TransferCoding& transferCoding);
+  void setContentLength(const ContentLengthType& content_length);
+  void setContentType(const ContentTypeType& content_type);
+  void setTransferCoding(const TransferCoding& transfer_coding);
 
   void parseHost(Method method, HeaderValueType value);
   void parseContentLength(Method method, HeaderValueType value);
@@ -43,16 +43,58 @@ class RequestHeader {
   void parseTransferCoding(Method method, HeaderValueType value);
 
  private:
-  HeaderMapType     headers_;
+  ParseFuncMapType initParseFuncMap();
+
+  HeaderMapType     header_map_;
   PortType          port_;
   ContentLengthType content_length_;
   ContentTypeType   content_type_;
   TransferCoding    transfer_coding_;
+
+  ParseFuncMapType parse_func_map_;
 };
 
 class Request {
  public:
+  typedef RequestHeader::HeaderMapType   HeaderMapType;
+  typedef RequestHeader::HeaderKeyType   HeaderKeyType;
+  typedef RequestHeader::HeaderValueType HeaderValueType;
+  typedef std::string                    MessageType;
+  typedef std::string                    PathType;
+  typedef std::string                    VersionType;
+  typedef std::string                    BodyType;
+
+  Request();
+  ~Request();
+
+  const MessageType&     getRequestMessage() const;
+  const Method&          getMethod() const;
+  const HeaderValueType& getHeader(const HeaderKeyType& key) const;
+  const HeaderMapType&   getHeaderMap() const;
+  const PathType&        getPath() const;
+  const VersionType&     getVersion() const;
+  const BodyType&        getBody() const;
+  const State&           getState() const;
+
+  void setRequestMessage(const MessageType& request_message);
+  void setMethod(const Method& method);
+  void setHeader(const HeaderKeyType& key, const HeaderValueType& value);
+  void setPath(const PathType& path);
+  void setVersion(const VersionType& version);
+  void setBody(const BodyType& body);
+  void setState(const State& state);
+
+  int  parse(MessageType& request_message);
+  void print() const;
+
  private:
+  MessageType   request_message_;
+  Method        method_;
+  RequestHeader header_;
+  PathType      path_;
+  VersionType   version_;
+  BodyType      body_;
+  State         state_;
 };
 
 #endif
