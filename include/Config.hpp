@@ -22,8 +22,11 @@ class Config {
 
   const ServersType& getServers() const;
   void               addServers(const ConfigServer& server);
+  ListenListType     getAllListenList() const;
 
   void printConfig() const;
+  void printListen(const ListenListType& listen_list,
+                   const std::string&    indent) const;
 
  private:
   ServersType servers_;
