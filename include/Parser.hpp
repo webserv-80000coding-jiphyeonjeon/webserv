@@ -18,17 +18,21 @@ class Parser {
   typedef ConfigServer::AddressType AddressType;
   typedef ConfigServer::PortType    PortType;
 
-  typedef void (Parser::*ServerParserFuncType)(ConfigServer&, const TokensType&);
+  typedef void (Parser::*ServerParserFuncType)(ConfigServer&,
+                                               const TokensType&);
   typedef std::map<std::string, ServerParserFuncType> ServerParserFuncMapType;
-  typedef ServerParserFuncMapType::iterator           ServerParserFuncMapIterator;
+  typedef ServerParserFuncMapType::iterator ServerParserFuncMapIterator;
 
-  typedef void (Parser::*LocationParserFuncType)(ConfigLocation&, const TokensType&);
-  typedef std::map<std::string, LocationParserFuncType> LocationParserFuncMapType;
-  typedef LocationParserFuncMapType::iterator           LocationParserFuncMapIterator;
+  typedef void (Parser::*LocationParserFuncType)(ConfigLocation&,
+                                                 const TokensType&);
+  typedef std::map<std::string, LocationParserFuncType>
+                                              LocationParserFuncMapType;
+  typedef LocationParserFuncMapType::iterator LocationParserFuncMapIterator;
 
-  typedef void (Parser::*CommonParserFuncType)(ConfigCommon&, const TokensType&);
+  typedef void (Parser::*CommonParserFuncType)(ConfigCommon&,
+                                               const TokensType&);
   typedef std::map<std::string, CommonParserFuncType> CommonParserFuncMapType;
-  typedef CommonParserFuncMapType::iterator           CommonParserFuncMapIterator;
+  typedef CommonParserFuncMapType::iterator CommonParserFuncMapIterator;
 
   typedef ResultConstant ResultType;
 
@@ -54,7 +58,8 @@ class Parser {
   ResultType parseServer(ConfigServer& server, size_t& idx);
   ResultType parseLocation(ConfigLocation& location, size_t& idx);
   void       fillDefaultConfigServer(ConfigServer& server);
-  void       fillDefaultConfigLocation(ConfigServer& server, ConfigServer::LocationType& locations);
+  void       fillDefaultConfigLocation(ConfigServer&               server,
+                                       ConfigServer::LocationType& locations);
 
   void parseServerName(ConfigServer& server, const TokensType& args);
   void parseListen(ConfigServer& server, const TokensType& args);

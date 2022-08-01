@@ -11,15 +11,16 @@
 
 class ConfigCommon {
  public:
-  typedef bool                                                            AutoindexType;
-  typedef std::size_t                                                     ClientBodyBufferSizeType;
-  typedef unsigned int                                                    ErrorCodeType;
-  typedef std::string                                                     ErrorUriType;
-  typedef std::pair<ErrorCodeType, ErrorUriType>                          ErrorPairType;
-  typedef std::map<ErrorPairType::first_type, ErrorPairType::second_type> ErrorPageType;
-  typedef std::string                                                     IndexFileType;
-  typedef std::vector<IndexFileType>                                      IndexType;
-  typedef std::string                                                     RootType;
+  typedef bool                                   AutoindexType;
+  typedef std::size_t                            ClientBodyBufferSizeType;
+  typedef unsigned int                           ErrorCodeType;
+  typedef std::string                            ErrorUriType;
+  typedef std::pair<ErrorCodeType, ErrorUriType> ErrorPairType;
+  typedef std::map<ErrorPairType::first_type, ErrorPairType::second_type>
+                                     ErrorPageType;
+  typedef std::string                IndexFileType;
+  typedef std::vector<IndexFileType> IndexType;
+  typedef std::string                RootType;
 
   ConfigCommon();
   ConfigCommon(const ConfigCommon& other);

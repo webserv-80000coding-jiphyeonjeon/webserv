@@ -1,5 +1,5 @@
-#ifndef COLOR_H
-#define COLOR_H
+#ifndef COLOR_HPP_
+#define COLOR_HPP_
 
 //      ===== Regular text =====
 #define BLK "\001\033[0;30\002m"
@@ -78,4 +78,4 @@
         https://gist.github.com/RabaDabaDoba/145049536f815903c79944599c6f952a
 */
 
-#endif
+#endif  // COLOR_HPP_

@@ -7,15 +7,16 @@
 
 class ConfigServer {
  public:
-  typedef std::vector<std::string>                                              ServerNameType;
-  typedef std::uint32_t                                                         AddressType;
-  typedef std::uint16_t                                                         PortType;
-  typedef std::pair<AddressType, PortType>                                      ListenType;
-  typedef std::vector<ListenType>                                               ListenListType;
-  typedef std::pair<std::string, ConfigLocation>                                LocationPairType;
-  typedef std::map<LocationPairType::first_type, LocationPairType::second_type> LocationType;
-  typedef ConfigCommon                                                          Common;
-  typedef Common::AutoindexType                                                 AutoindexType;
+  typedef std::vector<std::string>               ServerNameType;
+  typedef std::uint32_t                          AddressType;
+  typedef std::uint16_t                          PortType;
+  typedef std::pair<AddressType, PortType>       ListenType;
+  typedef std::vector<ListenType>                ListenListType;
+  typedef std::pair<std::string, ConfigLocation> LocationPairType;
+  typedef std::map<LocationPairType::first_type, LocationPairType::second_type>
+                                           LocationType;
+  typedef ConfigCommon                     Common;
+  typedef Common::AutoindexType            AutoindexType;
   typedef Common::ClientBodyBufferSizeType ClientBodyBufferSizeType;
   typedef Common::ErrorCodeType            ErrorCodeType;
   typedef Common::ErrorUriType             ErrorUriType;

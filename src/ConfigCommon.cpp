@@ -25,21 +25,29 @@ ConfigCommon& ConfigCommon::operator=(const ConfigCommon& other) {
   return *this;
 }
 
-const ConfigCommon::AutoindexType& ConfigCommon::getAutoindex() const { return autoindex_; }
+const ConfigCommon::AutoindexType& ConfigCommon::getAutoindex() const {
+  return autoindex_;
+}
 
-const ConfigCommon::ClientBodyBufferSizeType& ConfigCommon::getClientBodyBufferSize() const {
+const ConfigCommon::ClientBodyBufferSizeType&
+ConfigCommon::getClientBodyBufferSize() const {
   return client_body_buffer_size_;
 }
 
-const ConfigCommon::ErrorPageType& ConfigCommon::getErrorPage() const { return error_page_; }
+const ConfigCommon::ErrorPageType& ConfigCommon::getErrorPage() const {
+  return error_page_;
+}
 
 const ConfigCommon::IndexType& ConfigCommon::getIndex() const { return index_; }
 
 const ConfigCommon::RootType& ConfigCommon::getRoot() const { return root_; }
 
-void ConfigCommon::setAutoindex(const ConfigCommon::AutoindexType& value) { autoindex_ = value; }
+void ConfigCommon::setAutoindex(const ConfigCommon::AutoindexType& value) {
+  autoindex_ = value;
+}
 
-void ConfigCommon::setClientBodyBufferSize(const ConfigCommon::ClientBodyBufferSizeType& value) {
+void ConfigCommon::setClientBodyBufferSize(
+    const ConfigCommon::ClientBodyBufferSizeType& value) {
   client_body_buffer_size_ = value;
 }
 
@@ -47,8 +55,14 @@ void ConfigCommon::addErrorPage(const ConfigCommon::ErrorPairType& value) {
   error_page_.insert(value);
 }
 
-void ConfigCommon::setIndex(const ConfigCommon::IndexType& index) { index_ = index; }
+void ConfigCommon::setIndex(const ConfigCommon::IndexType& index) {
+  index_ = index;
+}
 
-void ConfigCommon::addIndex(const ConfigCommon::IndexFileType& value) { index_.push_back(value); }
+void ConfigCommon::addIndex(const ConfigCommon::IndexFileType& value) {
+  index_.push_back(value);
+}
 
-void ConfigCommon::setRoot(const ConfigCommon::RootType& value) { root_ = value; }
+void ConfigCommon::setRoot(const ConfigCommon::RootType& value) {
+  root_ = value;
+}

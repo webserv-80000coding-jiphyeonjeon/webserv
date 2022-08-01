@@ -11,6 +11,8 @@ class Scanner {
   typedef std::vector<std::string> TokensType;
 
   static void readFile(TokensType& tokens, const std::string& filename);
+
+ private:
   static void tokenize(TokensType& tokens, const std::string& str);
   static void checkMetaCharacter(TokensType& tokens, const std::string& str);
 };

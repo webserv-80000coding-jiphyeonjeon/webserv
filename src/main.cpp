@@ -18,7 +18,7 @@ int main(int argc, char* argv[]) {
     parser.parse(config);
     config.printConfig();
   } catch (std::exception& e) {
-    std::cout << e.what() << std::endl;
+    std::cout << RED << e.what() << END << std::endl;
     return 1;
   }
   std::cout << GRN "go next step!" END << std::endl;

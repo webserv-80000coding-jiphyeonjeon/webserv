@@ -24,15 +24,15 @@ class Config {
   void               addServers(const ConfigServer& server);
 
   void printConfig() const;
-  void printServer(const ConfigServer& server) const;
-  void printLocation(const ConfigLocation& location, const std::string& indent) const;
-  void printCommon(const ConfigCommon& common, const std::string& indent,
-                   const std::string& color) const;
 
  private:
   ServersType servers_;
-};
 
-// std::ostream& operator<<(std::ostream& os, const Config& config);
+  void printServer(const ConfigServer& server) const;
+  void printLocation(const ConfigLocation& location,
+                     const std::string&    indent) const;
+  void printCommon(const ConfigCommon& common, const std::string& indent,
+                   const std::string& color) const;
+};
 
 #endif  // CONFIG_HPP_

@@ -3,4 +3,4 @@ BasedOnStyle: Google
 AlignConsecutiveDeclarations: true
 AllowShortLoopsOnASingleLine: false
 AllowShortIfStatementsOnASingleLine: false
-ColumnLimit: 100
+ColumnLimit: 80
