@@ -21,7 +21,11 @@ int main(int argc, char* argv[]) {
   try {
     Parser parser(filename);
     parser.parse(config);
+
+#if defined(PARSER_LOG)
     config.printConfig();
+#endif
+
   } catch (std::exception& e) {
     std::cout << RED << e.what() << END << std::endl;
     return 1;

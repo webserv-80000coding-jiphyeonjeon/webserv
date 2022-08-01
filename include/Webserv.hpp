@@ -7,16 +7,31 @@
 
 class Webserv {
  public:
-  typedef Server::FdType           FdType;
-  typedef std::map<FdType, Server> FdServerMapType;
+  typedef Server::FdType            FdType;
+  typedef std::map<FdType, Server>  FdServerMapType;
+  typedef std::map<FdType, Server*> ConnectSocketType;
+  typedef std::vector<FdType>       ReadyType;
+
+  Webserv();
+  ~Webserv();
 
   void initWebserv(const Config& config);
   void runWebserv();
 
  private:
-  FdType          max_fd_;
-  fd_set          fd_set_;
-  FdServerMapType server_map_;
+  static const int kTimeOut = 0;
+  static const int kError = -1;
+
+  FdType            max_fd_;
+  fd_set            fd_set_;
+  FdServerMapType   server_map_;
+  ConnectSocketType connect_socket_;
+  ReadyType         ready_to_write_;
+
+  void addConnection(int& state, fd_set& read_fds);
+  void recieveRequest(int& state, fd_set& read_fds);
+  void sendResponse(int& state, fd_set& write_fds);
+  void selectError();
 };
 
 #endif  // WEBSERV_HPP_

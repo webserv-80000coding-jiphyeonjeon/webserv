@@ -14,7 +14,9 @@ Parser::Parser(const std::string& filename) : tokens_() {
 Parser::~Parser() {}
 
 void Parser::parse(Config& config) {
+#if defined(PARSER_LOG)
   std::cout << tokens_ << std::endl;
+#endif
 
   for (size_t i = 0; i < tokens_.size(); ++i) {
     if (tokens_[i] == "server") {
@@ -68,7 +70,10 @@ Parser::ResultType Parser::parseServer(ConfigServer& server, size_t& idx) {
   std::string                 directive;
   TokensType                  args;
 
+#if defined(PARSER_LOG)
   std::cout << "\n" GRN "--- parseServer ---" END << std::endl;
+#endif
+
   for (; idx < tokens_.size() && tokens_[idx] != "}"; ++idx) {
     // std::cout << "token: " << tokens_[idx] << std::endl;
 
@@ -78,7 +83,10 @@ Parser::ResultType Parser::parseServer(ConfigServer& server, size_t& idx) {
          common_parsing_map_.end())) {
       // set directive
       if (directive != "") {
+#if defined(PARSER_LOG)
         std::cout << GRN "[" << directive << "] " END << args << std::endl;
+#endif
+
         if (args.back() != ";")
           throw std::invalid_argument("Config: Directive must end with ';'");
         if (type == kServer)
@@ -92,7 +100,10 @@ Parser::ResultType Parser::parseServer(ConfigServer& server, size_t& idx) {
 
     } else if (tokens_[idx] == "location") {
       if (directive != "") {
+#if defined(PARSER_LOG)
         std::cout << GRN "[" << directive << "] " END << args << std::endl;
+#endif
+
         if (args.back() != ";")
           throw std::invalid_argument("Config: Directive must end with ';'");
         if (type == kServer)
@@ -125,7 +136,10 @@ Parser::ResultType Parser::parseServer(ConfigServer& server, size_t& idx) {
   }
 
   if (directive != "") {
+#if defined(PARSER_LOG)
     std::cout << GRN "[" << directive << "] " END << args << std::endl;
+#endif
+
     if (args.back() != ";")
       throw std::invalid_argument("Config: Directive must end with ';'");
     if (type == kServer)
@@ -141,7 +155,10 @@ Parser::ResultType Parser::parseServer(ConfigServer& server, size_t& idx) {
     return kError;
   }
 
+#if defined(PARSER_LOG)
   std::cout << GRN "-------------------" END "\n" << std::endl;
+#endif
+
   // parsing이 끝났으니 ConfigServer내부에 연결해주기
   server.setCommon(common);
 
@@ -162,7 +179,10 @@ Parser::ResultType Parser::parseLocation(ConfigLocation& location,
   std::string                   directive;
   TokensType                    args;
 
+#if defined(PARSER_LOG)
   std::cout << "\n  " YEL "--- parseLocation ---" END << std::endl;
+#endif
+
   for (; idx < tokens_.size() && tokens_[idx] != "}"; ++idx) {
     // std::cout << "  tokens: " << tokens_[idx] << std::endl;
 
@@ -171,7 +191,10 @@ Parser::ResultType Parser::parseLocation(ConfigLocation& location,
         ((it_common = common_parsing_map_.find(tokens_[idx])) !=
          common_parsing_map_.end())) {
       if (directive != "") {
+#if defined(PARSER_LOG)
         std::cout << YEL "  [" << directive << "] " END << args << std::endl;
+#endif
+
         if (args.back() != ";")
           throw std::invalid_argument("Config: Directive must end with ';'");
         if (type == kLocation)
@@ -189,7 +212,10 @@ Parser::ResultType Parser::parseLocation(ConfigLocation& location,
   }
 
   if (directive != "") {
+#if defined(PARSER_LOG)
     std::cout << YEL "  [" << directive << "] " END << args << std::endl;
+#endif
+
     if (args.back() != ";")
       throw std::invalid_argument("Config: Directive must end with ';'");
     if (type == kLocation)
@@ -203,7 +229,10 @@ Parser::ResultType Parser::parseLocation(ConfigLocation& location,
     return kError;
   }
 
+#if defined(PARSER_LOG)
   std::cout << YEL "  --------------------- " END "\n" << std::endl;
+#endif
+
   location.setCommon(common);
   return kOk;
 }
