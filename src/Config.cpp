@@ -5,6 +5,7 @@
 
 #include <iostream>
 
+#include "Log.hpp"
 #include "color.hpp"
 
 Config::Config() : servers_() {}
@@ -34,77 +35,78 @@ Config::ListenListType Config::getAllListenList() const {
 }
 
 void Config::printConfig() const {
+  ft::log.writeTimeLog("[Config] --- Print config ---");
+
   int i = 0;
   for (ServersType::const_iterator server = servers_.begin();
        server != servers_.end(); ++server, ++i) {
-    std::cout << BGRN "📮 server [" << i << "]" END << std::endl;
+    ft::log.getLogStream() << BGRN "📮 server [" << i << "]" END << std::endl;
     printServer(*server);
-    std::cout << std::endl;
+    ft::log.writeEndl();
   }
 }
 
 void Config::printServer(const ConfigServer& server) const {
-  std::cout << GRN "  [server name]" END << std::endl;
+  ft::log.getLogStream() << GRN "  [server name]" END << std::endl;
   const ServerNameType server_name = server.getServerName();
   for (ServerNameType::const_iterator it = server_name.begin();
-       it != server_name.end(); ++it) {
-    std::cout << "    " << *it << "\n";
-  }
-  std::cout << std::endl;
+       it != server_name.end(); ++it)
+    ft::log.getLogStream() << "    " << *it << "\n";
+  ft::log.writeEndl();
 
-  std::cout << GRN "  [listen]" END << std::endl;
+  ft::log.writeLog(GRN "  [listen]" END);
   printListen(server.getListen(), "    ");
 
   printCommon(server.getCommon(), "  ", GRN);
-  std::cout << std::endl;
+  ft::log.writeEndl();
 
   const LocationType locations = server.getLocation();
   for (LocationType::const_iterator loc = locations.begin();
        loc != locations.end(); ++loc) {
-    std::cout << BYEL "  📂 location " << loc->first << END << std::endl;
+    ft::log.getLogStream() << BYEL "  📂 location " << loc->first << END
+                           << std::endl;
     printLocation(loc->second, "    ");
-    std::cout << std::endl;
+    ft::log.writeEndl();
   }
 }
 
 void Config::printLocation(const ConfigLocation& location,
                            const std::string&    indent) const {
-  std::cout << indent << YEL "  [limit_except]" END << std::endl;
+  ft::log.getLogStream() << indent << YEL "  [limit_except]" END << std::endl;
   const LimitExceptType limit_except = location.getLimitExcept();
   for (LimitExceptType::const_iterator it = limit_except.begin();
-       it != limit_except.end(); ++it) {
-    std::cout << indent << "    " << *it << "\n";
-  }
-  std::cout << std::endl;
+       it != limit_except.end(); ++it)
+    ft::log.getLogStream() << indent << "    " << *it << "\n";
+  ft::log.writeEndl();
 
   printCommon(location.getCommon(), indent + "  ", YEL);
 }
 
 void Config::printCommon(const ConfigCommon& common, const std::string& indent,
                          const std::string& color) const {
-  std::cout << indent << color << "[autoindex] " END
-            << (common.getAutoindex() ? "on" : "off") << "\n"
-            << std::endl;
-  std::cout << indent << color << "[client_body_buffer_size] " END
-            << common.getClientBodyBufferSize() << "\n"
-            << std::endl;
-  std::cout << indent << color << "[root] " END << common.getRoot() << "\n"
-            << std::endl;
+  ft::log.getLogStream() << indent << color << "[autoindex] " END
+                         << (common.getAutoindex() ? "on" : "off") << "\n"
+                         << std::endl;
+  ft::log.getLogStream() << indent << color << "[client_body_buffer_size] " END
+                         << common.getClientBodyBufferSize() << "\n"
+                         << std::endl;
+  ft::log.getLogStream() << indent << color << "[root] " END << common.getRoot()
+                         << "\n"
+                         << std::endl;
 
-  std::cout << indent << color << "[index]" END << std::endl;
+  ft::log.getLogStream() << indent << color << "[index]" END << std::endl;
   const IndexType index = common.getIndex();
-  for (IndexType::const_iterator it = index.begin(); it != index.end(); ++it) {
-    std::cout << indent << "  " << *it << "\n";
-  }
-  std::cout << std::endl;
+  for (IndexType::const_iterator it = index.begin(); it != index.end(); ++it)
+    ft::log.getLogStream() << indent << "  " << *it << "\n";
+  ft::log.writeEndl();
 
-  std::cout << indent << color << "[error_page]" END << std::endl;
+  ft::log.getLogStream() << indent << color << "[error_page]" END << std::endl;
   const ErrorPageType error_page = common.getErrorPage();
   for (ErrorPageType::const_iterator it = error_page.begin();
-       it != error_page.end(); ++it) {
-    std::cout << indent << "  " << it->first << " -> " << it->second << "\n";
-  }
-  std::cout << std::endl;
+       it != error_page.end(); ++it)
+    ft::log.getLogStream() << indent << "  " << it->first << " -> "
+                           << it->second << "\n";
+  ft::log.writeEndl();
 }
 
 void Config::printListen(const Config::ListenListType& listen_list,
@@ -113,8 +115,8 @@ void Config::printListen(const Config::ListenListType& listen_list,
        it != listen_list.end(); ++it) {
     sockaddr_in addr;
     addr.sin_addr.s_addr = it->first;
-    std::cout << indent << inet_ntoa(addr.sin_addr) << ":" << it->second
-              << "\n";
+    ft::log.getLogStream() << indent << inet_ntoa(addr.sin_addr) << ":"
+                           << it->second << "\n";
   }
-  std::cout << std::endl;
+  ft::log.writeEndl();
 }

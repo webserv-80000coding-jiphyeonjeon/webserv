@@ -56,8 +56,9 @@ void Scanner::checkMetaCharacter(Scanner::TokensType& tokens,
     if (token != "")
       tokens.push_back(token);
     tokens.push_back(";");
-  } else
+  } else {
     tokens.push_back(str);
+  }
 }
 
 std::ostream& operator<<(std::ostream& os, const Scanner::TokensType& tokens) {
