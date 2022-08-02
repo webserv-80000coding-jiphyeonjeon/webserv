@@ -2,10 +2,16 @@
 
 #include <iostream>
 
+#include "Log.hpp"
 #include "color.hpp"
 
 Parser::Parser(const std::string& filename) : tokens_() {
+  ft::log.writeTimeLog("[Parser] --- Start to parsing ---");
+  ft::log.writeTimeLog("Tokenizeing...");
+
   Scanner::readFile(tokens_, filename);
+  ft::log.getLogStream() << tokens_ << std::endl;
+
   initServerParsingMap();
   initLocationParsingMap();
   initCommonParsingMap();
@@ -14,9 +20,7 @@ Parser::Parser(const std::string& filename) : tokens_() {
 Parser::~Parser() {}
 
 void Parser::parse(Config& config) {
-#if defined(PARSER_LOG)
-  std::cout << tokens_ << std::endl;
-#endif
+  ft::log.writeTimeLog("Parsing...");
 
   for (size_t i = 0; i < tokens_.size(); ++i) {
     if (tokens_[i] == "server") {
@@ -31,6 +35,8 @@ void Parser::parse(Config& config) {
       throw std::invalid_argument("Config: Server block is not found.");
     }
   }
+
+  ft::log.writeTimeLog("[Parser] --- Success to config parsing ---");
 }
 
 void Parser::initServerParsingMap() {
@@ -52,6 +58,8 @@ void Parser::initCommonParsingMap() {
 }
 
 void Parser::parseServer(ConfigServer& server, size_t& idx) {
+  ft::log.writeLog(GRN "--- parseServer ---" END);
+
   ConfigServer::LocationType locations;
   ConfigCommon               common;
 
@@ -60,10 +68,6 @@ void Parser::parseServer(ConfigServer& server, size_t& idx) {
   FunctionType                type;
   std::string                 directive;
   TokensType                  args;
-
-#if defined(PARSER_LOG)
-  std::cout << "\n" GRN "--- parseServer ---" END << std::endl;
-#endif
 
   for (; idx < tokens_.size() && tokens_[idx] != "}"; ++idx) {
     if (isServerDirective(it_server, it_common, tokens_[idx])) {
@@ -102,17 +106,17 @@ void Parser::parseServer(ConfigServer& server, size_t& idx) {
   if (tokens_[idx] != "}")
     throw std::invalid_argument("Config: Server block must end with '}'");
 
-#if defined(PARSER_LOG)
-  std::cout << GRN "-------------------" END "\n" << std::endl;
-#endif
-
   server.setCommon(common);
   fillDefaultConfigServer(server);
   fillDefaultConfigLocation(server, locations);
   server.setLocation(locations);
+
+  ft::log.writeLog(GRN "-------------------" END);
 }
 
 void Parser::parseLocation(ConfigLocation& location, size_t& idx) {
+  ft::log.writeLog(YEL "  --- parseLocation ---" END);
+
   ConfigCommon common;
 
   LocationParserFuncMapIterator it_location;
@@ -120,10 +124,6 @@ void Parser::parseLocation(ConfigLocation& location, size_t& idx) {
   FunctionType                  type;
   std::string                   directive;
   TokensType                    args;
-
-#if defined(PARSER_LOG)
-  std::cout << "\n  " YEL "--- parseLocation ---" END << std::endl;
-#endif
 
   for (; idx < tokens_.size() && tokens_[idx] != "}"; ++idx) {
     if (isLocationDirective(it_location, it_common, tokens_[idx])) {
@@ -143,11 +143,9 @@ void Parser::parseLocation(ConfigLocation& location, size_t& idx) {
   if (tokens_[idx] != "}")
     throw std::invalid_argument("Config: Location block must end with '}'");
 
-#if defined(PARSER_LOG)
-  std::cout << YEL "  --------------------- " END "\n" << std::endl;
-#endif
-
   location.setCommon(common);
+
+  ft::log.writeLog(YEL "  --------------------- " END);
 }
 
 void Parser::fillDefaultConfigServer(ConfigServer& server) {
@@ -338,9 +336,8 @@ void Parser::serverParserFunctionCall(ConfigServer&       server,
                                       Parser::TokensType& args,
                                       const std::string&  directive,
                                       const FunctionType  type) {
-#if defined(PARSER_LOG)
-  std::cout << GRN "[" << directive << "] " END << args << std::endl;
-#endif
+  ft::log.getLogStream() << GRN "[" << directive << "] " END << args
+                         << std::endl;
 
   if (args.back() != ";")
     throw std::invalid_argument("Config: Directive must end with ';'");
@@ -358,9 +355,8 @@ void Parser::locationParserFunctionCall(ConfigLocation&     location,
                                         Parser::TokensType& args,
                                         const std::string&  directive,
                                         const FunctionType  type) {
-#if defined(PARSER_LOG)
-  std::cout << YEL "  [" << directive << "] " END << args << std::endl;
-#endif
+  ft::log.getLogStream() << YEL "  [" << directive << "] " END << args
+                         << std::endl;
 
   if (args.back() != ";")
     throw std::invalid_argument("Config: Directive must end with ';'");

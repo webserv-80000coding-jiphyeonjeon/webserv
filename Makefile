@@ -8,17 +8,13 @@ CXX			:= c++
 CXXFLAGS	:= -std=c++98 -pedantic -Wall -Wextra -Werror
 RM			:= rm -rf
 
-ifdef PARSER_LOG
-	MACRO_NAME = PARSER_LOG
-else
-	MACRO_NAME = NONE
-endif
 
 # ===== Sources =====
 INCD			:=	-I ./include
 
 SRCS_DIR	:=	src
 SRCS_NAME	:=	main.cpp						\
+							Log.cpp							\
 							Scanner.cpp					\
 							Parser.cpp					\
 							Config.cpp					\
@@ -68,12 +64,14 @@ INDEX = 0
 	else \
 		echo -en "$(FG_TEXT)◼︎︎︎︎︎︎◼︎︎︎︎︎◼︎︎︎︎︎︎◼︎︎︎︎︎" ; \
 	fi
-	@$(CXX) $(CXXFLAGS) $(INCD) -c $< -o $@ -g -D $(MACRO_NAME)
+	@$(CXX) $(CXXFLAGS) $(INCD) -c $< -o $@ -g
 
 
 # ===== Custom =====
-.PHONY : test
+.PHONY : run test
 
-test :
-	@make PARSER_LOG=1 re
+run : all
+	@./$(NAME)
+
+test : all
 	@./$(NAME) ./config/test.conf
