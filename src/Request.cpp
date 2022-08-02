@@ -4,13 +4,11 @@
 
 #include "Utilities.hpp"
 
-// ================================================================
-// RequestHeader
-// ================================================================
+// ANCHOR: RequestHeader
 
 RequestHeader::RequestHeader()
     : port_(0),
-      content_length_(0),
+      content_length_(-1),
       content_type_(0),
       transfer_coding_(kDefault) {
   parse_func_map_ = initParseFuncMap();
@@ -29,6 +27,10 @@ const RequestHeader::HeaderValueType& RequestHeader::getHeader(
 
 const RequestHeader::PortType& RequestHeader::getPort() const { return port_; }
 
+const RequestHeader::AddressType& RequestHeader::getAddress() const {
+  return address_;
+}
+
 const RequestHeader::ContentLengthType& RequestHeader::getContentLength()
     const {
   return content_length_;
@@ -42,13 +44,26 @@ const TransferCoding& RequestHeader::getTransferCoding() const {
   return transfer_coding_;
 }
 
-void RequestHeader::setHeaderMap(const HeaderMapType& header_map) {
-  header_map_ = header_map;
+void RequestHeader::setHeaderMap(const HeaderMapType& header_map,
+                                 const Method&        method) {
+  header_map_.clear();
+  for (HeaderMapType::const_iterator it = header_map.begin();
+       it != header_map.end(); ++it) {
+    setHeader(it->first, it->second, method);
+  }
 }
 
 void RequestHeader::setHeader(const HeaderKeyType&   key,
-                              const HeaderValueType& value) {
+                              const HeaderValueType& value,
+                              const Method&          method) {
   header_map_[key] = value;
+
+  if (parse_func_map_.find("key") != parse_func_map_.end())
+    (this->*parse_func_map_[key])(method, value);
+}
+
+void RequestHeader::setAddress(const AddressType& address) {
+  address_ = address;
 }
 
 void RequestHeader::setPort(const PortType& port) { port_ = port; }
@@ -69,9 +84,12 @@ void RequestHeader::parseHost(Method method, HeaderValueType value) {
   (void)method;
   size_t pos;
 
-  if ((pos = value.find(':')) != std::string::npos) {
-    port_ = atoi(value.substr(pos + 1).c_str());
+  if (value.find(':') != std::string::npos) {
+    address_ = ft::splitUntilDelimiter(value, ":");
+    port_ = atoi(value.c_str());
   } else {
+    // TODO: 나중에 Host IP와 동일한 지 확인
+    address_ = value;
     port_ = 80;
   }
 }
@@ -83,6 +101,7 @@ void RequestHeader::parseContentLength(Method method, HeaderValueType value) {
     content_length_ = 0;
 }
 
+// TODO: parse content type
 void RequestHeader::parseContentType(Method method, HeaderValueType value) {
   (void)method;
   (void)value;
@@ -97,6 +116,8 @@ void RequestHeader::parseTransferCoding(Method method, HeaderValueType value) {
     transfer_coding_ = kDefault;
 }
 
+bool RequestHeader::isChunked() const { return transfer_coding_ == kChunked; }
+
 RequestHeader::ParseFuncMapType RequestHeader::initParseFuncMap() {
   ParseFuncMapType parse_func_map;
 
@@ -108,9 +129,7 @@ RequestHeader::ParseFuncMapType RequestHeader::initParseFuncMap() {
   return parse_func_map;
 }
 
-// ================================================================
-// Request
-// ================================================================
+// ANCHOR: Request
 
 Request::Request()
     : method_(kNone),
@@ -151,7 +170,7 @@ void Request::setMethod(const Method& method) { method_ = method; }
 
 void Request::setHeader(const HeaderKeyType&   key,
                         const HeaderValueType& value) {
-  header_.setHeader(key, value);
+  header_.setHeader(key, value, method_);
 }
 
 void Request::setPath(const PathType& path) { path_ = path; }
@@ -165,7 +184,8 @@ void Request::setState(const State& state) { state_ = state; }
 int Request::parse(MessageType& request_message) {
   request_message_ += request_message;
 
-  size_t pos;
+  if (request_message_.size() > MAXIMUM_PAYLOAD_LIMIT)
+    throw RequestException("Request payload is too large", 413);
 
   parseStartLine();
   parseHeader();
@@ -218,33 +238,50 @@ void Request::parseStartLine() {
 }
 
 void Request::parseHeader() {
-  PositionType    cp_pos = position_;
   HeaderKeyType   key;
   HeaderValueType value;
 
-  // Content-Length: 0\r\n
-  // Host: localhost:8080\r\n\r\n
   if (level_ != kHeader) return;
+  // Wait for header end.
+  if (request_message_.find("\r\n\r\n", position_) == std::string::npos) return;
+  // If header start from CRLF, throw exception.
+  if (request_message_.find("\r\n", position_) == 0)
+    throw RequestException("Bad Request(header)", 400);
   while (request_message_.find("\r\n", position_) != std::string::npos) {
     std::string header =
         ft::getUntilDelimiter(request_message_, "\r\n", position_);
-    // \r\n으로 시작하는 경우, header가 비어있으므로 400
-    // \r\n\r\n인 경우, kBody레벨으로
-    if (header == "") break;
 
-    key = ft::splitUntilDelimiter(header, ": ");
-    if (key == "") throw RequestException("Bad Request(header_key)", 400);
-    if (getHeaderMap().find(key) != getHeaderMap().end()) {
-      throw RequestException("Bad Request(duplicated header)", 400);
+    // End of header.
+    if (header == "") {
+      level_ = kBody;
+      break;
     }
 
+    key = ft::splitUntilDelimiter(header, ": ");
+    // No ':' in header or space included in key.
+    if (key == "" || key.find(' ') != std::string::npos)
+      throw RequestException("Bad Request(header_key)", 400);
+    // Duplicated header.
+    if (getHeaderMap().find(key) != getHeaderMap().end())
+      throw RequestException("Bad Request(duplicated header)", 400);
+
     value = ft::strBidirectionalTrim(header, " ");
+    // No value in header.
     if (value == "") throw RequestException("Bad Request(header_value)", 400);
 
     setHeader(key, value);
   }
-  if (request_message_.find("\r\n\r\n", cp_pos) == std::string::npos)
+
+  if (header_.getHeader("Host") == "")
+    throw RequestException("Bad Request(no host)", 400);
+
+  if (!header_.isChunked() && header_.getContentLength() == -1 &&
+      (method_ == kPost || method_ == kPut))
+    throw RequestException("Bad Request(no content-length)", 400);
+  else if (header_.getContentLength() >= 0 || header_.isChunked())
     level_ = kBody;
+  else
+    level_ = kDone;
 }
 
 void Request::parseBody() {}

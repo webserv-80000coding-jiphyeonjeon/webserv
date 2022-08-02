@@ -7,7 +7,7 @@
 enum Method { kNone, kGet, kPost, kPut, kDelete, kHead };
 enum TransferCoding { kDefault, kChunked };
 enum State { kContinuous, kEnd };
-enum Level { kStartLine, kHeader, kBody };
+enum Level { kStartLine, kHeader, kBody, kDone };
 
 // ================================================================
 // RequestHeader
@@ -19,9 +19,10 @@ class RequestHeader {
   typedef std::string                              HeaderValueType;
   typedef std::map<HeaderKeyType, HeaderValueType> HeaderMapType;
 
-  typedef int16_t PortType;
-  typedef int     ContentLengthType;
-  typedef int     ContentTypeType;
+  typedef std::string AddressType;
+  typedef uint16_t    PortType;
+  typedef int         ContentLengthType;
+  typedef int         ContentTypeType;
 
   typedef void (RequestHeader::*ParseFuncType)(Method          method,
                                                HeaderValueType value);
@@ -32,13 +33,16 @@ class RequestHeader {
 
   const HeaderMapType&     getHeaderMap() const;
   const HeaderValueType&   getHeader(const HeaderKeyType& key) const;
+  const AddressType&       getAddress() const;
   const PortType&          getPort() const;
   const ContentLengthType& getContentLength() const;
   const ContentTypeType&   getContentType() const;
   const TransferCoding&    getTransferCoding() const;
 
-  void setHeaderMap(const HeaderMapType& header_map);
-  void setHeader(const HeaderKeyType& key, const HeaderValueType& value);
+  void setHeaderMap(const HeaderMapType& header_map, const Method& method);
+  void setHeader(const HeaderKeyType& key, const HeaderValueType& value,
+                 const Method& method);
+  void setAddress(const AddressType& address);
   void setPort(const PortType& port);
   void setContentLength(const ContentLengthType& content_length);
   void setContentType(const ContentTypeType& content_type);
@@ -49,10 +53,13 @@ class RequestHeader {
   void parseContentType(Method method, HeaderValueType value);
   void parseTransferCoding(Method method, HeaderValueType value);
 
+  bool isChunked() const;
+
  private:
   ParseFuncMapType initParseFuncMap();
 
   HeaderMapType     header_map_;
+  AddressType       address_;
   PortType          port_;
   ContentLengthType content_length_;
   ContentTypeType   content_type_;
