@@ -14,11 +14,13 @@ std::string strBidirectionalTrim(std::string& str, const std::string& charset) {
   size_t left_edge = str.find_first_not_of(charset);
   size_t right_edge = str.find_last_not_of(charset);
 
-  return str.substr(left_edge, right_edge - left_edge + 1);
+  return left_edge != right_edge
+             ? str.substr(left_edge, right_edge - left_edge + 1)
+             : "";
 }
 
-std::string getUntilDelimiter(std::string& str, std::string delimiter,
-                              size_t& pos) {
+std::string getUntilDelimiter(const std::string& str,
+                              const std::string delimiter, size_t& pos) {
   std::string line;
   size_t      new_pos;
 

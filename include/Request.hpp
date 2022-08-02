@@ -97,10 +97,7 @@ class Request {
   void setBody(const BodyType& body);
   void setState(const State& state);
 
-  int  parse(MessageType& request_message);
-  void parseStartLine(MessageType& start_line);
-  void parseHeader(MessageType& header_field);
-  void parseBody(MessageType& body_field);
+  int parse(MessageType& request_message);
 
   void print() const;
 
@@ -119,6 +116,10 @@ class Request {
   };
 
  private:
+  void parseStartLine();
+  void parseHeader();
+  void parseBody();
+
   MessageType   request_message_;
   Method        method_;
   RequestHeader header_;

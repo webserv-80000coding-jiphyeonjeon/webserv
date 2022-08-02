@@ -3,6 +3,8 @@
 
 #include <sstream>
 
+#define MAXIMUM_URI_LIMIT 2048
+
 namespace ft {
 
 template <typename T>
@@ -15,8 +17,8 @@ std::string toString(T value) {
 void        strLeftTrim(std::string& str, const std::string& charset);
 void        strRightTrim(std::string& str, const std::string& charset);
 std::string strBidirectionalTrim(std::string& str, const std::string& charset);
-std::string getUntilDelimiter(std::string& str, std::string delimiter,
-                              size_t& pos);
+std::string getUntilDelimiter(const std::string& str,
+                              const std::string delimiter, size_t& pos);
 std::string splitUntilDelimiter(std::string& str, std::string delimiter);
 std::vector<std::string> splitByString(std::string str, std::string delimiter);
 

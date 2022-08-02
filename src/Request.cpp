@@ -1,5 +1,7 @@
 #include "Request.hpp"
 
+#include <iostream>
+
 #include "Utilities.hpp"
 
 // ================================================================
@@ -95,6 +97,17 @@ void RequestHeader::parseTransferCoding(Method method, HeaderValueType value) {
     transfer_coding_ = kDefault;
 }
 
+RequestHeader::ParseFuncMapType RequestHeader::initParseFuncMap() {
+  ParseFuncMapType parse_func_map;
+
+  parse_func_map["Host"] = &RequestHeader::parseHost;
+  parse_func_map["Content-Length"] = &RequestHeader::parseContentLength;
+  parse_func_map["Content-Type"] = &RequestHeader::parseContentType;
+  parse_func_map["Transfer-Encoding"] = &RequestHeader::parseTransferCoding;
+
+  return parse_func_map;
+}
+
 // ================================================================
 // Request
 // ================================================================
@@ -153,31 +166,98 @@ int Request::parse(MessageType& request_message) {
   request_message_ += request_message;
 
   size_t pos;
-  if ((pos = request_message_.find("\r\n")) == std::string::npos)
-    return kContinuous;
-  // FIXME error
-  parseStartLine(ft::getUntilDelimiter(request_message_, "\r\n", position_));
-  parseHeader(request_message);
-  parseBody(request_message);
+
+  parseStartLine();
+  parseHeader();
+  parseBody();
 
   return state_;
 }
 
-void Request::parseStartLine(MessageType& start_line) {
-  size_t      pos = position_;
+void Request::parseStartLine() {
   std::string method;
   std::string methods[] = {"GET", "POST", "PUT", "DELETE", "HEAD"};
 
   if (level_ != kStartLine) return;
-  if ((pos = start_line.find("\r\n", position_)) == std::string::npos) return;
+  if (request_message_.find("\r\n", position_) == std::string::npos) return;
 
-  method = ft::getUntilDelimiter(start_line, " ", pos);
+  // TODO: Refactor below codes.
+  // Method
+  method = ft::getUntilDelimiter(request_message_, " ", position_);
+  // No space or start from space.
+  if (method == "") throw RequestException("Bad Request(method)", 400);
   for (int i = 0; i < 5; i++) {
     if (method == methods[i]) {
-      method_ = static_cast<Method>(i);
+      method_ = static_cast<Method>(i + 1);
       break;
     }
   }
+  // Method not supported.
+  if (method_ == kNone) throw RequestException("Invalid method" + method, 501);
 
-  path_ = ft::getUntilDelimiter(start_line, " ", pos);
+  // Path
+  path_ = ft::getUntilDelimiter(request_message_, " ", position_);
+  // No space or start from space.
+  if (path_ == "") throw RequestException("Bad Request(path)", 400);
+  // Path not start with '/'(means refused).
+  if (path_[0] != '/') throw RequestException("Invalid path", 403);
+  // Path is too long.(limit 2MB(2048))
+  if (path_.length() > MAXIMUM_URI_LIMIT)
+    throw RequestException("Too long URI", 414);
+  // check is path_ valid(depth)
+  // check is query_string valid
+
+  // Version
+  VersionType version =
+      ft::getUntilDelimiter(request_message_, "\r\n", position_);
+  // Webserv only support HTTP/1.1.
+  if (version_ != version) throw RequestException("Invalid version", 505);
+
+  // Next level.
+  level_ = kHeader;
+}
+
+void Request::parseHeader() {
+  PositionType    cp_pos = position_;
+  HeaderKeyType   key;
+  HeaderValueType value;
+
+  // Content-Length: 0\r\n
+  // Host: localhost:8080\r\n\r\n
+  if (level_ != kHeader) return;
+  while (request_message_.find("\r\n", position_) != std::string::npos) {
+    std::string header =
+        ft::getUntilDelimiter(request_message_, "\r\n", position_);
+    // \r\n으로 시작하는 경우, header가 비어있으므로 400
+    // \r\n\r\n인 경우, kBody레벨으로
+    if (header == "") break;
+
+    key = ft::splitUntilDelimiter(header, ": ");
+    if (key == "") throw RequestException("Bad Request(header_key)", 400);
+    if (getHeaderMap().find(key) != getHeaderMap().end()) {
+      throw RequestException("Bad Request(duplicated header)", 400);
+    }
+
+    value = ft::strBidirectionalTrim(header, " ");
+    if (value == "") throw RequestException("Bad Request(header_value)", 400);
+
+    setHeader(key, value);
+  }
+  if (request_message_.find("\r\n\r\n", cp_pos) == std::string::npos)
+    level_ = kBody;
+}
+
+void Request::parseBody() {}
+
+void Request::print() const {
+  std::cout << "Request" << std::endl;
+  std::cout << "Method: " << getMethod() << std::endl;
+  std::cout << "Path: " << getPath() << std::endl;
+  std::cout << "Version: " << getVersion() << std::endl;
+  std::cout << "Header: " << std::endl;
+  for (HeaderMapType::const_iterator it = getHeaderMap().begin();
+       it != getHeaderMap().end(); ++it) {
+    std::cout << it->first << ": " << it->second << std::endl;
+  }
+  std::cout << "Body: " << getBody() << std::endl;
 }
