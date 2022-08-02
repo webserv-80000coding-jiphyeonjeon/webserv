@@ -59,7 +59,7 @@ void RequestHeader::setHeader(const HeaderKeyType&   key,
                               const Method&          method) {
   header_map_[key] = value;
 
-  if (parse_func_map_.find("key") != parse_func_map_.end())
+  if (parse_func_map_.find(key) != parse_func_map_.end())
     (this->*parse_func_map_[key])(method, value);
 }
 
@@ -137,7 +137,9 @@ Request::Request()
       version_("HTTP/1.1"),
       state_(kContinuous),
       level_(kStartLine),
-      position_(0) {}
+      position_(0),
+      chunk_level_(kChunkSize),
+      chunk_size_(0) {}
 Request::~Request() {}
 
 const Request::MessageType& Request::getRequestMessage() const {
@@ -253,10 +255,7 @@ void Request::parseHeader() {
         ft::getUntilDelimiter(request_message_, "\r\n", position_);
 
     // End of header.
-    if (header == "") {
-      level_ = kBody;
-      break;
-    }
+    if (header == "") break;
 
     key = ft::splitUntilDelimiter(header, ": ");
     // No ':' in header or space included in key.
@@ -276,6 +275,10 @@ void Request::parseHeader() {
   if (header_.getHeader("Host") == "")
     throw RequestException("Bad Request(no host)", 400);
 
+  // Erase request_message_ from start to position_(until end of header).
+  request_message_.erase(0, position_);
+  position_ = 0;
+  // Next level.
   if (!header_.isChunked() && header_.getContentLength() == -1 &&
       (method_ == kPost || method_ == kPut))
     throw RequestException("Bad Request(no content-length)", 400);
@@ -293,6 +296,69 @@ void Request::parseBody() {
   } else {
     parseDefaultBody();
   }
+}
+
+void Request::parseChunkedBody() {
+  static ChunkSizeType recv_size;
+
+  if (request_message_.find("\r\n", position_) == std::string::npos) return;
+
+  while (request_message_.find("\r\n", position_) != std::string::npos) {
+    std::string chunk_data =
+        ft::getUntilDelimiter(request_message_, "\r\n", position_);
+
+    if (chunk_level_ == kChunkSize) {
+      chunk_size_ = ft::hexStringToInt(chunk_data);
+      chunk_level_ = kChunkData;
+    } else if (chunk_level_ == kChunkData) {
+      if (chunk_size_ == 0) {
+        chunk_level_ = kChunkEnd;
+        continue;
+      }
+      body_ += chunk_data;
+      recv_size += chunk_data.size();
+      // TODO: Check when error occurs.(recv_size couldn't be match)
+      if (recv_size == chunk_size_) {
+        chunk_size_ = 0;
+        chunk_level_ = kChunkSize;
+        recv_size = 0;
+      }
+    } else if (chunk_level_ == kChunkEnd) {
+      HeaderKeyType   key;
+      HeaderValueType value;
+
+      if (chunk_data == "") {
+        level_ = kDone;
+        break;
+      }
+
+      // TODO: Duplicated code with parseHeader().
+      key = ft::splitUntilDelimiter(chunk_data, ": ");
+      // No ':' in header or space included in key.
+      if (key == "" || key.find(' ') != std::string::npos)
+        throw RequestException("Bad Request(header_key)", 400);
+      // Duplicated header.
+      if (getHeaderMap().find(key) != getHeaderMap().end())
+        throw RequestException("Bad Request(duplicated header)", 400);
+
+      value = ft::strBidirectionalTrim(chunk_data, " ");
+      // No value in header.
+      if (value == "") throw RequestException("Bad Request(header_value)", 400);
+
+      setHeader(key, value);
+    }
+  }
+}
+
+void Request::parseDefaultBody() {
+  if (request_message_.size() == header_.getContentLength()) {
+    body_ = request_message_;
+    level_ = kDone;
+  } else if (request_message_.size() > header_.getContentLength()) {
+    std::cout << header_.getContentLength() << std::endl;
+    throw RequestException("Bad Request(Body longer than content-length)", 400);
+  }
+  return;
 }
 
 void Request::print() const {

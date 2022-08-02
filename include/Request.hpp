@@ -4,10 +4,13 @@
 #include <map>
 #include <string>
 
+#include "Utilities.hpp"
+
 enum Method { kNone, kGet, kPost, kPut, kDelete, kHead };
 enum TransferCoding { kDefault, kChunked };
 enum State { kContinuous, kEnd };
 enum Level { kStartLine, kHeader, kBody, kDone };
+enum ChunkLevel { kChunkSize, kChunkData, kChunkEnd };
 
 // ================================================================
 // RequestHeader
@@ -77,12 +80,14 @@ class Request {
   typedef RequestHeader::HeaderMapType   HeaderMapType;
   typedef RequestHeader::HeaderKeyType   HeaderKeyType;
   typedef RequestHeader::HeaderValueType HeaderValueType;
-  typedef std::string                    MessageType;
-  typedef std::string                    PathType;
-  typedef std::string                    VersionType;
-  typedef std::string                    BodyType;
-  typedef size_t                         PositionType;
-  typedef int                            StatusCodeType;
+
+  typedef std::string  MessageType;
+  typedef std::string  PathType;
+  typedef std::string  VersionType;
+  typedef std::string  BodyType;
+  typedef size_t       PositionType;
+  typedef unsigned int StatusCodeType;
+  typedef unsigned int ChunkSizeType;
 
   Request();
   ~Request();
@@ -139,6 +144,8 @@ class Request {
   State         state_;
   Level         level_;
   PositionType  position_;
+  ChunkLevel    chunk_level_;
+  ChunkSizeType chunk_size_;
 };
 
 #endif

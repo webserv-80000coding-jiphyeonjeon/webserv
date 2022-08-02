@@ -1,6 +1,7 @@
 #ifndef WEBSERV_UTILITIES_HPP_
 #define WEBSERV_UTILITIES_HPP_
 
+#include <iostream>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -17,6 +18,8 @@ std::string toString(T value) {
   ss << value;
   return ss.str();
 }
+
+unsigned int hexStringToInt(const std::string& hex_string);
 
 void        strLeftTrim(std::string& str, const std::string& charset);
 void        strRightTrim(std::string& str, const std::string& charset);

@@ -1,8 +1,15 @@
-#include <iostream>
-#include <string>
-#include <vector>
+#include "Utilities.hpp"
 
 namespace ft {
+
+unsigned int hexStringToInt(const std::string& hex_string) {
+  std::stringstream ss(hex_string);
+  unsigned int      value;
+
+  ss >> std::hex >> value;
+
+  return value;
+}
 
 void strLeftTrim(std::string& str, const std::string& charset) {
   str.erase(0, str.find_first_not_of(charset));
