@@ -45,6 +45,7 @@ void Parser::initServerParsingMap() {
 }
 
 void Parser::initLocationParsingMap() {
+  location_parsing_map_["cgi"] = &Parser::parseCgi;
   location_parsing_map_["limit_except"] = &Parser::parseLimitExcept;
 }
 
@@ -54,6 +55,7 @@ void Parser::initCommonParsingMap() {
       &Parser::parseClientBodyBufferSize;
   common_parsing_map_["error_page"] = &Parser::parseErrorPage;
   common_parsing_map_["index"] = &Parser::parseIndex;
+  common_parsing_map_["return"] = &Parser::parseReturn;
   common_parsing_map_["root"] = &Parser::parseRoot;
 }
 
@@ -239,6 +241,15 @@ void Parser::parseListen(ConfigServer& server, const Parser::TokensType& args) {
   server.addListen(std::make_pair(addr, port));
 }
 
+void Parser::parseCgi(ConfigLocation&           location,
+                      const Parser::TokensType& args) {
+  if (args.size() != 3)
+    throw std::invalid_argument(
+        "Config: cgi: Invalid arguments."
+        "\nUsage: cgi extenstion cgi_program_path");
+  location.addCgi(std::make_pair(args[0], args[1]));
+}
+
 void Parser::parseLimitExcept(ConfigLocation&           location,
                               const Parser::TokensType& args) {
   if (args.size() < 2)
@@ -297,6 +308,17 @@ void Parser::parseIndex(ConfigCommon& common, const Parser::TokensType& args) {
 
   for (size_t i = 0; i < args.size() - 1; ++i)
     common.addIndex(args[i]);
+}
+
+void Parser::parseReturn(ConfigCommon& common, const Parser::TokensType& args) {
+  if (args.size() != 3)
+    throw std::invalid_argument(
+        "Config: return: Invalid arguments."
+        "\nUsage: return code url");
+
+  if (!isDigits(args[0]))
+    throw std::invalid_argument("Config: return: Invalid code.");
+  common.setReturn(std::make_pair(atoi(args[0].c_str()), args[1]));
 }
 
 void Parser::parseRoot(ConfigCommon& common, const Parser::TokensType& args) {

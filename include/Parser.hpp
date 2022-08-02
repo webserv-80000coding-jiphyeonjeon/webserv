@@ -64,12 +64,14 @@ class Parser {
   void parseServerName(ConfigServer& server, const TokensType& args);
   void parseListen(ConfigServer& server, const TokensType& args);
 
+  void parseCgi(ConfigLocation& location, const TokensType& args);
   void parseLimitExcept(ConfigLocation& location, const TokensType& args);
 
   void parseAutoindex(ConfigCommon& common, const TokensType& args);
   void parseClientBodyBufferSize(ConfigCommon& common, const TokensType& args);
   void parseErrorPage(ConfigCommon& common, const TokensType& args);
   void parseIndex(ConfigCommon& common, const TokensType& args);
+  void parseReturn(ConfigCommon& common, const TokensType& args);
   void parseRoot(ConfigCommon& common, const TokensType& args);
 
   bool isServerDirective(ServerParserFuncMapIterator& it_server,

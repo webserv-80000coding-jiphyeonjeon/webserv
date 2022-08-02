@@ -1,12 +1,13 @@
 #include "ConfigLocation.hpp"
 
 ConfigLocation::ConfigLocation()
-    : method_set_(), limit_except_(), common_config_() {
+    : method_set_(), cgi_(), limit_except_(), common_config_() {
   initMethodSet();
 }
 
 ConfigLocation::ConfigLocation(const ConfigLocation& other)
     : method_set_(other.method_set_),
+      cgi_(other.cgi_),
       limit_except_(other.limit_except_),
       common_config_(other.common_config_) {}
 
@@ -14,10 +15,13 @@ ConfigLocation::~ConfigLocation() {}
 
 ConfigLocation& ConfigLocation::operator=(const ConfigLocation& other) {
   method_set_ = other.method_set_;
+  cgi_ = other.cgi_;
   limit_except_ = other.limit_except_;
   common_config_ = other.common_config_;
   return *this;
 }
+
+const ConfigLocation::CgiType& ConfigLocation::getCgi() const { return cgi_; }
 
 const ConfigLocation::LimitExceptType& ConfigLocation::getLimitExcept() const {
   return limit_except_;
@@ -44,8 +48,16 @@ const ConfigLocation::IndexType& ConfigLocation::getIndex() const {
   return common_config_.getIndex();
 }
 
+const ConfigLocation::ReturnType& ConfigLocation::getReturn() const {
+  return common_config_.getReturn();
+}
+
 const ConfigLocation::RootType& ConfigLocation::getRoot() const {
   return common_config_.getRoot();
+}
+
+void ConfigLocation::addCgi(const ConfigLocation::CgiPairType& value) {
+  cgi_.insert(value);
 }
 
 void ConfigLocation::addLimitExcept(const ConfigLocation::MethodType& value) {
@@ -75,6 +87,10 @@ void ConfigLocation::setIndex(const ConfigLocation::IndexType& index) {
 
 void ConfigLocation::addIndex(const ConfigLocation::IndexFileType& value) {
   common_config_.addIndex(value);
+}
+
+void ConfigLocation::setReturn(const ConfigLocation::ReturnType& value) {
+  common_config_.setReturn(value);
 }
 
 void ConfigLocation::setRoot(const ConfigLocation::RootType& value) {

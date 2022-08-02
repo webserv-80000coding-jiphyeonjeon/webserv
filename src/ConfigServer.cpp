@@ -54,6 +54,10 @@ const ConfigServer::IndexType& ConfigServer::getIndex() const {
   return common_config_.getIndex();
 }
 
+const ConfigServer::ReturnType& ConfigServer::getReturn() const {
+  return common_config_.getReturn();
+}
+
 const ConfigServer::RootType& ConfigServer::getRoot() const {
   return common_config_.getRoot();
 }
@@ -109,6 +113,10 @@ void ConfigServer::addErrorPage(const ConfigServer::ErrorPairType& value) {
 
 void ConfigServer::addIndex(const ConfigServer::IndexFileType& value) {
   common_config_.addIndex(value);
+}
+
+void ConfigServer::setReturn(const ConfigServer::ReturnType& value) {
+  common_config_.setReturn(value);
 }
 
 void ConfigServer::setRoot(const ConfigServer::RootType& value) {
