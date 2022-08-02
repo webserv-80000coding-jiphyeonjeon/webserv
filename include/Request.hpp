@@ -127,6 +127,9 @@ class Request {
   void parseHeader();
   void parseBody();
 
+  void parseChunkedBody();
+  void parseDefaultBody();
+
   MessageType   request_message_;
   Method        method_;
   RequestHeader header_;

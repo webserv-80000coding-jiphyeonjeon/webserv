@@ -2,12 +2,15 @@
 #define WEBSERV_UTILITIES_HPP_
 
 #include <sstream>
+#include <string>
+#include <vector>
 
 #define MAXIMUM_URI_LIMIT 2048
 #define MAXIMUM_PAYLOAD_LIMIT 8192
 
-namespace ft {
+typedef unsigned short uint16_t;
 
+namespace ft {
 template <typename T>
 std::string toString(T value) {
   std::stringstream ss;

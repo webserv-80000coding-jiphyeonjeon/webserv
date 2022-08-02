@@ -1,5 +1,6 @@
 #include "Request.hpp"
 
+#include <cstdlib>
 #include <iostream>
 
 #include "Utilities.hpp"
@@ -284,7 +285,15 @@ void Request::parseHeader() {
     level_ = kDone;
 }
 
-void Request::parseBody() {}
+void Request::parseBody() {
+  if (level_ != kBody) return;
+
+  if (header_.isChunked()) {
+    parseChunkedBody();
+  } else {
+    parseDefaultBody();
+  }
+}
 
 void Request::print() const {
   std::cout << "Request" << std::endl;
