@@ -30,6 +30,9 @@ class File {
   bool create();
   bool remove();
 
+  bool isExist() const;
+  bool isDirectory() const;
+
  private:
   void parsePath();
 

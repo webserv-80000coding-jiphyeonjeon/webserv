@@ -1,5 +1,7 @@
 #include "File.hpp"
 
+#include <sys/stat.h>
+
 File::File(const PathType& path) : fd_(-1) { parsePath(path); }
 File::~File() { close(); }
 
@@ -28,6 +30,16 @@ bool File::create() {
 }
 
 bool File::remove() { return ::unlink(path_.c_str()); }
+
+bool File::isExist() const {
+  struct stat buf;
+  return ::stat(path_.c_str(), &buf) == 0;
+}
+
+bool File::isDirectory() const {
+  struct stat buf;
+  return ::stat(path_.c_str(), &buf) == 0 && S_ISDIR(buf.st_mode);
+}
 
 void parsePath(const PathType& path) {
   path_ = path;
