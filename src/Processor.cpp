@@ -3,7 +3,9 @@
 #include <exception>
 #include <iostream>
 
-Processor::Processor() : method_func_map_(initMethodFuncMap()) {}
+#include "Log.hpp"
+
+Processor::Processor() { initMethodFuncMap(); }
 
 Processor::~Processor() {}
 
@@ -14,6 +16,8 @@ const Processor::StatusCodeType& Processor::getStatusCode() const {
 }
 
 const Request& Processor::getRequest() const { return request_; }
+
+const Level& Processor::getLevel() const { return request_.getLevel(); }
 
 void Processor::setFd(const FdType& fd) { fd_ = fd; }
 
@@ -30,13 +34,17 @@ int Processor::parseRequest(MessageType request_message) {
     return request_.parse(request_message);
   } catch (RequestException& e) {
     std::cout << e.what() << std::endl;
+    ft::log.writeTimeLog("[Processor] --- Parsing request failed ---");
+    ft::log.writeLog("Reason: " + std::string(e.what()));
     // TODO 응답 메세지 작성 및 응답 준비
     // readyToResponse(e.getStatusCode());
     return -1;
   }
 }
 
-void Processor::printRequest() { request_.print(); }
+// void Processor::printRequest() { request_.print(); }
+
+std::string Processor::strRequest() { return request_.printToString(); }
 
 void Processor::printResponse() {
   // response_.print();
@@ -52,12 +60,10 @@ void Processor::methodDelete() {}
 
 void Processor::methodHead() {}
 
-Processor::MethodFuncMapType Processor::initMethodFuncMap() {
-  MethodFuncMapType method_func_map;
-  method_func_map[kGet] = &Processor::methodGet;
-  method_func_map[kPost] = &Processor::methodPost;
-  method_func_map[kPut] = &Processor::methodPut;
-  method_func_map[kDelete] = &Processor::methodDelete;
-  method_func_map[kHead] = &Processor::methodHead;
-  return method_func_map;
+void Processor::initMethodFuncMap() {
+  method_func_map_[kGet] = &Processor::methodGet;
+  method_func_map_[kPost] = &Processor::methodPost;
+  method_func_map_[kPut] = &Processor::methodPut;
+  method_func_map_[kDelete] = &Processor::methodDelete;
+  method_func_map_[kHead] = &Processor::methodHead;
 }

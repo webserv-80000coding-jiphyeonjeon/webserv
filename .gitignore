@@ -2,6 +2,7 @@
 webserv
 .vscode/
 *.json
+*.log
 
 # Prerequisites
 *.d

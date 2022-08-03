@@ -2,6 +2,7 @@
 
 #include <iostream>
 
+#include "Log.hpp"
 #include "color.hpp"
 #include "sys/time.h"
 
@@ -64,7 +65,7 @@ void Webserv::runWebserv() {
     // 변화에 따라 write -> read -> connection 순서로 처리
     if (state > kTimeOut) {
       sendResponse(state, write_fds);
-      recieveRequest(state, read_fds);
+      receiveRequest(state, read_fds);
       addConnection(state, read_fds);
     } else {
       selectError();
@@ -92,25 +93,26 @@ void Webserv::addConnection(int& state, fd_set& read_fds) {
   }
 }
 
-void Webserv::recieveRequest(int& state, fd_set& read_fds) {
-  FdType recieve_socket;
+void Webserv::receiveRequest(int& state, fd_set& read_fds) {
+  FdType receive_socket;
 
   for (ConnectSocketType::iterator it = connect_socket_.begin();
        it != connect_socket_.end(); ++it) {
-    recieve_socket = it->first;
-    if (FD_ISSET(recieve_socket, &read_fds)) {
-      RecvState recv_state = it->second->recieveData(recieve_socket);
+    receive_socket = it->first;
+    if (FD_ISSET(receive_socket, &read_fds)) {
+      RecvState recv_state = it->second->receiveData(receive_socket);
 
       if (recv_state == kClosedClient || recv_state == kRecvError) {
-        FD_CLR(recieve_socket, &fd_set_);
-        FD_CLR(recieve_socket, &read_fds);
-        connect_socket_.erase(recieve_socket);
+        FD_CLR(receive_socket, &fd_set_);
+        FD_CLR(receive_socket, &read_fds);
+        connect_socket_.erase(receive_socket);
+
       } else if (recv_state == kRecvSuccess) {
-        // 일단은 request_map_에 담겨있는 내용을 그대로 출력할거라 그냥 넘어감
-        // 참고했던 코드는 여기서 process를 실행해서, request_map_의 해당 위치에
-        // response 값을 다시 담아줌
-        ready_to_write_.push_back(recieve_socket);
+        ft::log.writeTimeLog("[Webserv] --- Success to received request ---");
+        // process()
+        ready_to_write_.push_back(receive_socket);
       }
+      // kRecvContinuous는 데이터를 더 받아야하는 상태이므로 아무것도 하지 않음
       state = 0;
       break;
     }

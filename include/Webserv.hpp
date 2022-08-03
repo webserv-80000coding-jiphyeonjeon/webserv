@@ -29,7 +29,7 @@ class Webserv {
   ReadyType         ready_to_write_;
 
   void addConnection(int& state, fd_set& read_fds);
-  void recieveRequest(int& state, fd_set& read_fds);
+  void receiveRequest(int& state, fd_set& read_fds);
   void sendResponse(int& state, fd_set& write_fds);
   void selectError();
 };
