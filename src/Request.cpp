@@ -13,7 +13,7 @@ RequestHeader::RequestHeader()
       content_length_(0),
       content_type_(0),
       transfer_coding_(kDefault) {
-  parse_func_map_ = initParseFuncMap();
+  initParseFuncMap();
 }
 
 RequestHeader::~RequestHeader() {}
@@ -120,15 +120,11 @@ void RequestHeader::parseTransferCoding(Method method, HeaderValueType value) {
 
 bool RequestHeader::isChunked() const { return transfer_coding_ == kChunked; }
 
-RequestHeader::ParseFuncMapType RequestHeader::initParseFuncMap() {
-  ParseFuncMapType parse_func_map;
-
-  parse_func_map["Host"] = &RequestHeader::parseHost;
-  parse_func_map["Content-Length"] = &RequestHeader::parseContentLength;
-  parse_func_map["Content-Type"] = &RequestHeader::parseContentType;
-  parse_func_map["Transfer-Encoding"] = &RequestHeader::parseTransferCoding;
-
-  return parse_func_map;
+void RequestHeader::initParseFuncMap() {
+  parse_func_map_["Host"] = &RequestHeader::parseHost;
+  parse_func_map_["Content-Length"] = &RequestHeader::parseContentLength;
+  parse_func_map_["Content-Type"] = &RequestHeader::parseContentType;
+  parse_func_map_["Transfer-Encoding"] = &RequestHeader::parseTransferCoding;
 }
 
 // ANCHOR: Request
@@ -204,8 +200,13 @@ int Request::parse(MessageType& request_message) {
 }
 
 void Request::parseStartLine() {
-  std::string method;
-  std::string methods[] = {"GET", "POST", "PUT", "DELETE", "HEAD"};
+  std::string                   method;
+  std::map<std::string, Method> method_map;
+  method_map["GET"] = kGet;
+  method_map["POST"] = kPost;
+  method_map["PUT"] = kPut;
+  method_map["DELETE"] = kDelete;
+  method_map["HEAD"] = kHead;
 
   if (level_ != kStartLine)
     return;
@@ -218,15 +219,11 @@ void Request::parseStartLine() {
   // No space or start from space.
   if (method == "")
     throw RequestException("Bad Request(method)", 400);
-  for (int i = 0; i < 5; i++) {
-    if (method == methods[i]) {
-      method_ = static_cast<Method>(i + 1);
-      break;
-    }
-  }
   // Method not supported.
-  if (method_ == kNone)
+  if (method_map.find(method) == method_map.end())
     throw RequestException("Invalid method" + method, 501);
+
+  method_ = method_map[method];
 
   // Path
   path_ = ft::getUntilDelimiter(request_message_, " ", position_);

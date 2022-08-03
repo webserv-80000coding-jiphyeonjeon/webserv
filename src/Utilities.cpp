@@ -11,19 +11,14 @@ unsigned int hexStringToInt(const std::string& hex_string) {
   return value;
 }
 
-void strLeftTrim(std::string& str, const std::string& charset) {
-  str.erase(0, str.find_first_not_of(charset));
-}
-void strRightTrim(std::string& str, const std::string& charset) {
-  str.erase(str.find_last_not_of(charset) + 1);
-}
 std::string strBidirectionalTrim(std::string& str, const std::string& charset) {
   size_t left_edge = str.find_first_not_of(charset);
   size_t right_edge = str.find_last_not_of(charset);
 
-  return left_edge != right_edge
-             ? str.substr(left_edge, right_edge - left_edge + 1)
-             : "";
+  if (left_edge == std::string::npos)
+    return "";
+
+  return str.substr(left_edge, right_edge - left_edge + 1);
 }
 
 std::string getUntilDelimiter(const std::string& str,
@@ -48,8 +43,6 @@ std::string splitUntilDelimiter(std::string& str, std::string delimiter) {
     line = str.substr(0, pos);
     // O(n), n is the length of new str.
     str.erase(0, pos + delimiter.length());
-  } else {
-    line = std::string();
   }
 
   return line;

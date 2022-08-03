@@ -5,7 +5,7 @@
 
 #include "Log.hpp"
 
-Processor::Processor() : method_func_map_(initMethodFuncMap()) {}
+Processor::Processor() { initMethodFuncMap(); }
 
 Processor::~Processor() {}
 
@@ -60,12 +60,10 @@ void Processor::methodDelete() {}
 
 void Processor::methodHead() {}
 
-Processor::MethodFuncMapType Processor::initMethodFuncMap() {
-  MethodFuncMapType method_func_map;
-  method_func_map[kGet] = &Processor::methodGet;
-  method_func_map[kPost] = &Processor::methodPost;
-  method_func_map[kPut] = &Processor::methodPut;
-  method_func_map[kDelete] = &Processor::methodDelete;
-  method_func_map[kHead] = &Processor::methodHead;
-  return method_func_map;
+void Processor::initMethodFuncMap() {
+  method_func_map_[kGet] = &Processor::methodGet;
+  method_func_map_[kPost] = &Processor::methodPost;
+  method_func_map_[kPut] = &Processor::methodPut;
+  method_func_map_[kDelete] = &Processor::methodDelete;
+  method_func_map_[kHead] = &Processor::methodHead;
 }

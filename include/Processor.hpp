@@ -45,7 +45,7 @@ class Processor {
   void methodHead();
 
  private:
-  MethodFuncMapType initMethodFuncMap();
+  void              initMethodFuncMap();
   MethodFuncMapType method_func_map_;
 
   FdType         fd_;

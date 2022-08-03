@@ -22,10 +22,10 @@ class RequestHeader {
   typedef std::string                              HeaderValueType;
   typedef std::map<HeaderKeyType, HeaderValueType> HeaderMapType;
 
-  typedef std::string AddressType;
-  typedef uint16_t    PortType;
-  typedef std::size_t ContentLengthType;
-  typedef int         ContentTypeType;
+  typedef std::string   AddressType;
+  typedef std::uint16_t PortType;
+  typedef std::size_t   ContentLengthType;
+  typedef int           ContentTypeType;
 
   typedef void (RequestHeader::*ParseFuncType)(Method          method,
                                                HeaderValueType value);
@@ -59,7 +59,7 @@ class RequestHeader {
   bool isChunked() const;
 
  private:
-  ParseFuncMapType initParseFuncMap();
+  void initParseFuncMap();
 
   HeaderMapType     header_map_;
   AddressType       address_;
