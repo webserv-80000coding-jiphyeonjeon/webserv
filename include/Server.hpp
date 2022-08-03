@@ -7,15 +7,21 @@
 #include <sys/socket.h>
 
 #include "Config.hpp"
+#include "Processor.hpp"
 
-enum RecvState { kClosedClient = 0, kRecvError = -1, kRecvSuccess = 1 };
+enum RecvState {
+  kClosedClient = 0,
+  kRecvSuccess = 1,
+  kRecvContinuous = 2,
+  kRecvError = -1
+};
 enum SendState { kSendError = -1, kSendSuccess = 0 };
 
 class Server {
  public:
-  typedef ConfigServer::ListenType      ListenType;
-  typedef int                           FdType;
-  typedef std::map<FdType, std::string> RequestType;
+  typedef ConfigServer::ListenType    ListenType;
+  typedef int                         FdType;
+  typedef std::map<FdType, Processor> ProcessorType;
 
   Server(const ListenType& listen);
   ~Server();
@@ -25,7 +31,7 @@ class Server {
 
   void      initServer();
   FdType    acceptClient();
-  RecvState recieveData(FdType client_socket);
+  RecvState receiveData(FdType client_socket);
   SendState sendData(FdType client_socket);
   void      closeClient(FdType client_socket);
 
@@ -34,9 +40,9 @@ class Server {
   static const int kBufferSize = 1024;
 
   ListenType         listen_;
-  int                socket_;
+  FdType             socket_;
   struct sockaddr_in addr_;
-  RequestType        request_map_;
+  ProcessorType      processor_map_;
 
   void setAddr();
 };

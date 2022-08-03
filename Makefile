@@ -22,6 +22,9 @@ SRCS_NAME	:=	main.cpp						\
 							ConfigLocation.cpp	\
 							ConfigServer.cpp		\
 							Server.cpp					\
+							Processor.cpp				\
+							Request.cpp					\
+							Utilities.cpp				\
 							Webserv.cpp
 SRCS			:= $(addprefix $(SRCS_DIR)/, $(SRCS_NAME))
 

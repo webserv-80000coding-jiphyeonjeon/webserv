@@ -24,6 +24,7 @@ class Processor {
   const FdType&         getFd() const;
   const StatusCodeType& getStatusCode() const;
   const Request&        getRequest() const;
+  const Level&          getLevel() const;
   // const Response& getResponse() const;
 
   void setFd(const FdType& fd);
@@ -32,9 +33,10 @@ class Processor {
 
   void process();
 
-  int  parseRequest(MessageType request_message);
-  void printRequest();
-  void printResponse();
+  int         parseRequest(MessageType request_message);
+  void        printResponse();
+  std::string strRequest();
+  // void        printRequest();
 
   void methodGet();
   void methodPost();

@@ -24,7 +24,7 @@ class RequestHeader {
 
   typedef std::string AddressType;
   typedef uint16_t    PortType;
-  typedef int         ContentLengthType;
+  typedef std::size_t ContentLengthType;
   typedef int         ContentTypeType;
 
   typedef void (RequestHeader::*ParseFuncType)(Method          method,
@@ -100,6 +100,7 @@ class Request {
   const VersionType&     getVersion() const;
   const BodyType&        getBody() const;
   const State&           getState() const;
+  const Level&           getLevel() const;
 
   void setRequestMessage(const MessageType& request_message);
   void setMethod(const Method& method);
@@ -111,7 +112,8 @@ class Request {
 
   int parse(MessageType& request_message);
 
-  void print() const;
+  // void        print() const;
+  std::string printToString() const;
 
   class RequestException : public std::exception {
    public:

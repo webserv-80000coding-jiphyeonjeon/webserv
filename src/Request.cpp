@@ -3,13 +3,14 @@
 #include <cstdlib>
 #include <iostream>
 
+#include "Log.hpp"
 #include "Utilities.hpp"
 
 // ANCHOR: RequestHeader
 
 RequestHeader::RequestHeader()
     : port_(0),
-      content_length_(-1),
+      content_length_(0),
       content_type_(0),
       transfer_coding_(kDefault) {
   parse_func_map_ = initParseFuncMap();
@@ -83,7 +84,7 @@ void RequestHeader::setTransferCoding(const TransferCoding& transfer_coding) {
 
 void RequestHeader::parseHost(Method method, HeaderValueType value) {
   (void)method;
-  size_t pos;
+  // size_t pos;
 
   if (value.find(':') != std::string::npos) {
     address_ = ft::splitUntilDelimiter(value, ":");
@@ -165,6 +166,8 @@ const Request::BodyType& Request::getBody() const { return body_; }
 
 const State& Request::getState() const { return state_; }
 
+const Level& Request::getLevel() const { return level_; }
+
 void Request::setRequestMessage(const MessageType& request_message) {
   request_message_ = request_message;
 }
@@ -186,6 +189,9 @@ void Request::setState(const State& state) { state_ = state; }
 
 int Request::parse(MessageType& request_message) {
   request_message_ += request_message;
+
+  ft::log.writeTimeLog("Parsing...");
+  ft::log.writeLog(request_message_);
 
   if (request_message_.size() > MAXIMUM_PAYLOAD_LIMIT)
     throw RequestException("Request payload is too large", 413);
@@ -277,8 +283,8 @@ void Request::parseHeader() {
 
     value = ft::strBidirectionalTrim(header, " ");
     // No value in header.
-    if (value == "")
-      throw RequestException("Bad Request(header_value)", 400);
+    // if (value == "")
+    //   throw RequestException("Bad Request(header_value)", 400);
 
     setHeader(key, value);
   }
@@ -290,10 +296,12 @@ void Request::parseHeader() {
   request_message_.erase(0, position_);
   position_ = 0;
   // Next level.
-  if (!header_.isChunked() && header_.getContentLength() == -1 &&
+  const HeaderMapType& header_map = getHeaderMap();
+  if (!header_.isChunked() &&
+      header_map.find("Content-Length") == header_map.end() &&
       (method_ == kPost || method_ == kPut))
     throw RequestException("Bad Request(no content-length)", 400);
-  else if (header_.getContentLength() >= 0 || header_.isChunked())
+  else if (header_.getContentLength() > 0 || header_.isChunked())
     level_ = kBody;
   else
     level_ = kDone;
@@ -377,15 +385,30 @@ void Request::parseDefaultBody() {
   return;
 }
 
-void Request::print() const {
-  std::cout << "Request" << std::endl;
-  std::cout << "Method: " << getMethod() << std::endl;
-  std::cout << "Path: " << getPath() << std::endl;
-  std::cout << "Version: " << getVersion() << std::endl;
-  std::cout << "Header: " << std::endl;
+// void Request::print() const {
+//   std::cout << "Request" << std::endl;
+//   std::cout << "Method: " << getMethod() << std::endl;
+//   std::cout << "Path: " << getPath() << std::endl;
+//   std::cout << "Version: " << getVersion() << std::endl;
+//   std::cout << "Header: " << std::endl;
+//   for (HeaderMapType::const_iterator it = getHeaderMap().begin();
+//        it != getHeaderMap().end(); ++it) {
+//     std::cout << it->first << ": " << it->second << std::endl;
+//   }
+//   std::cout << "Body: " << getBody() << std::endl;
+// }
+
+std::string Request::printToString() const {
+  std::stringstream ss;
+  ss << "\nRequest" << std::endl;
+  ss << "Method: " << getMethod() << std::endl;
+  ss << "Path: " << getPath() << std::endl;
+  ss << "Version: " << getVersion() << std::endl;
+  ss << "Header: " << std::endl;
   for (HeaderMapType::const_iterator it = getHeaderMap().begin();
        it != getHeaderMap().end(); ++it) {
-    std::cout << it->first << ": " << it->second << std::endl;
+    ss << it->first << ": " << it->second << std::endl;
   }
-  std::cout << "Body: " << getBody() << std::endl;
+  ss << "Body: " << getBody() << std::endl;
+  return ss.str();
 }
