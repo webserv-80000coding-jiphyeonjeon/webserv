@@ -31,6 +31,8 @@ class File {
   bool remove();
 
  private:
+  void parsePath();
+
   PathType      path_;
   NameType      name_;
   ExtensionType extension_;

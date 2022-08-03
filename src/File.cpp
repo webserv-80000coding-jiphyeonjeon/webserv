@@ -1,6 +1,6 @@
 #include "File.hpp"
 
-File::File(const PathType& path) : path_(path), fd_(-1) {}
+File::File(const PathType& path) : fd_(-1) { parsePath(path); }
 File::~File() { close(); }
 
 const File::PathType&      File::getPath() const { return path_; }
@@ -28,3 +28,22 @@ bool File::create() {
 }
 
 bool File::remove() { return ::unlink(path_.c_str()); }
+
+void parsePath(const PathType& path) {
+  path_ = path;
+
+  size_t name_pos = path_.find_last_of('/');
+  size_t extension_pos = name_.find_last_of('.');
+
+  if (name_pos == std::string::npos && extension_pos == std::string::npos) {
+    name_ = path_;
+  } else if (name_pos == std::string::npos) {
+    name_ = path_.substr(0, extension_pos);
+    extension_ = path_.substr(extension_pos + 1);
+  } else if (extension_pos == std::string::npos) {
+    name_ = path_.substr(name_pos + 1);
+  } else {
+    name_ = path_.substr(name_pos + 1, extension_pos - name_pos - 1);
+    extension_ = path_.substr(extension_pos + 1);
+  }
+}
