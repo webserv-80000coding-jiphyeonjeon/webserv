@@ -41,6 +41,16 @@ bool File::isDirectory() const {
   return ::stat(path_.c_str(), &buf) == 0 && S_ISDIR(buf.st_mode);
 }
 
+bool File::isExist(const PathType& path) {
+  struct stat buf;
+  return ::stat(path.c_str(), &buf) == 0;
+}
+
+bool File::isDirectory(const PathType& path) {
+  struct stat buf;
+  return ::stat(path.c_str(), &buf) == 0 && S_ISDIR(buf.st_mode);
+}
+
 void parsePath(const PathType& path) {
   path_ = path;
 

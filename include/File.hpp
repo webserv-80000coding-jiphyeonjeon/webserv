@@ -33,6 +33,9 @@ class File {
   bool isExist() const;
   bool isDirectory() const;
 
+  static bool isExist(const PathType& path);
+  static bool isDirectory(const PathType& path);
+
  private:
   void parsePath();
 
