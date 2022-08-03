@@ -35,3 +35,5 @@ webserv
 *.exe
 *.out
 *.app
+
+.vscode
