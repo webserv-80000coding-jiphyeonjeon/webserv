@@ -201,14 +201,17 @@ void Request::parseStartLine() {
   std::string method;
   std::string methods[] = {"GET", "POST", "PUT", "DELETE", "HEAD"};
 
-  if (level_ != kStartLine) return;
-  if (request_message_.find("\r\n", position_) == std::string::npos) return;
+  if (level_ != kStartLine)
+    return;
+  if (request_message_.find("\r\n", position_) == std::string::npos)
+    return;
 
   // TODO: Refactor below codes.
   // Method
   method = ft::getUntilDelimiter(request_message_, " ", position_);
   // No space or start from space.
-  if (method == "") throw RequestException("Bad Request(method)", 400);
+  if (method == "")
+    throw RequestException("Bad Request(method)", 400);
   for (int i = 0; i < 5; i++) {
     if (method == methods[i]) {
       method_ = static_cast<Method>(i + 1);
@@ -216,14 +219,17 @@ void Request::parseStartLine() {
     }
   }
   // Method not supported.
-  if (method_ == kNone) throw RequestException("Invalid method" + method, 501);
+  if (method_ == kNone)
+    throw RequestException("Invalid method" + method, 501);
 
   // Path
   path_ = ft::getUntilDelimiter(request_message_, " ", position_);
   // No space or start from space.
-  if (path_ == "") throw RequestException("Bad Request(path)", 400);
+  if (path_ == "")
+    throw RequestException("Bad Request(path)", 400);
   // Path not start with '/'(means refused).
-  if (path_[0] != '/') throw RequestException("Invalid path", 403);
+  if (path_[0] != '/')
+    throw RequestException("Invalid path", 403);
   // Path is too long.(limit 2MB(2048))
   if (path_.length() > MAXIMUM_URI_LIMIT)
     throw RequestException("Too long URI", 414);
@@ -234,7 +240,8 @@ void Request::parseStartLine() {
   VersionType version =
       ft::getUntilDelimiter(request_message_, "\r\n", position_);
   // Webserv only support HTTP/1.1.
-  if (version_ != version) throw RequestException("Invalid version", 505);
+  if (version_ != version)
+    throw RequestException("Invalid version", 505);
 
   // Next level.
   level_ = kHeader;
@@ -244,9 +251,11 @@ void Request::parseHeader() {
   HeaderKeyType   key;
   HeaderValueType value;
 
-  if (level_ != kHeader) return;
+  if (level_ != kHeader)
+    return;
   // Wait for header end.
-  if (request_message_.find("\r\n\r\n", position_) == std::string::npos) return;
+  if (request_message_.find("\r\n\r\n", position_) == std::string::npos)
+    return;
   // If header start from CRLF, throw exception.
   if (request_message_.find("\r\n", position_) == 0)
     throw RequestException("Bad Request(header)", 400);
@@ -255,7 +264,8 @@ void Request::parseHeader() {
         ft::getUntilDelimiter(request_message_, "\r\n", position_);
 
     // End of header.
-    if (header == "") break;
+    if (header == "")
+      break;
 
     key = ft::splitUntilDelimiter(header, ": ");
     // No ':' in header or space included in key.
@@ -267,7 +277,8 @@ void Request::parseHeader() {
 
     value = ft::strBidirectionalTrim(header, " ");
     // No value in header.
-    if (value == "") throw RequestException("Bad Request(header_value)", 400);
+    if (value == "")
+      throw RequestException("Bad Request(header_value)", 400);
 
     setHeader(key, value);
   }
@@ -289,7 +300,8 @@ void Request::parseHeader() {
 }
 
 void Request::parseBody() {
-  if (level_ != kBody) return;
+  if (level_ != kBody)
+    return;
 
   if (header_.isChunked()) {
     parseChunkedBody();
@@ -301,7 +313,8 @@ void Request::parseBody() {
 void Request::parseChunkedBody() {
   static ChunkSizeType recv_size;
 
-  if (request_message_.find("\r\n", position_) == std::string::npos) return;
+  if (request_message_.find("\r\n", position_) == std::string::npos)
+    return;
 
   while (request_message_.find("\r\n", position_) != std::string::npos) {
     std::string chunk_data =
@@ -309,12 +322,13 @@ void Request::parseChunkedBody() {
 
     if (chunk_level_ == kChunkSize) {
       chunk_size_ = ft::hexStringToInt(chunk_data);
-      chunk_level_ = kChunkData;
-    } else if (chunk_level_ == kChunkData) {
+
       if (chunk_size_ == 0) {
         chunk_level_ = kChunkEnd;
-        continue;
+      } else {
+        chunk_level_ = kChunkData;
       }
+    } else if (chunk_level_ == kChunkData) {
       body_ += chunk_data;
       recv_size += chunk_data.size();
       // TODO: Check when error occurs.(recv_size couldn't be match)
@@ -340,10 +354,12 @@ void Request::parseChunkedBody() {
       // Duplicated header.
       if (getHeaderMap().find(key) != getHeaderMap().end())
         throw RequestException("Bad Request(duplicated header)", 400);
+      std::cout << key << std::endl;
 
       value = ft::strBidirectionalTrim(chunk_data, " ");
       // No value in header.
-      if (value == "") throw RequestException("Bad Request(header_value)", 400);
+      if (value == "")
+        throw RequestException("Bad Request(header_value)", 400);
 
       setHeader(key, value);
     }

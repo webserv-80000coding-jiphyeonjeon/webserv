@@ -71,8 +71,8 @@ int main() {
   Request     req2;
   std::string msg2 =
       "POST / HTTP/1.1\r\nHost: localhost:8080\r\nTransfer-Encoding: "
-      "chunked\r\n\r\n 5\r\nhello\r\n0\r\n"
-      "Date: Sun,06 Nov 1994 08 : 49 : 37 GMT\r\n"
+      "chunked\r\n\r\n 5\r\nhello\r\na\r\nHelloWorld\r\n0\r\n"
+      "Date: Sun,06 Nov 1994 08:49:37 GMT\r\n"
       "Content-MD5: 1B2M2Y8AsgTpgAmY7PhCfg ==\r\n\r\n";
   try {
     req2.parse(msg2);

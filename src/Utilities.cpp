@@ -27,7 +27,7 @@ std::string strBidirectionalTrim(std::string& str, const std::string& charset) {
 }
 
 std::string getUntilDelimiter(const std::string& str,
-                              const std::string delimiter, size_t& pos) {
+                              const std::string& delimiter, size_t& pos) {
   std::string line;
   size_t      new_pos;
 
