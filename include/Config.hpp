@@ -16,6 +16,8 @@ class Config {
   typedef ConfigServer::LocationType                LocationType;
   typedef ConfigServer::IndexType                   IndexType;
   typedef ConfigServer::ErrorPageType               ErrorPageType;
+  typedef ConfigServer::ReturnType                  ReturnType;
+  typedef ConfigLocation::CgiType                   CgiType;
   typedef ConfigLocation::LimitExceptType           LimitExceptType;
   typedef std::map<ListenType, const ConfigServer*> ConfigFinderType;
 

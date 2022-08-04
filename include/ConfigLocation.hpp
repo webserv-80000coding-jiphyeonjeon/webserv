@@ -9,9 +9,11 @@
 
 class ConfigLocation {
  public:
-  typedef std::string                      MethodType;
+  typedef std::string                         MethodType;
+  typedef std::pair<std::string, std::string> CgiPairType;
+  typedef std::map<CgiPairType::first_type, CgiPairType::second_type> CgiType;
+  typedef ConfigCommon                                                Common;
   typedef std::set<MethodType>             LimitExceptType;
-  typedef ConfigCommon                     Common;
   typedef Common::AutoindexType            AutoindexType;
   typedef Common::ClientBodyBufferSizeType ClientBodyBufferSizeType;
   typedef Common::ErrorCodeType            ErrorCodeType;
@@ -20,14 +22,17 @@ class ConfigLocation {
   typedef Common::ErrorPageType            ErrorPageType;
   typedef Common::IndexFileType            IndexFileType;
   typedef Common::IndexType                IndexType;
+  typedef Common::ReturnCodeType           ReturnCodeType;
+  typedef Common::ReturnUrlType            ReturnUrlType;
+  typedef Common::ReturnType               ReturnType;
   typedef Common::RootType                 RootType;
-  // typedef something cgi
 
   ConfigLocation();
   ConfigLocation(const ConfigLocation& other);
   ~ConfigLocation();
   ConfigLocation& operator=(const ConfigLocation& other);
 
+  const CgiType&         getCgi() const;
   const LimitExceptType& getLimitExcept() const;
   const Common&          getCommon() const;
 
@@ -35,8 +40,10 @@ class ConfigLocation {
   const ClientBodyBufferSizeType& getClientBodyBufferSize() const;
   const ErrorPageType&            getErrorPage() const;
   const IndexType&                getIndex() const;
+  const ReturnType&               getReturn() const;
   const RootType&                 getRoot() const;
 
+  void addCgi(const CgiPairType& value);
   void addLimitExcept(const MethodType& value);
   void setCommon(const Common& common);
 
@@ -45,12 +52,14 @@ class ConfigLocation {
   void addErrorPage(const ErrorPairType& value);
   void setIndex(const IndexType& index);
   void addIndex(const IndexFileType& value);
+  void setReturn(const ReturnType& value);
   void setRoot(const RootType& value);
 
   bool isInMethodSet(const MethodType& method) const;
 
  private:
   LimitExceptType method_set_;
+  CgiType         cgi_;
   LimitExceptType limit_except_;
   Common          common_config_;
 

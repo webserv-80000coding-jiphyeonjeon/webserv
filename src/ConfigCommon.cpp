@@ -5,6 +5,7 @@ ConfigCommon::ConfigCommon()
       client_body_buffer_size_(kDefaultClientBodyBufferSize),
       error_page_(),
       index_(),
+      return_(),
       root_("") {}
 
 ConfigCommon::ConfigCommon(const ConfigCommon& other)
@@ -12,6 +13,7 @@ ConfigCommon::ConfigCommon(const ConfigCommon& other)
       client_body_buffer_size_(other.client_body_buffer_size_),
       error_page_(other.error_page_),
       index_(other.index_),
+      return_(other.return_),
       root_(other.root_) {}
 
 ConfigCommon::~ConfigCommon() {}
@@ -21,6 +23,7 @@ ConfigCommon& ConfigCommon::operator=(const ConfigCommon& other) {
   client_body_buffer_size_ = other.client_body_buffer_size_;
   error_page_ = other.error_page_;
   index_ = other.index_;
+  return_ = other.return_;
   root_ = other.root_;
   return *this;
 }
@@ -39,6 +42,10 @@ const ConfigCommon::ErrorPageType& ConfigCommon::getErrorPage() const {
 }
 
 const ConfigCommon::IndexType& ConfigCommon::getIndex() const { return index_; }
+
+const ConfigCommon::ReturnType& ConfigCommon::getReturn() const {
+  return return_;
+}
 
 const ConfigCommon::RootType& ConfigCommon::getRoot() const { return root_; }
 
@@ -61,6 +68,10 @@ void ConfigCommon::setIndex(const ConfigCommon::IndexType& index) {
 
 void ConfigCommon::addIndex(const ConfigCommon::IndexFileType& value) {
   index_.push_back(value);
+}
+
+void ConfigCommon::setReturn(const ConfigCommon::ReturnType& value) {
+  return_ = value;
 }
 
 void ConfigCommon::setRoot(const ConfigCommon::RootType& value) {

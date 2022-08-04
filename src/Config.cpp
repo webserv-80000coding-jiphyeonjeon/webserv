@@ -88,6 +88,13 @@ void Config::printServer(const ConfigServer& server) {
 
 void Config::printLocation(const ConfigLocation& location,
                            const std::string&    indent) {
+  ft::log.getLogStream() << indent << YEL "  [cgi]" END << std::endl;
+  const CgiType cgi = location.getCgi();
+  for (CgiType::const_iterator it = cgi.begin(); it != cgi.end(); ++it)
+    ft::log.getLogStream() << indent << "    " << it->first << " " << it->second
+                           << "\n";
+  ft::log.writeEndl();
+
   ft::log.getLogStream() << indent << YEL "  [limit_except]" END << std::endl;
   const LimitExceptType limit_except = location.getLimitExcept();
   for (LimitExceptType::const_iterator it = limit_except.begin();
@@ -107,6 +114,12 @@ void Config::printCommon(const ConfigCommon& common, const std::string& indent,
                          << common.getClientBodyBufferSize() << "\n"
                          << std::endl;
   ft::log.getLogStream() << indent << color << "[root] " END << common.getRoot()
+                         << "\n"
+                         << std::endl;
+
+  const ReturnType return_pair = common.getReturn();
+  ft::log.getLogStream() << indent << color << "[return] " END
+                         << return_pair.first << " " << return_pair.second
                          << "\n"
                          << std::endl;
 

@@ -24,6 +24,9 @@ class ConfigServer {
   typedef Common::ErrorPageType            ErrorPageType;
   typedef Common::IndexFileType            IndexFileType;
   typedef Common::IndexType                IndexType;
+  typedef Common::ReturnCodeType           ReturnCodeType;
+  typedef Common::ReturnUrlType            ReturnUrlType;
+  typedef Common::ReturnType               ReturnType;
   typedef Common::RootType                 RootType;
 
   ConfigServer();
@@ -40,6 +43,7 @@ class ConfigServer {
   const ClientBodyBufferSizeType& getClientBodyBufferSize() const;
   const ErrorPageType&            getErrorPage() const;
   const IndexType&                getIndex() const;
+  const ReturnType&               getReturn() const;
   const RootType&                 getRoot() const;
 
   void setServerName(const ServerNameType& server_name);
@@ -55,6 +59,7 @@ class ConfigServer {
   void setClientBodyBufferSize(const ClientBodyBufferSizeType& value);
   void addErrorPage(const ErrorPairType& value);
   void addIndex(const IndexFileType& value);
+  void setReturn(const ReturnType& value);
   void setRoot(const RootType& value);
 
  private:
