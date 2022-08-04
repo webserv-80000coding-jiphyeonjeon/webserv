@@ -15,9 +15,11 @@ Server::Server(const Server::ListenType& listen)
 
 Server::~Server() {}
 
-Server::FdType Server::getFd() const { return socket_; }
+const Server::FdType& Server::getFd() const { return socket_; }
 
-ConfigServer::PortType Server::getPort() const { return listen_.second; }
+const Server::ListenType& Server::getListen() const { return listen_; }
+
+const ConfigServer::PortType& Server::getPort() const { return listen_.second; }
 
 void Server::initServer() {
   if ((socket_ = socket(PF_INET, SOCK_STREAM, 0)) == -1)
@@ -34,7 +36,7 @@ void Server::initServer() {
     throw std::runtime_error("Server: listen() error");
 }
 
-Server::FdType Server::acceptClient() {
+Server::FdType Server::acceptClient(const ConfigServer& config) {
   FdType             client_socket;
   struct sockaddr_in client_addr;
   socklen_t          client_addr_len = sizeof(client_addr);
@@ -45,10 +47,13 @@ Server::FdType Server::acceptClient() {
     throw std::runtime_error("Server: accept() error");
 
   // 연결된 fd와 여기에 관련된 Processor 객체를 map에 추가
-  processor_map_.insert(std::make_pair(client_socket, Processor()));
   ft::log.writeTimeLog("[Server] --- Accept client ---");
   ft::log.getLogStream() << "Host: " << socket_ << "\nClient: " << client_socket
                          << std::endl;
+
+  Processor processor;
+  processor.setConfig(config);
+  processor_map_.insert(std::make_pair(client_socket, processor));
 
   return client_socket;
 }

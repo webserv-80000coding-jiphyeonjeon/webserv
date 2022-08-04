@@ -19,8 +19,8 @@ void Config::addServers(const ConfigServer& server) {
 }
 
 Config::ListenListType Config::getAllListenList() const {
-  ListenListType                     all_listen_list;
-  std::set<ConfigServer::ListenType> unique_list;
+  ListenListType       all_listen_list;
+  std::set<ListenType> unique_list;
 
   for (ServersType::const_iterator server = servers_.begin();
        server != servers_.end(); ++server) {
@@ -34,8 +34,24 @@ Config::ListenListType Config::getAllListenList() const {
   return all_listen_list;
 }
 
+Config::ConfigFinderType Config::getConfigFinder() const {
+  ConfigFinderType     config_finder;
+  std::set<ListenType> unique_list;
+
+  for (ServersType::const_iterator config = servers_.begin();
+       config != servers_.end(); ++config) {
+    const ListenListType& listen_list = config->getListen();
+    for (ListenListType::const_iterator listen = listen_list.begin();
+         listen != listen_list.end(); ++listen) {
+      if ((unique_list.insert(*listen)).second)
+        config_finder.insert(std::make_pair(*listen, &(*config)));
+    }
+  }
+  return config_finder;
+}
+
 void Config::printConfig() const {
-  ft::log.writeTimeLog("[Config] --- Print config ---");
+  ft::log.writeTimeLog("[Config] --- Print config after parsing ---");
 
   int i = 0;
   for (ServersType::const_iterator server = servers_.begin();
@@ -46,7 +62,7 @@ void Config::printConfig() const {
   }
 }
 
-void Config::printServer(const ConfigServer& server) const {
+void Config::printServer(const ConfigServer& server) {
   ft::log.getLogStream() << GRN "  [server name]" END << std::endl;
   const ServerNameType server_name = server.getServerName();
   for (ServerNameType::const_iterator it = server_name.begin();
@@ -71,7 +87,7 @@ void Config::printServer(const ConfigServer& server) const {
 }
 
 void Config::printLocation(const ConfigLocation& location,
-                           const std::string&    indent) const {
+                           const std::string&    indent) {
   ft::log.getLogStream() << indent << YEL "  [limit_except]" END << std::endl;
   const LimitExceptType limit_except = location.getLimitExcept();
   for (LimitExceptType::const_iterator it = limit_except.begin();
@@ -83,7 +99,7 @@ void Config::printLocation(const ConfigLocation& location,
 }
 
 void Config::printCommon(const ConfigCommon& common, const std::string& indent,
-                         const std::string& color) const {
+                         const std::string& color) {
   ft::log.getLogStream() << indent << color << "[autoindex] " END
                          << (common.getAutoindex() ? "on" : "off") << "\n"
                          << std::endl;
@@ -110,7 +126,7 @@ void Config::printCommon(const ConfigCommon& common, const std::string& indent,
 }
 
 void Config::printListen(const Config::ListenListType& listen_list,
-                         const std::string&            indent) const {
+                         const std::string&            indent) {
   for (ListenListType::const_iterator it = listen_list.begin();
        it != listen_list.end(); ++it) {
     sockaddr_in addr;

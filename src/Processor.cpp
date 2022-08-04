@@ -3,6 +3,7 @@
 #include <exception>
 #include <iostream>
 
+#include "Config.hpp"
 #include "Log.hpp"
 
 Processor::Processor() { initMethodFuncMap(); }
@@ -18,6 +19,12 @@ const Processor::StatusCodeType& Processor::getStatusCode() const {
 const Request& Processor::getRequest() const { return request_; }
 
 const Level& Processor::getLevel() const { return request_.getLevel(); }
+
+void Processor::setConfig(const ConfigServer& config) {
+  ft::log.writeTimeLog("[Processor] --- Set config ---");
+  config_ = config;
+  Config::printServer(config_);
+}
 
 void Processor::setFd(const FdType& fd) { fd_ = fd; }
 

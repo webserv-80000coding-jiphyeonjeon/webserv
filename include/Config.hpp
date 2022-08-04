@@ -9,13 +9,23 @@
 
 class Config {
  public:
-  typedef std::vector<ConfigServer>       ServersType;
-  typedef ConfigServer::ServerNameType    ServerNameType;
-  typedef ConfigServer::ListenListType    ListenListType;
-  typedef ConfigServer::LocationType      LocationType;
-  typedef ConfigServer::IndexType         IndexType;
-  typedef ConfigServer::ErrorPageType     ErrorPageType;
-  typedef ConfigLocation::LimitExceptType LimitExceptType;
+  typedef std::vector<ConfigServer>                 ServersType;
+  typedef ConfigServer::ServerNameType              ServerNameType;
+  typedef ConfigServer::ListenType                  ListenType;
+  typedef ConfigServer::ListenListType              ListenListType;
+  typedef ConfigServer::LocationType                LocationType;
+  typedef ConfigServer::IndexType                   IndexType;
+  typedef ConfigServer::ErrorPageType               ErrorPageType;
+  typedef ConfigLocation::LimitExceptType           LimitExceptType;
+  typedef std::map<ListenType, const ConfigServer*> ConfigFinderType;
+
+  static void printServer(const ConfigServer& server);
+  static void printLocation(const ConfigLocation& location,
+                            const std::string&    indent);
+  static void printCommon(const ConfigCommon& common, const std::string& indent,
+                          const std::string& color);
+  static void printListen(const ListenListType& listen_list,
+                          const std::string&    indent);
 
   Config();
   ~Config();
@@ -23,19 +33,12 @@ class Config {
   const ServersType& getServers() const;
   void               addServers(const ConfigServer& server);
   ListenListType     getAllListenList() const;
+  ConfigFinderType   getConfigFinder() const;
 
   void printConfig() const;
-  void printListen(const ListenListType& listen_list,
-                   const std::string&    indent) const;
 
  private:
   ServersType servers_;
-
-  void printServer(const ConfigServer& server) const;
-  void printLocation(const ConfigLocation& location,
-                     const std::string&    indent) const;
-  void printCommon(const ConfigCommon& common, const std::string& indent,
-                   const std::string& color) const;
 };
 
 #endif  // CONFIG_HPP_
