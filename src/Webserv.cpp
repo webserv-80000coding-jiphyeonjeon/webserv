@@ -6,9 +6,9 @@
 #include "color.hpp"
 #include "sys/time.h"
 
-Webserv::Webserv()
-    : max_fd_(0),
-      config_finder_(),
+Webserv::Webserv(const Config& config)
+    : config_(config),
+      max_fd_(0),
       server_map_(),
       connect_socket_(),
       ready_to_write_() {
@@ -17,8 +17,9 @@ Webserv::Webserv()
 
 Webserv::~Webserv() {}
 
-void Webserv::initWebserv(const Config& config) {
-  Config::ListenListType listen_list = config.getAllListenList();
+void Webserv::initWebserv() {
+  Config::ListenListType listen_list = config_.getAllListenList();
+
   for (Config::ListenListType::const_iterator listen = listen_list.begin();
        listen != listen_list.end(); ++listen) {
     Server server(*listen);
@@ -36,8 +37,6 @@ void Webserv::initWebserv(const Config& config) {
   }
   if (!max_fd_)
     throw std::runtime_error("Server: No listening.");
-
-  config_finder_ = config.getConfigFinder();
 }
 
 void Webserv::runWebserv() {
@@ -80,8 +79,7 @@ void Webserv::addConnection(int& state, fd_set& read_fds) {
   for (FdServerMapType::iterator it = server_map_.begin();
        it != server_map_.end(); ++it) {
     if (FD_ISSET(it->first, &read_fds)) {
-      FdType client_socket =
-          it->second.acceptClient(*config_finder_[it->second.getListen()]);
+      FdType client_socket = it->second.acceptClient();
       if (client_socket != -1) {
         FD_SET(client_socket, &fd_set_);
         connect_socket_.insert(std::make_pair(client_socket, &it->second));
@@ -112,7 +110,7 @@ void Webserv::receiveRequest(int& state, fd_set& read_fds) {
 
       } else if (recv_state == kRecvSuccess) {
         ft::log.writeTimeLog("[Webserv] --- Success to received request ---");
-        // process()
+        it->second->process(receive_socket, config_);
         ready_to_write_.push_back(receive_socket);
       }
       // kRecvContinuous는 데이터를 더 받아야하는 상태이므로 아무것도 하지 않음

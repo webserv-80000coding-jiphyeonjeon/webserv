@@ -34,22 +34,6 @@ Config::ListenListType Config::getAllListenList() const {
   return all_listen_list;
 }
 
-Config::ConfigFinderType Config::getConfigFinder() const {
-  ConfigFinderType     config_finder;
-  std::set<ListenType> unique_list;
-
-  for (ServersType::const_iterator config = servers_.begin();
-       config != servers_.end(); ++config) {
-    const ListenListType& listen_list = config->getListen();
-    for (ListenListType::const_iterator listen = listen_list.begin();
-         listen != listen_list.end(); ++listen) {
-      if ((unique_list.insert(*listen)).second)
-        config_finder.insert(std::make_pair(*listen, &(*config)));
-    }
-  }
-  return config_finder;
-}
-
 void Config::printConfig() const {
   ft::log.writeTimeLog("[Config] --- Print config after parsing ---");
 
@@ -64,8 +48,8 @@ void Config::printConfig() const {
 
 void Config::printServer(const ConfigServer& server) {
   ft::log.getLogStream() << GRN "  [server name]" END << std::endl;
-  const ServerNameType server_name = server.getServerName();
-  for (ServerNameType::const_iterator it = server_name.begin();
+  const ServerNamesType server_name = server.getServerName();
+  for (ServerNamesType::const_iterator it = server_name.begin();
        it != server_name.end(); ++it)
     ft::log.getLogStream() << "    " << *it << "\n";
   ft::log.writeEndl();

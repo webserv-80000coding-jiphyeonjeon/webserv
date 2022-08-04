@@ -7,7 +7,7 @@
 
 class ConfigServer {
  public:
-  typedef std::vector<std::string>               ServerNameType;
+  typedef std::vector<std::string>               ServerNamesType;
   typedef std::uint32_t                          AddressType;
   typedef std::uint16_t                          PortType;
   typedef std::pair<AddressType, PortType>       ListenType;
@@ -34,10 +34,10 @@ class ConfigServer {
   ~ConfigServer();
   ConfigServer& operator=(const ConfigServer& other);
 
-  const ServerNameType& getServerName() const;
-  const ListenListType& getListen() const;
-  const LocationType&   getLocation() const;
-  const Common&         getCommon() const;
+  const ServerNamesType& getServerName() const;
+  const ListenListType&  getListen() const;
+  const LocationType&    getLocation() const;
+  const Common&          getCommon() const;
 
   const AutoindexType&            getAutoindex() const;
   const ClientBodyBufferSizeType& getClientBodyBufferSize() const;
@@ -46,7 +46,7 @@ class ConfigServer {
   const ReturnType&               getReturn() const;
   const RootType&                 getRoot() const;
 
-  void setServerName(const ServerNameType& server_name);
+  void setServerName(const ServerNamesType& server_name);
   void addServerName(const std::string& value);
   void setListen(const ListenListType& listen);
   void addListen(const ListenType& value);
@@ -63,10 +63,10 @@ class ConfigServer {
   void setRoot(const RootType& value);
 
  private:
-  ServerNameType server_name_;
-  ListenListType listen_;
-  LocationType   location_;
-  Common         common_config_;
+  ServerNamesType server_name_;
+  ListenListType  listen_;
+  LocationType    location_;
+  Common          common_config_;
 };
 
 #endif  // CONFIGSERVER_HPP_
