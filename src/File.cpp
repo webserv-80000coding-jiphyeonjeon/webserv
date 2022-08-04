@@ -1,12 +1,11 @@
 #include "File.hpp"
 
+#include <fcntl.h>
 #include <sys/stat.h>
+#include <unistd.h>
 
 File::File() : fd_(-1) {}
-File::File(const PathType& root, const PathType& path) : path_(path), fd_(-1) {
-  parsePath(path);
-}
-File::File(const PathType& path) : fd_(-1) { parsePath(path); }
+File::File(const PathType& path) : path_(path), fd_(-1) {}
 File::~File() { close(); }
 
 const File::PathType&      File::getPath() const { return path_; }
@@ -29,7 +28,7 @@ bool File::open() {
 bool File::close() { return ::close(fd_); }
 
 bool File::create() {
-  fd_ = ::open(path_.c_str(), O_RDWR | O_CREAT | O_TRUNC, 0755));
+  fd_ = ::open(path_.c_str(), O_RDWR | O_CREAT | O_TRUNC, 0755);
   return fd_ == -1;
 }
 
@@ -55,7 +54,7 @@ bool File::isDirectory(const PathType& path) {
   return ::stat(path.c_str(), &buf) == 0 && S_ISDIR(buf.st_mode);
 }
 
-void parsePath(const PathType& path) {
+void File::parsePath(const PathType& path) {
   path_ = path;
 
   size_t name_pos = path_.find_last_of('/');

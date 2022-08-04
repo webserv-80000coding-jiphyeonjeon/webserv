@@ -39,7 +39,7 @@ class File {
   static bool isDirectory(const PathType& path);
 
  private:
-  void parsePath();
+  void parsePath(const PathType& path);
 
   PathType      path_;
   NameType      name_;
