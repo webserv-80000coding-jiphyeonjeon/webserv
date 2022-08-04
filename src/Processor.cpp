@@ -6,11 +6,11 @@
 #include "Config.hpp"
 #include "Log.hpp"
 
-Processor::Processor() { initMethodFuncMap(); }
+Processor::Processor() : status_code_(200) { initMethodFuncMap(); }
 
 Processor::~Processor() {}
 
-const Processor::FdType& Processor::getFd() const { return fd_; }
+const File& Processor::getFile() const { return file_; }
 
 const Processor::StatusCodeType& Processor::getStatusCode() const {
   return status_code_;
@@ -22,7 +22,7 @@ const Level& Processor::getLevel() const { return request_.getLevel(); }
 
 void Processor::setConfig(const ConfigServer& config) { config_ = config; }
 
-void Processor::setFd(const FdType& fd) { fd_ = fd; }
+void Processor::setFile(const File& file) { file_ = file; }
 
 void Processor::setStatusCode(const StatusCodeType& status_code) {
   status_code_ = status_code;

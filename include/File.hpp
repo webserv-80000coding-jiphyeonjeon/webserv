@@ -12,6 +12,7 @@ class File {
   typedef std::string ExtensionType;
   typedef int         FdType;
 
+  File();
   File(const PathType& path);
   ~File();
 

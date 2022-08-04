@@ -2,6 +2,7 @@
 
 #include <sys/stat.h>
 
+File::File() : fd_(-1) {}
 File::File(const PathType& path) : fd_(-1) { parsePath(path); }
 File::~File() { close(); }
 
