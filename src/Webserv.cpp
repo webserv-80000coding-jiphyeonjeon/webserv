@@ -7,7 +7,11 @@
 #include "sys/time.h"
 
 Webserv::Webserv()
-    : max_fd_(0), server_map_(), connect_socket_(), ready_to_write_() {
+    : max_fd_(0),
+      config_finder_(),
+      server_map_(),
+      connect_socket_(),
+      ready_to_write_() {
   FD_ZERO(&fd_set_);
 }
 
@@ -15,10 +19,6 @@ Webserv::~Webserv() {}
 
 void Webserv::initWebserv(const Config& config) {
   Config::ListenListType listen_list = config.getAllListenList();
-#if defined(PARSER_LOG)
-  config.printListen(listen_list, "");
-#endif
-
   for (Config::ListenListType::const_iterator listen = listen_list.begin();
        listen != listen_list.end(); ++listen) {
     Server server(*listen);
@@ -36,6 +36,8 @@ void Webserv::initWebserv(const Config& config) {
   }
   if (!max_fd_)
     throw std::runtime_error("Server: No listening.");
+
+  config_finder_ = config.getConfigFinder();
 }
 
 void Webserv::runWebserv() {
@@ -78,7 +80,8 @@ void Webserv::addConnection(int& state, fd_set& read_fds) {
   for (FdServerMapType::iterator it = server_map_.begin();
        it != server_map_.end(); ++it) {
     if (FD_ISSET(it->first, &read_fds)) {
-      FdType client_socket = it->second.acceptClient();
+      FdType client_socket =
+          it->second.acceptClient(*config_finder_[it->second.getListen()]);
       if (client_socket != -1) {
         FD_SET(client_socket, &fd_set_);
         connect_socket_.insert(std::make_pair(client_socket, &it->second));

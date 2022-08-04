@@ -26,11 +26,12 @@ class Server {
   Server(const ListenType& listen);
   ~Server();
 
-  FdType                 getFd() const;
-  ConfigServer::PortType getPort() const;
+  const FdType&                 getFd() const;
+  const ListenType&             getListen() const;
+  const ConfigServer::PortType& getPort() const;
 
   void      initServer();
-  FdType    acceptClient();
+  FdType    acceptClient(const ConfigServer& config);
   RecvState receiveData(FdType client_socket);
   SendState sendData(FdType client_socket);
   void      closeClient(FdType client_socket);

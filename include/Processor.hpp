@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 
+#include "ConfigServer.hpp"
 #include "Request.hpp"
 
 class Processor {
@@ -27,6 +28,7 @@ class Processor {
   const Level&          getLevel() const;
   // const Response& getResponse() const;
 
+  void setConfig(const ConfigServer& config);
   void setFd(const FdType& fd);
   void setStatusCode(const StatusCodeType& status_code);
   void setRequest(const Request& request);
@@ -45,13 +47,14 @@ class Processor {
   void methodHead();
 
  private:
-  void              initMethodFuncMap();
   MethodFuncMapType method_func_map_;
-
-  FdType         fd_;
-  StatusCodeType status_code_;
-  Request        request_;
+  ConfigServer      config_;
+  FdType            fd_;
+  StatusCodeType    status_code_;
+  Request           request_;
   // Response       response_;
+
+  void initMethodFuncMap();
 };
 
 #endif

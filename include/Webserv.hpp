@@ -11,6 +11,7 @@ class Webserv {
   typedef std::map<FdType, Server>  FdServerMapType;
   typedef std::map<FdType, Server*> ConnectSocketType;
   typedef std::vector<FdType>       ReadyType;
+  typedef Config::ConfigFinderType  ConfigFinderType;
 
   Webserv();
   ~Webserv();
@@ -24,6 +25,7 @@ class Webserv {
 
   FdType            max_fd_;
   fd_set            fd_set_;
+  ConfigFinderType  config_finder_;
   FdServerMapType   server_map_;
   ConnectSocketType connect_socket_;
   ReadyType         ready_to_write_;
