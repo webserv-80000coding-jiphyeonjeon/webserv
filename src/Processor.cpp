@@ -35,7 +35,24 @@ void Processor::process(const Config&                   total_config,
   ft::log.writeTimeLog("[Processor] --- Set config ---");
   config_ = getConfigServerForRequest(total_config, listen);
   Config::printServer(config_);
-  // (this->*method_func_map_[request_.getMethod()])();
+  file_.setPath(config_.getRoot() + request_.getPath());
+  (this->*method_func_map_[request_.getMethod()])();
+}
+
+void Processor::findLocation(const ConfigServer& config) {
+  size_t      last_slash_pos = request_.getPath().find_last_of("/");
+  std::string tmp_location, location = "/";
+
+  while (last_slash_pos != std::string::npos) {
+    tmp_location = request_.getPath().substr(0, last_slash_pos);
+    if (config.getLocation().find(tmp_location) != config.getLocation().end()) {
+      location = tmp_location;
+      break;
+    }
+    last_slash_pos = tmp_location.find_last_of("/", last_slash_pos - 1);
+  }
+
+  // config_ = config.getLocation().at(location);
 }
 
 int Processor::parseRequest(MessageType request_message) {
@@ -59,13 +76,32 @@ void Processor::printResponse() {
   // response_.print();
 }
 
-void Processor::methodGet() {}
+void Processor::methodGet() {
+  // TODO: autoindex case
 
-void Processor::methodPost() {}
+  // default case
+  // - set content type
+
+  // - set content length
+  // - set body
+}
+
+void Processor::methodPost() {
+  // set body(requested body)
+  // set content type
+  // set content length(body size)
+  // if file isn't exist, create file. 201
+  // if file is exist, update file. 200
+}
 
 void Processor::methodPut() {}
 
-void Processor::methodDelete() {}
+void Processor::methodDelete() {
+  // if file is exist, delete file. 200
+  // set body(file deleted)
+  // set content length(body size)
+  // if file isn't exist, 404
+}
 
 void Processor::methodHead() {}
 

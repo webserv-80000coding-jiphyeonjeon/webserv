@@ -13,6 +13,7 @@ class File {
   typedef int         FdType;
 
   File();
+  File(const PathType& root, const PathType& path);
   File(const PathType& path);
   ~File();
 

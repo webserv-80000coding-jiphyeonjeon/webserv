@@ -22,7 +22,7 @@ class Processor {
   typedef Request::MessageType      MessageType;
   typedef Request::StatusCodeType   StatusCodeType;
   typedef Request::RequestException RequestException;
-  // TODO 현재는 Fd로 관리하지만, 추후에 File 클래스로 관리할 예정
+  typedef Request::PathType         PathType;
 
   Processor();
   ~Processor();
@@ -39,6 +39,8 @@ class Processor {
   void setRequest(const Request& request);
 
   void process(const Config& total_config, const ListenType& listen);
+
+  void findLocation(const ConfigServer& config);
 
   int         parseRequest(MessageType request_message);
   void        printResponse();
