@@ -38,6 +38,9 @@ class File {
   static bool isExist(const PathType& path);
   static bool isDirectory(const PathType& path);
 
+  const std::string getContent() const;
+  void              appendContent(const std::string& content);
+
  private:
   void parsePath(const PathType& path);
 

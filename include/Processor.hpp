@@ -8,6 +8,7 @@
 #include "Config.hpp"
 #include "File.hpp"
 #include "Request.hpp"
+#include "Response.hpp"
 
 class Processor {
  public:
@@ -60,7 +61,7 @@ class Processor {
   File           file_;
   StatusCodeType status_code_;
   Request        request_;
-  // Response       response_;
+  Response       response_;
 
   void initMethodFuncMap();
 

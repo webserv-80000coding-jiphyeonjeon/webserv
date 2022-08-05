@@ -1,5 +1,7 @@
 #include "Processor.hpp"
 
+#include <unistd.h>
+
 #include <exception>
 #include <iostream>
 
@@ -80,27 +82,43 @@ void Processor::methodGet() {
   // TODO: autoindex case
 
   // default case
+  // FIXME: MIME 구현 후 수정
   // - set content type
-
-  // - set content length
+  response_.setHeader("Content-Type", "text/html");
   // - set body
 }
 
 void Processor::methodPost() {
   // set body(requested body)
+  response_.setBody(request_.getBody());
+  // FIXME: MIME 구현 후 수정
   // set content type
-  // set content length(body size)
-  // if file isn't exist, create file. 201
-  // if file is exist, update file. 200
+  response_.setHeader("Content-Type", "text/html");
+  if (file_.isExist() == false) {
+    // if file isn't exist, create file. 201
+    file_.create();
+    ::write(file_.getFd(), request_.getBody().c_str(),
+            request_.getBody().size());
+    response_.setStatusCode(201);
+  } else {
+    // if file is exist, update file. 200
+    file_.appendContent(request_.getBody());
+    response_.setStatusCode(200);
+  }
 }
 
 void Processor::methodPut() {}
 
 void Processor::methodDelete() {
-  // if file is exist, delete file. 200
-  // set body(file deleted)
-  // set content length(body size)
-  // if file isn't exist, 404
+  if (file_.isExist()) {
+    // if file is exist, delete file. 200
+    // 204 means no content
+    file_.remove();
+    response_.setStatusCode(204);
+  } else {
+    // if file isn't exist, 404
+    response_.setStatusCode(404);
+  }
 }
 
 void Processor::methodHead() {}
