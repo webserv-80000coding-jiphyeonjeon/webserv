@@ -20,6 +20,10 @@ const Processor::StatusCodeType& Processor::getStatusCode() const {
 
 const Request& Processor::getRequest() const { return request_; }
 
+const Processor::ResponseMessageType& Processor::getResponseMessage() const {
+  return response_.getMessage();
+}
+
 const Level& Processor::getLevel() const { return request_.getLevel(); }
 
 void Processor::setConfig(const ConfigServer& config) { config_ = config; }
@@ -39,6 +43,7 @@ void Processor::process(const Config&                   total_config,
   Config::printServer(config_);
   file_.setPath(config_.getRoot() + request_.getPath());
   (this->*method_func_map_[request_.getMethod()])();
+  response_.build();
 }
 
 void Processor::findLocation(const ConfigServer& config) {
@@ -84,8 +89,16 @@ void Processor::methodGet() {
   // default case
   // FIXME: MIME 구현 후 수정
   // - set content type
-  response_.setHeader("Content-Type", "text/html");
-  // - set body
+  if (file_.isExist()) {
+    file_.open();
+    response_.setHeader("Content-Type", "text/html");
+    // - set body
+    response_.setBody(file_.getContent());
+    response_.setStatusCode(200);
+    file_.close();
+  } else {
+    response_.setStatusCode(404);
+  }
 }
 
 void Processor::methodPost() {
@@ -100,10 +113,13 @@ void Processor::methodPost() {
     ::write(file_.getFd(), request_.getBody().c_str(),
             request_.getBody().size());
     response_.setStatusCode(201);
+    file_.close();
   } else {
     // if file is exist, update file. 200
+    file_.open();
     file_.appendContent(request_.getBody());
     response_.setStatusCode(200);
+    file_.close();
   }
 }
 

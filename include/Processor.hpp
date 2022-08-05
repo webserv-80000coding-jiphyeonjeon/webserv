@@ -25,6 +25,8 @@ class Processor {
   typedef Request::RequestException RequestException;
   typedef Request::PathType         PathType;
 
+  typedef Response::MessageType ResponseMessageType;
+
   Processor();
   ~Processor();
 
@@ -33,6 +35,8 @@ class Processor {
   const Request&        getRequest() const;
   const Level&          getLevel() const;
   // const Response& getResponse() const;
+
+  const ResponseMessageType& getResponseMessage() const;
 
   void setConfig(const ConfigServer& config);
   void setFile(const File& file);

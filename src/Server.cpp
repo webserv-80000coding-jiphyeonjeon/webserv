@@ -81,7 +81,7 @@ RecvState Server::receiveData(Server::FdType client_socket) {
 }
 
 SendState Server::sendData(Server::FdType client_socket) {
-  std::string str = processor_map_[client_socket].strRequest();
+  std::string str = processor_map_[client_socket].getResponseMessage();
   ft::log.writeTimeLog("[Server] --- Send Data ---");
   ft::log.writeLog(str);
   ssize_t send_size = send(client_socket, str.c_str(), str.size(), 0);
