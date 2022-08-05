@@ -28,6 +28,9 @@ class Response {
   void setBody(const BodyType& body);
 
   void build();
+  void buildException(const StatusCodeType& status_code);
+
+  bool isBuilt() const;
 
  private:
   void initStatusCodeMap();

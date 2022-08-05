@@ -13,7 +13,8 @@ enum RecvState {
   kClosedClient = 0,
   kRecvSuccess = 1,
   kRecvContinuous = 2,
-  kRecvError = -1
+  kRecvError = -1,
+  kParseError = -2
 };
 enum SendState { kSendError = -1, kSendSuccess = 0 };
 

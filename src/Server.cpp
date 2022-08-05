@@ -77,7 +77,7 @@ RecvState Server::receiveData(Server::FdType client_socket) {
 
   ProcessorType::iterator it = processor_map_.find(client_socket);
   if (it->second.parseRequest(std::string(buffer)) == -1)
-    return kRecvError;
+    return kParseError;
   return (it->second.getLevel() == kDone ? kRecvSuccess : kRecvContinuous);
 }
 

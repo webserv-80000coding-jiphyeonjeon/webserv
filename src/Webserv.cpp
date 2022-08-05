@@ -108,7 +108,7 @@ void Webserv::receiveRequest(int& state, fd_set& read_fds) {
         FD_CLR(receive_socket, &read_fds);
         connect_socket_.erase(receive_socket);
 
-      } else if (recv_state == kRecvSuccess) {
+      } else if (recv_state == kRecvSuccess || recv_state == kParseError) {
         ft::log.writeTimeLog("[Webserv] --- Success to received request ---");
         it->second->process(receive_socket, config_);
         ready_to_write_.push_back(receive_socket);

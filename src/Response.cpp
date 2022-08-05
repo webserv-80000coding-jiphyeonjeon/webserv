@@ -38,6 +38,18 @@ void Response::build() {
   message_ = ss.str();
 }
 
+void Response::buildException(const StatusCodeType& status_code) {
+  std::stringstream ss;
+  setStatusCode(status_code);
+  ss << "<html><body><h1>" << status_code_ << " "
+     << status_code_map_[status_code_] << "</h1></body></html>";
+  setHeader("Content-Type", "text/html");
+  setBody(ss.str());
+  build();
+}
+
+bool Response::isBuilt() const { return message_ != ""; }
+
 void Response::initStatusCodeMap() {
   status_code_map_[100] = "Continue";
   status_code_map_[101] = "Switching Protocols";

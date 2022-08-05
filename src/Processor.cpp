@@ -38,6 +38,8 @@ void Processor::setRequest(const Request& request) { request_ = request; }
 
 void Processor::process(const Config&                   total_config,
                         const ConfigServer::ListenType& listen) {
+  if (response_.isBuilt() != false)
+    return;
   ft::log.writeTimeLog("[Processor] --- Set config ---");
   config_ = getConfigServerForRequest(total_config, listen);
   Config::printServer(config_);
@@ -66,11 +68,10 @@ int Processor::parseRequest(MessageType request_message) {
   try {
     return request_.parse(request_message);
   } catch (RequestException& e) {
-    std::cout << e.what() << std::endl;
     ft::log.writeTimeLog("[Processor] --- Parsing request failed ---");
     ft::log.writeLog("Reason: " + std::string(e.what()));
     // TODO 응답 메세지 작성 및 응답 준비
-    // readyToResponse(e.getStatusCode());
+    response_.buildException(e.getStatusCode());
     return -1;
   }
 }
