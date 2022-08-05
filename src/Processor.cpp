@@ -1,16 +1,18 @@
 #include "Processor.hpp"
 
+#include <unistd.h>
+
 #include <exception>
 #include <iostream>
 
 #include "Config.hpp"
 #include "Log.hpp"
 
-Processor::Processor() { initMethodFuncMap(); }
+Processor::Processor() : status_code_(200) { initMethodFuncMap(); }
 
 Processor::~Processor() {}
 
-const Processor::FdType& Processor::getFd() const { return fd_; }
+const File& Processor::getFile() const { return file_; }
 
 const Processor::StatusCodeType& Processor::getStatusCode() const {
   return status_code_;
@@ -18,11 +20,15 @@ const Processor::StatusCodeType& Processor::getStatusCode() const {
 
 const Request& Processor::getRequest() const { return request_; }
 
+const Processor::ResponseMessageType& Processor::getResponseMessage() const {
+  return response_.getMessage();
+}
+
 const Level& Processor::getLevel() const { return request_.getLevel(); }
 
 void Processor::setConfig(const ConfigServer& config) { config_ = config; }
 
-void Processor::setFd(const FdType& fd) { fd_ = fd; }
+void Processor::setFile(const File& file) { file_ = file; }
 
 void Processor::setStatusCode(const StatusCodeType& status_code) {
   status_code_ = status_code;
@@ -35,7 +41,25 @@ void Processor::process(const Config&                   total_config,
   ft::log.writeTimeLog("[Processor] --- Set config ---");
   config_ = getConfigServerForRequest(total_config, listen);
   Config::printServer(config_);
-  // (this->*method_func_map_[request_.getMethod()])();
+  file_.setPath(config_.getRoot() + request_.getPath());
+  (this->*method_func_map_[request_.getMethod()])();
+  response_.build();
+}
+
+void Processor::findLocation(const ConfigServer& config) {
+  size_t      last_slash_pos = request_.getPath().find_last_of("/");
+  std::string tmp_location, location = "/";
+
+  while (last_slash_pos != std::string::npos) {
+    tmp_location = request_.getPath().substr(0, last_slash_pos);
+    if (config.getLocation().find(tmp_location) != config.getLocation().end()) {
+      location = tmp_location;
+      break;
+    }
+    last_slash_pos = tmp_location.find_last_of("/", last_slash_pos - 1);
+  }
+
+  // config_ = config.getLocation().at(location);
 }
 
 int Processor::parseRequest(MessageType request_message) {
@@ -59,13 +83,59 @@ void Processor::printResponse() {
   // response_.print();
 }
 
-void Processor::methodGet() {}
+void Processor::methodGet() {
+  // TODO: autoindex case
 
-void Processor::methodPost() {}
+  // default case
+  // FIXME: MIME 구현 후 수정
+  // - set content type
+  if (file_.isExist()) {
+    file_.open();
+    response_.setHeader("Content-Type", "text/html");
+    // - set body
+    response_.setBody(file_.getContent());
+    response_.setStatusCode(200);
+    file_.close();
+  } else {
+    response_.setStatusCode(404);
+  }
+}
+
+void Processor::methodPost() {
+  // set body(requested body)
+  response_.setBody(request_.getBody());
+  // FIXME: MIME 구현 후 수정
+  // set content type
+  response_.setHeader("Content-Type", "text/html");
+  if (file_.isExist() == false) {
+    // if file isn't exist, create file. 201
+    file_.create();
+    ::write(file_.getFd(), request_.getBody().c_str(),
+            request_.getBody().size());
+    response_.setStatusCode(201);
+    file_.close();
+  } else {
+    // if file is exist, update file. 200
+    file_.open();
+    file_.appendContent(request_.getBody());
+    response_.setStatusCode(200);
+    file_.close();
+  }
+}
 
 void Processor::methodPut() {}
 
-void Processor::methodDelete() {}
+void Processor::methodDelete() {
+  if (file_.isExist()) {
+    // if file is exist, delete file. 200
+    // 204 means no content
+    file_.remove();
+    response_.setStatusCode(204);
+  } else {
+    // if file isn't exist, 404
+    response_.setStatusCode(404);
+  }
+}
 
 void Processor::methodHead() {}
 

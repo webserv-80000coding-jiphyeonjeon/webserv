@@ -8,6 +8,7 @@
 
 #define MAXIMUM_URI_LIMIT 2048
 #define MAXIMUM_PAYLOAD_LIMIT 8192
+#define FILE_READ_BUFFER_SIZE 8192
 
 namespace ft {
 template <typename T>

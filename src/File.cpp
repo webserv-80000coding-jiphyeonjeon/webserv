@@ -1,8 +1,17 @@
 #include "File.hpp"
 
+#include <fcntl.h>
 #include <sys/stat.h>
+#include <unistd.h>
 
-File::File(const PathType& path) : fd_(-1) { parsePath(path); }
+#include "Utilities.hpp"
+
+File::File() : fd_(-1) {}
+File::File(const PathType& root, const PathType& path)
+    : path_(root + path), fd_(-1) {
+  parsePath(path);
+}
+File::File(const PathType& path) : path_(path), fd_(-1) {}
 File::~File() { close(); }
 
 const File::PathType&      File::getPath() const { return path_; }
@@ -25,7 +34,7 @@ bool File::open() {
 bool File::close() { return ::close(fd_); }
 
 bool File::create() {
-  fd_ = ::open(path_.c_str(), O_RDWR | O_CREAT | O_TRUNC, 0755));
+  fd_ = ::open(path_.c_str(), O_RDWR | O_CREAT | O_TRUNC, 0755);
   return fd_ == -1;
 }
 
@@ -51,7 +60,33 @@ bool File::isDirectory(const PathType& path) {
   return ::stat(path.c_str(), &buf) == 0 && S_ISDIR(buf.st_mode);
 }
 
-void parsePath(const PathType& path) {
+const std::string File::getContent() const {
+  ssize_t     size;
+  std::string content;
+  char        buffer[FILE_READ_BUFFER_SIZE + 1];
+
+  lseek(fd_, 0, SEEK_SET);
+  while ((size = ::read(fd_, buffer, FILE_READ_BUFFER_SIZE)) > 0) {
+    buffer[size] = '\0';
+    content += buffer;
+  }
+  if (size == -1) {
+    content = "";
+    return content;
+  }
+
+  return content;
+}
+
+void File::appendContent(const std::string& content) {
+  close();
+  fd_ = ::open(path_.c_str(), O_RDWR | O_APPEND, 0755);
+  if (fd_ == -1)
+    return;
+  write(fd_, content.c_str(), content.size());
+}
+
+void File::parsePath(const PathType& path) {
   path_ = path;
 
   size_t name_pos = path_.find_last_of('/');

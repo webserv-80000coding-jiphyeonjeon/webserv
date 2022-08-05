@@ -12,6 +12,8 @@ class File {
   typedef std::string ExtensionType;
   typedef int         FdType;
 
+  File();
+  File(const PathType& root, const PathType& path);
   File(const PathType& path);
   ~File();
 
@@ -36,8 +38,11 @@ class File {
   static bool isExist(const PathType& path);
   static bool isDirectory(const PathType& path);
 
+  const std::string getContent() const;
+  void              appendContent(const std::string& content);
+
  private:
-  void parsePath();
+  void parsePath(const PathType& path);
 
   PathType      path_;
   NameType      name_;

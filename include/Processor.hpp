@@ -6,7 +6,9 @@
 #include <vector>
 
 #include "Config.hpp"
+#include "File.hpp"
 #include "Request.hpp"
+#include "Response.hpp"
 
 class Processor {
  public:
@@ -21,24 +23,29 @@ class Processor {
   typedef Request::MessageType      MessageType;
   typedef Request::StatusCodeType   StatusCodeType;
   typedef Request::RequestException RequestException;
-  // TODO 현재는 Fd로 관리하지만, 추후에 File 클래스로 관리할 예정
-  typedef int FdType;
+  typedef Request::PathType         PathType;
+
+  typedef Response::MessageType ResponseMessageType;
 
   Processor();
   ~Processor();
 
-  const FdType&         getFd() const;
+  const File&           getFile() const;
   const StatusCodeType& getStatusCode() const;
   const Request&        getRequest() const;
   const Level&          getLevel() const;
   // const Response& getResponse() const;
 
+  const ResponseMessageType& getResponseMessage() const;
+
   void setConfig(const ConfigServer& config);
-  void setFd(const FdType& fd);
+  void setFile(const File& file);
   void setStatusCode(const StatusCodeType& status_code);
   void setRequest(const Request& request);
 
   void process(const Config& total_config, const ListenType& listen);
+
+  void findLocation(const ConfigServer& config);
 
   int         parseRequest(MessageType request_message);
   void        printResponse();
@@ -55,10 +62,10 @@ class Processor {
   MethodFuncMapType method_func_map_;
 
   ConfigServer   config_;
-  FdType         fd_;
+  File           file_;
   StatusCodeType status_code_;
   Request        request_;
-  // Response       response_;
+  Response       response_;
 
   void initMethodFuncMap();
 

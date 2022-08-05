@@ -77,7 +77,7 @@ void Webserv::runWebserv() {
 
 void Webserv::addConnection(int& state, fd_set& read_fds) {
   for (FdServerMapType::iterator it = server_map_.begin();
-       it != server_map_.end(); ++it) {
+       state && it != server_map_.end(); ++it) {
     if (FD_ISSET(it->first, &read_fds)) {
       FdType client_socket = it->second.acceptClient();
       if (client_socket != -1) {
@@ -98,7 +98,7 @@ void Webserv::receiveRequest(int& state, fd_set& read_fds) {
   FdType receive_socket;
 
   for (ConnectSocketType::iterator it = connect_socket_.begin();
-       it != connect_socket_.end(); ++it) {
+       state && it != connect_socket_.end(); ++it) {
     receive_socket = it->first;
     if (FD_ISSET(receive_socket, &read_fds)) {
       RecvState recv_state = it->second->receiveData(receive_socket);
@@ -113,7 +113,7 @@ void Webserv::receiveRequest(int& state, fd_set& read_fds) {
         it->second->process(receive_socket, config_);
         ready_to_write_.push_back(receive_socket);
       }
-      // kRecvContinuous는 데이터를 더 받아야하는 상태이므로 아무것도 하지 않음
+      // kRecvContinuous: do nothing
       state = 0;
       break;
     }
@@ -122,7 +122,7 @@ void Webserv::receiveRequest(int& state, fd_set& read_fds) {
 
 void Webserv::sendResponse(int& state, fd_set& write_fds) {
   for (ReadyType::iterator it = ready_to_write_.begin();
-       it != ready_to_write_.end(); ++it) {
+       state && it != ready_to_write_.end(); ++it) {
     if (FD_ISSET(*it, &write_fds)) {
       SendState send_state = connect_socket_[*it]->sendData(*it);
 
