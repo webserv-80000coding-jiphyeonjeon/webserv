@@ -22,7 +22,7 @@ class RequestHeader {
   typedef std::string                              HeaderValueType;
   typedef std::map<HeaderKeyType, HeaderValueType> HeaderMapType;
 
-  typedef std::string   AddressType;
+  typedef std::string   ServerNameType;
   typedef std::uint16_t PortType;
   typedef std::size_t   ContentLengthType;
   typedef int           ContentTypeType;
@@ -36,7 +36,7 @@ class RequestHeader {
 
   const HeaderMapType&     getHeaderMap() const;
   const HeaderValueType&   getHeader(const HeaderKeyType& key) const;
-  const AddressType&       getAddress() const;
+  const ServerNameType&    getServerName() const;
   const PortType&          getPort() const;
   const ContentLengthType& getContentLength() const;
   const ContentTypeType&   getContentType() const;
@@ -45,7 +45,7 @@ class RequestHeader {
   void setHeaderMap(const HeaderMapType& header_map, const Method& method);
   void setHeader(const HeaderKeyType& key, const HeaderValueType& value,
                  const Method& method);
-  void setAddress(const AddressType& address);
+  void setServerName(const ServerNameType& server_name);
   void setPort(const PortType& port);
   void setContentLength(const ContentLengthType& content_length);
   void setContentType(const ContentTypeType& content_type);
@@ -62,7 +62,7 @@ class RequestHeader {
   void initParseFuncMap();
 
   HeaderMapType     header_map_;
-  AddressType       address_;
+  ServerNameType    server_name_;
   PortType          port_;
   ContentLengthType content_length_;
   ContentTypeType   content_type_;
@@ -101,6 +101,8 @@ class Request {
   const BodyType&        getBody() const;
   const State&           getState() const;
   const Level&           getLevel() const;
+
+  const RequestHeader::ServerNameType& getServerName() const;
 
   void setRequestMessage(const MessageType& request_message);
   void setMethod(const Method& method);

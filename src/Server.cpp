@@ -36,7 +36,7 @@ void Server::initServer() {
     throw std::runtime_error("Server: listen() error");
 }
 
-Server::FdType Server::acceptClient(const ConfigServer& config) {
+Server::FdType Server::acceptClient() {
   FdType             client_socket;
   struct sockaddr_in client_addr;
   socklen_t          client_addr_len = sizeof(client_addr);
@@ -50,10 +50,7 @@ Server::FdType Server::acceptClient(const ConfigServer& config) {
   ft::log.writeTimeLog("[Server] --- Accept client ---");
   ft::log.getLogStream() << "Host: " << socket_ << "\nClient: " << client_socket
                          << std::endl;
-
-  Processor processor;
-  processor.setConfig(config);
-  processor_map_.insert(std::make_pair(client_socket, processor));
+  processor_map_.insert(std::make_pair(client_socket, Processor()));
 
   return client_socket;
 }
@@ -103,6 +100,10 @@ void Server::closeClient(Server::FdType client_socket) {
   if (client_socket > 0)
     close(client_socket);
   processor_map_.erase(client_socket);
+}
+
+void Server::process(Server::FdType client_socket, const Config& total_config) {
+  processor_map_[client_socket].process(total_config, listen_);
 }
 
 void Server::setAddr() {

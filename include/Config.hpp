@@ -9,17 +9,16 @@
 
 class Config {
  public:
-  typedef std::vector<ConfigServer>                 ServersType;
-  typedef ConfigServer::ServerNameType              ServerNameType;
-  typedef ConfigServer::ListenType                  ListenType;
-  typedef ConfigServer::ListenListType              ListenListType;
-  typedef ConfigServer::LocationType                LocationType;
-  typedef ConfigServer::IndexType                   IndexType;
-  typedef ConfigServer::ErrorPageType               ErrorPageType;
-  typedef ConfigServer::ReturnType                  ReturnType;
-  typedef ConfigLocation::CgiType                   CgiType;
-  typedef ConfigLocation::LimitExceptType           LimitExceptType;
-  typedef std::map<ListenType, const ConfigServer*> ConfigFinderType;
+  typedef std::vector<ConfigServer>       ServersType;
+  typedef ConfigServer::ServerNamesType   ServerNamesType;
+  typedef ConfigServer::ListenType        ListenType;
+  typedef ConfigServer::ListenListType    ListenListType;
+  typedef ConfigServer::LocationType      LocationType;
+  typedef ConfigServer::IndexType         IndexType;
+  typedef ConfigServer::ErrorPageType     ErrorPageType;
+  typedef ConfigServer::ReturnType        ReturnType;
+  typedef ConfigLocation::CgiType         CgiType;
+  typedef ConfigLocation::LimitExceptType LimitExceptType;
 
   static void printServer(const ConfigServer& server);
   static void printLocation(const ConfigLocation& location,
@@ -35,7 +34,6 @@ class Config {
   const ServersType& getServers() const;
   void               addServers(const ConfigServer& server);
   ListenListType     getAllListenList() const;
-  ConfigFinderType   getConfigFinder() const;
 
   void printConfig() const;
 

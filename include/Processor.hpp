@@ -5,13 +5,18 @@
 #include <string>
 #include <vector>
 
-#include "ConfigServer.hpp"
+#include "Config.hpp"
 #include "Request.hpp"
 
 class Processor {
  public:
   typedef void (Processor::*MethodFuncType)();
   typedef std::map<Method, MethodFuncType> MethodFuncMapType;
+
+  typedef Config::ServersType      ServersType;
+  typedef Config::ServerNamesType  ServerNamesType;
+  typedef Config::ListenListType   ListenListType;
+  typedef ConfigServer::ListenType ListenType;
 
   typedef Request::MessageType      MessageType;
   typedef Request::StatusCodeType   StatusCodeType;
@@ -33,7 +38,7 @@ class Processor {
   void setStatusCode(const StatusCodeType& status_code);
   void setRequest(const Request& request);
 
-  void process();
+  void process(const Config& total_config, const ListenType& listen);
 
   int         parseRequest(MessageType request_message);
   void        printResponse();
@@ -48,13 +53,17 @@ class Processor {
 
  private:
   MethodFuncMapType method_func_map_;
-  ConfigServer      config_;
-  FdType            fd_;
-  StatusCodeType    status_code_;
-  Request           request_;
+
+  ConfigServer   config_;
+  FdType         fd_;
+  StatusCodeType status_code_;
+  Request        request_;
   // Response       response_;
 
   void initMethodFuncMap();
+
+  ConfigServer getConfigServerForRequest(
+      const Config& total_config, const ConfigServer::ListenType& listen);
 };
 
 #endif

@@ -29,8 +29,8 @@ const RequestHeader::HeaderValueType& RequestHeader::getHeader(
 
 const RequestHeader::PortType& RequestHeader::getPort() const { return port_; }
 
-const RequestHeader::AddressType& RequestHeader::getAddress() const {
-  return address_;
+const RequestHeader::ServerNameType& RequestHeader::getServerName() const {
+  return server_name_;
 }
 
 const RequestHeader::ContentLengthType& RequestHeader::getContentLength()
@@ -64,8 +64,8 @@ void RequestHeader::setHeader(const HeaderKeyType&   key,
     (this->*parse_func_map_[key])(method, value);
 }
 
-void RequestHeader::setAddress(const AddressType& address) {
-  address_ = address;
+void RequestHeader::setServerName(const ServerNameType& server_name) {
+  server_name_ = server_name;
 }
 
 void RequestHeader::setPort(const PortType& port) { port_ = port; }
@@ -87,11 +87,11 @@ void RequestHeader::parseHost(Method method, HeaderValueType value) {
   // size_t pos;
 
   if (value.find(':') != std::string::npos) {
-    address_ = ft::splitUntilDelimiter(value, ":");
+    server_name_ = ft::splitUntilDelimiter(value, ":");
     port_ = atoi(value.c_str());
   } else {
     // TODO: 나중에 Host IP와 동일한 지 확인
-    address_ = value;
+    server_name_ = value;
     port_ = 80;
   }
 }
@@ -166,6 +166,10 @@ const Level& Request::getLevel() const { return level_; }
 
 void Request::setRequestMessage(const MessageType& request_message) {
   request_message_ = request_message;
+}
+
+const RequestHeader::ServerNameType& Request::getServerName() const {
+  return header_.getServerName();
 }
 
 void Request::setMethod(const Method& method) { method_ = method; }

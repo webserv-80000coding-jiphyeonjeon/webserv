@@ -21,7 +21,7 @@ ConfigServer& ConfigServer::operator=(const ConfigServer& other) {
   return *this;
 }
 
-const ConfigServer::ServerNameType& ConfigServer::getServerName() const {
+const ConfigServer::ServerNamesType& ConfigServer::getServerName() const {
   return server_name_;
 }
 
@@ -63,7 +63,7 @@ const ConfigServer::RootType& ConfigServer::getRoot() const {
 }
 
 void ConfigServer::setServerName(
-    const ConfigServer::ServerNameType& server_name) {
+    const ConfigServer::ServerNamesType& server_name) {
   server_name_ = server_name;
 }
 

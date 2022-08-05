@@ -31,10 +31,12 @@ class Server {
   const ConfigServer::PortType& getPort() const;
 
   void      initServer();
-  FdType    acceptClient(const ConfigServer& config);
+  FdType    acceptClient();
   RecvState receiveData(FdType client_socket);
   SendState sendData(FdType client_socket);
   void      closeClient(FdType client_socket);
+
+  void process(FdType client_socket, const Config& total_config);
 
  private:
   static const int kBacklog = 1024;

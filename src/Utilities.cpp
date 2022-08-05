@@ -60,4 +60,8 @@ std::vector<std::string> splitByString(std::string str, std::string delimiter) {
   return str_vector;
 }
 
+bool isDigits(const std::string& str) {
+  return str.find_first_not_of("0123456789") == std::string::npos;
+}
+
 }  // namespace ft

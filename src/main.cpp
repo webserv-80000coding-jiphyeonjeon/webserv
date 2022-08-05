@@ -35,8 +35,8 @@ int main(int argc, char* argv[]) {
   // ************************************************************************ //
 
   try {
-    Webserv webserv;
-    webserv.initWebserv(config);
+    Webserv webserv(config);
+    webserv.initWebserv();
     webserv.runWebserv();
   } catch (std::exception& e) {
     std::cerr << RED << e.what() << END << std::endl;
