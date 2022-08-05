@@ -3,6 +3,7 @@
 #include <iostream>
 
 #include "Log.hpp"
+#include "Utilities.hpp"
 #include "color.hpp"
 
 Parser::Parser(const std::string& filename) : tokens_() {
@@ -192,11 +193,6 @@ void Parser::parseServerName(ConfigServer&             server,
     server.addServerName(args[i]);
 }
 
-// TODO utils 함수 모으기
-bool isDigits(const std::string& str) {
-  return str.find_first_not_of("0123456789") == std::string::npos;
-}
-
 void Parser::parseListen(ConfigServer& server, const Parser::TokensType& args) {
   ConfigServer::AddressType addr = kDefaultAddress;
   ConfigServer::PortType    port = kDefaultPort;
@@ -213,7 +209,7 @@ void Parser::parseListen(ConfigServer& server, const Parser::TokensType& args) {
     } else if (args[0].find('.') != std::string::npos) {
       addr = inet_addr(args[0].c_str());
     } else {
-      if (!isDigits(args[0]))
+      if (!ft::isDigits(args[0]))
         throw std::invalid_argument(
             "Config: listen: Invalid arguments."
             "\nUsage: listen address[:port] or listen port");
@@ -229,7 +225,7 @@ void Parser::parseListen(ConfigServer& server, const Parser::TokensType& args) {
     }
 
     std::string port_str = args[0].substr(delimiter + 1);
-    if (!isDigits(port_str))
+    if (!ft::isDigits(port_str))
       throw std::invalid_argument(
           "Config: listen: Invalid arguments."
           "\nUsage: listen address[:port] or listen port");
@@ -278,7 +274,7 @@ void Parser::parseAutoindex(ConfigCommon&             common,
 
 void Parser::parseClientBodyBufferSize(ConfigCommon&             common,
                                        const Parser::TokensType& args) {
-  if (args.size() != 2 || !isDigits(args[0]))
+  if (args.size() != 2 || !ft::isDigits(args[0]))
     throw std::invalid_argument(
         "Config: client_body_buffer_size: Invalid arguments."
         "\nUsage: client_body_buffer_size size");
@@ -294,7 +290,7 @@ void Parser::parseErrorPage(ConfigCommon&             common,
 
   size_t uri_pos = args.size() - 2;
   for (size_t i = 0; i < uri_pos; i++) {
-    if (!isDigits(args[i]))
+    if (!ft::isDigits(args[i]))
       throw std::invalid_argument("Config: error_page: Invalid error code.");
     common.addErrorPage(std::make_pair(atoi(args[i].c_str()), args[uri_pos]));
   }
@@ -316,7 +312,7 @@ void Parser::parseReturn(ConfigCommon& common, const Parser::TokensType& args) {
         "Config: return: Invalid arguments."
         "\nUsage: return code url");
 
-  if (!isDigits(args[0]))
+  if (!ft::isDigits(args[0]))
     throw std::invalid_argument("Config: return: Invalid code.");
   common.setReturn(std::make_pair(atoi(args[0].c_str()), args[1]));
 }

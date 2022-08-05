@@ -25,6 +25,8 @@ std::string getUntilDelimiter(const std::string& str,
 std::string splitUntilDelimiter(std::string& str, std::string delimiter);
 std::vector<std::string> splitByString(std::string str, std::string delimiter);
 
+bool isDigits(const std::string& str);
+
 }  // namespace ft
 
 #endif
