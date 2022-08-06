@@ -38,7 +38,6 @@ class Processor {
 
   const ResponseMessageType& getResponseMessage() const;
 
-  void setConfig(const ConfigServer& config);
   void setFile(const File& file);
   void setStatusCode(const StatusCodeType& status_code);
   void setRequest(const Request& request);
@@ -61,7 +60,7 @@ class Processor {
  private:
   MethodFuncMapType method_func_map_;
 
-  ConfigServer   config_;
+  ConfigLocation config_;
   File           file_;
   StatusCodeType status_code_;
   Request        request_;

@@ -26,8 +26,6 @@ const Processor::ResponseMessageType& Processor::getResponseMessage() const {
 
 const Level& Processor::getLevel() const { return request_.getLevel(); }
 
-void Processor::setConfig(const ConfigServer& config) { config_ = config; }
-
 void Processor::setFile(const File& file) { file_ = file; }
 
 void Processor::setStatusCode(const StatusCodeType& status_code) {
@@ -41,8 +39,10 @@ void Processor::process(const Config&                   total_config,
   if (response_.isBuilt() != false)
     return;
   ft::log.writeTimeLog("[Processor] --- Set config ---");
-  config_ = getConfigServerForRequest(total_config, listen);
-  Config::printServer(config_);
+  ConfigServer config_server = getConfigServerForRequest(total_config, listen);
+  findLocation(config_server);
+  Config::printLocation(config_, "");
+  // Config::printServer(config_server);
   file_.setPath(config_.getRoot() + request_.getPath());
   (this->*method_func_map_[request_.getMethod()])();
   response_.build();
@@ -61,7 +61,7 @@ void Processor::findLocation(const ConfigServer& config) {
     last_slash_pos = tmp_location.find_last_of("/", last_slash_pos - 1);
   }
 
-  // config_ = config.getLocation().at(location);
+  config_ = config.getLocation().at(location);
 }
 
 int Processor::parseRequest(MessageType request_message) {

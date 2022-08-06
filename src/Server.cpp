@@ -92,6 +92,10 @@ SendState Server::sendData(Server::FdType client_socket) {
     closeClient(client_socket);
     std::cout << "Send error" << std::endl;
     return kSendError;
+  } else if (str.substr(9, 3) == "400") {
+    closeClient(client_socket);
+    std::cout << "\rConnection closed by client" << std::endl;
+    return kSendError;
   } else {
     processor_map_.erase(client_socket);
     processor_map_.insert(std::make_pair(client_socket, Processor()));
