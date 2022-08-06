@@ -89,6 +89,12 @@ class Request {
   typedef unsigned int StatusCodeType;
   typedef unsigned int ChunkSizeType;
 
+  class RequestException : public ServerException {
+   public:
+    RequestException(const std::string&    message,
+                     const StatusCodeType& status_code);
+  };
+
   Request();
   ~Request();
 
@@ -116,20 +122,6 @@ class Request {
 
   // void        print() const;
   std::string printToString() const;
-
-  class RequestException : public std::exception {
-   public:
-    RequestException(const std::string&    message,
-                     const StatusCodeType& status_code)
-        : message_(message), status_code_(status_code) {}
-    virtual ~RequestException() throw() {}
-    virtual const char*   what() const throw() { return message_.c_str(); }
-    const StatusCodeType& getStatusCode() const { return status_code_; }
-
-   private:
-    std::string    message_;
-    StatusCodeType status_code_;
-  };
 
  private:
   void parseStartLine();

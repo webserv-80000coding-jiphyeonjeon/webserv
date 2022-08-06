@@ -30,4 +30,19 @@ bool isDigits(const std::string& str);
 
 }  // namespace ft
 
+typedef int StatusCodeType;
+
+class ServerException : public std::exception {
+ public:
+  ServerException(const std::string&    message,
+                  const StatusCodeType& status_code);
+  virtual ~ServerException() throw();
+  virtual const char*           what() const throw();
+  virtual const StatusCodeType& getStatusCode() const;
+
+ protected:
+  std::string    message_;
+  StatusCodeType status_code_;
+};
+
 #endif

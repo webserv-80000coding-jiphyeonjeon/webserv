@@ -4,6 +4,7 @@
 
 #include <exception>
 #include <iostream>
+#include <string>
 
 #include "Config.hpp"
 #include "Log.hpp"
@@ -33,15 +34,24 @@ void Processor::process(const Config&                   total_config,
     return;
   ft::log.writeTimeLog("[Processor] --- Set config ---");
   ConfigServer config_server = getConfigServerForRequest(total_config, listen);
-  findLocation(config_server);
-  Config::printLocation(config_, "");
   // Config::printServer(config_server);
-  file_manager_.setPath(config_.getRoot() + request_.getPath());
+  findLocation(config_server);
+
   try {
+    // 사용가능한 함수인 지 확인(limit-accept)
+    const std::string method_list[] = {"GET", "POST", "PUT", "DELETE", "HEAD"};
+    if (config_.getLimitExcept().find(method_list[request_.getMethod() - 1]) ==
+        config_.getLimitExcept().end()) {
+      throw ProcessException("Method not allowed(limit_except) " +
+                                 method_list[request_.getMethod() - 1],
+                             405);
+    }
     (this->*method_func_map_[request_.getMethod()])();
     response_.build();
-  } catch (...) {
-    // response_.buildException();
+  } catch (const ProcessException& e) {
+    ft::log.writeTimeLog("[Processor] --- Process method check failed ---");
+    ft::log.writeLog("Reason: " + std::string(e.what()));
+    response_.buildException(e.getStatusCode());
   }
 }
 
@@ -59,8 +69,15 @@ void Processor::findLocation(const ConfigServer& config) {
     }
   }
 
-  ft::log.writeLog("Location: " + path);
   config_ = locations.at(path);
+  ft::log.writeLog("Location: " + path);
+  Config::printLocation(config_, "");
+
+  std::string result_path = request_.getPath();
+  result_path = config_.getRoot() + result_path.erase(0, path.size());
+  file_manager_.setPath(result_path);
+  ft::log.writeTimeLog("[Processor] --- Set path ---");
+  ft::log.writeLog(file_manager_.getPath());
 }
 
 int Processor::parseRequest(MessageType request_message) {
@@ -169,3 +186,7 @@ ConfigServer Processor::getConfigServerForRequest(
   }
   return candidate_configs[0];
 }
+
+Processor::ProcessException::ProcessException(const std::string&    message,
+                                              const StatusCodeType& status_code)
+    : ServerException(message, status_code) {}

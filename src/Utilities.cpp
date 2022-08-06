@@ -65,3 +65,15 @@ bool isDigits(const std::string& str) {
 }
 
 }  // namespace ft
+
+ServerException::ServerException(const std::string&    message,
+                                 const StatusCodeType& status_code)
+    : message_(message), status_code_(status_code) {}
+
+ServerException::~ServerException() throw() {}
+
+const char* ServerException::what() const throw() { return message_.c_str(); }
+
+const StatusCodeType& ServerException::getStatusCode() const {
+  return status_code_;
+}

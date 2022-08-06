@@ -27,6 +27,12 @@ class Processor {
 
   typedef Response::MessageType ResponseMessageType;
 
+  class ProcessException : public ServerException {
+   public:
+    ProcessException(const std::string&    message,
+                     const StatusCodeType& status_code);
+  };
+
   Processor();
   ~Processor();
 
