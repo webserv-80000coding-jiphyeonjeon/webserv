@@ -47,7 +47,6 @@ class Processor {
   void findLocation(const ConfigServer& config);
 
   int         parseRequest(MessageType request_message);
-  void        printResponse();
   std::string strRequest();
   // void        printRequest();
 

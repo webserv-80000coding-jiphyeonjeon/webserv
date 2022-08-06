@@ -12,26 +12,20 @@ Processor::Processor() : status_code_(200) { initMethodFuncMap(); }
 
 Processor::~Processor() {}
 
-const File& Processor::getFile() const { return file_; }
-
+const File&                      Processor::getFile() const { return file_; }
 const Processor::StatusCodeType& Processor::getStatusCode() const {
   return status_code_;
 }
-
 const Request& Processor::getRequest() const { return request_; }
-
 const Processor::ResponseMessageType& Processor::getResponseMessage() const {
   return response_.getMessage();
 }
-
 const Level& Processor::getLevel() const { return request_.getLevel(); }
 
 void Processor::setFile(const File& file) { file_ = file; }
-
 void Processor::setStatusCode(const StatusCodeType& status_code) {
   status_code_ = status_code;
 }
-
 void Processor::setRequest(const Request& request) { request_ = request; }
 
 void Processor::process(const Config&                   total_config,
@@ -44,8 +38,12 @@ void Processor::process(const Config&                   total_config,
   Config::printLocation(config_, "");
   // Config::printServer(config_server);
   file_.setPath(config_.getRoot() + request_.getPath());
-  (this->*method_func_map_[request_.getMethod()])();
-  response_.build();
+  try {
+    (this->*method_func_map_[request_.getMethod()])();
+    response_.build();
+  } catch (...) {
+    // response_.buildException();
+  }
 }
 
 void Processor::findLocation(const ConfigServer& config) {
@@ -70,19 +68,12 @@ int Processor::parseRequest(MessageType request_message) {
   } catch (RequestException& e) {
     ft::log.writeTimeLog("[Processor] --- Parsing request failed ---");
     ft::log.writeLog("Reason: " + std::string(e.what()));
-    // TODO 응답 메세지 작성 및 응답 준비
     response_.buildException(e.getStatusCode());
     return -1;
   }
 }
 
-// void Processor::printRequest() { request_.print(); }
-
 std::string Processor::strRequest() { return request_.printToString(); }
-
-void Processor::printResponse() {
-  // response_.print();
-}
 
 void Processor::methodGet() {
   // TODO: autoindex case
@@ -138,7 +129,14 @@ void Processor::methodDelete() {
   }
 }
 
-void Processor::methodHead() {}
+void Processor::methodHead() {
+  if (file_.isExist()) {
+    // - set body
+    response_.setStatusCode(200);
+  } else {
+    response_.setStatusCode(404);
+  }
+}
 
 void Processor::initMethodFuncMap() {
   method_func_map_[kGet] = &Processor::methodGet;
