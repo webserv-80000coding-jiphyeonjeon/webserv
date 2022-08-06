@@ -49,19 +49,21 @@ void Processor::process(const Config&                   total_config,
 }
 
 void Processor::findLocation(const ConfigServer& config) {
-  size_t      last_slash_pos = request_.getPath().find_last_of("/");
-  std::string tmp_location, location = "/";
+  const ConfigServer::LocationType& locations = config.getLocation();
+  std::string                       path = request_.getPath();
 
-  while (last_slash_pos != std::string::npos) {
-    tmp_location = request_.getPath().substr(0, last_slash_pos);
-    if (config.getLocation().find(tmp_location) != config.getLocation().end()) {
-      location = tmp_location;
+  while (locations.find(path) == locations.end()) {
+    size_t pos = path.find_last_of('/');
+    if (pos != 0) {
+      path = path.substr(0, pos);
+    } else {
+      path = "/";
       break;
     }
-    last_slash_pos = tmp_location.find_last_of("/", last_slash_pos - 1);
   }
 
-  config_ = config.getLocation().at(location);
+  ft::log.writeLog("Location: " + path);
+  config_ = locations.at(path);
 }
 
 int Processor::parseRequest(MessageType request_message) {
@@ -119,7 +121,7 @@ void Processor::methodPost() {
     // if file is exist, update file. 200
     file_.open();
     file_.appendContent(request_.getBody());
-    response_.setStatusCode(200);
+    response_.setStatusCode(405);
     file_.close();
   }
 }
@@ -138,7 +140,7 @@ void Processor::methodDelete() {
   }
 }
 
-void Processor::methodHead() {}
+void Processor::methodHead() { response_.setStatusCode(405); }
 
 void Processor::initMethodFuncMap() {
   method_func_map_[kGet] = &Processor::methodGet;
