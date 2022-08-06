@@ -405,15 +405,13 @@ std::string Request::printToString() const {
 
 Request::RequestException::RequestException(const std::string&    message,
                                             const StatusCodeType& status_code)
-    : message_(message), status_code_(status_code) {}
+    : ServerException(message, status_code) {}
 
-Request::RequestException::~RequestException() throw() {}
+// const char* Request::RequestException::what() const throw() {
+//   return message_.c_str();
+// }
 
-const char* Request::RequestException::what() const throw() {
-  return message_.c_str();
-}
-
-const Request::StatusCodeType& Request::RequestException::getStatusCode()
-    const {
-  return status_code_;
-}
+// const Request::StatusCodeType& Request::RequestException::getStatusCode()
+//     const {
+//   return status_code_;
+// }
