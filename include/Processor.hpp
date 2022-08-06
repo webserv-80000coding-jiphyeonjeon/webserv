@@ -6,7 +6,7 @@
 #include <vector>
 
 #include "Config.hpp"
-#include "File.hpp"
+#include "FileManager.hpp"
 #include "Request.hpp"
 #include "Response.hpp"
 
@@ -30,7 +30,7 @@ class Processor {
   Processor();
   ~Processor();
 
-  const File&           getFile() const;
+  const FileManager&    getFileManager() const;
   const StatusCodeType& getStatusCode() const;
   const Request&        getRequest() const;
   const Level&          getLevel() const;
@@ -38,7 +38,6 @@ class Processor {
 
   const ResponseMessageType& getResponseMessage() const;
 
-  void setFile(const File& file);
   void setStatusCode(const StatusCodeType& status_code);
   void setRequest(const Request& request);
 
@@ -47,7 +46,6 @@ class Processor {
   void findLocation(const ConfigServer& config);
 
   int         parseRequest(MessageType request_message);
-  void        printResponse();
   std::string strRequest();
   // void        printRequest();
 
@@ -61,7 +59,7 @@ class Processor {
   MethodFuncMapType method_func_map_;
 
   ConfigLocation config_;
-  File           file_;
+  FileManager    file_manager_;
   StatusCodeType status_code_;
   Request        request_;
   Response       response_;
