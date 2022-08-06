@@ -188,6 +188,8 @@ void Request::setBody(const BodyType& body) { body_ = body; }
 void Request::setState(const State& state) { state_ = state; }
 
 int Request::parse(MessageType& request_message) {
+  if (request_message == "\r\n" && level_ == kStartLine)
+    return state_;
   request_message_ += request_message;
 
   ft::log.writeTimeLog("Parsing...");
@@ -225,7 +227,7 @@ void Request::parseStartLine() {
     throw RequestException("Bad Request(method)", 400);
   // Method not supported.
   if (method_map.find(method) == method_map.end())
-    throw RequestException("Invalid method" + method, 501);
+    throw RequestException("Invalid method: " + method, 400);
 
   method_ = method_map[method];
 
@@ -236,7 +238,7 @@ void Request::parseStartLine() {
     throw RequestException("Bad Request(path)", 400);
   // Path not start with '/'(means refused).
   if (path_[0] != '/')
-    throw RequestException("Invalid path", 403);
+    throw RequestException("Invalid path", 400);
   // Path is too long.(limit 2MB(2048))
   if (path_.length() > MAXIMUM_URI_LIMIT)
     throw RequestException("Too long URI", 414);
@@ -248,7 +250,7 @@ void Request::parseStartLine() {
       ft::getUntilDelimiter(request_message_, "\r\n", position_);
   // Webserv only support HTTP/1.1.
   if (version_ != version)
-    throw RequestException("Invalid version", 505);
+    throw RequestException("Invalid version", 400);
 
   // Next level.
   level_ = kHeader;
@@ -284,13 +286,13 @@ void Request::parseHeader() {
 
     value = ft::strBidirectionalTrim(header, " ");
     // No value in header.
-    // if (value == "")
-    //   throw RequestException("Bad Request(header_value)", 400);
+    if (value == "")
+      throw RequestException("Bad Request(header_value)", 400);
 
     setHeader(key, value);
   }
 
-  if (header_.getHeader("Host") == "")
+  if (header_.getHeaderMap().find("Host") == header_.getHeaderMap().end())
     throw RequestException("Bad Request(no host)", 400);
 
   // Erase request_message_ from start to position_(until end of header).
@@ -301,7 +303,7 @@ void Request::parseHeader() {
   if (!header_.isChunked() &&
       header_map.find("Content-Length") == header_map.end() &&
       (method_ == kPost || method_ == kPut))
-    throw RequestException("Bad Request(no content-length)", 400);
+    throw RequestException("Bad Request(no content-length)", 405);
   else if (header_.getContentLength() > 0 || header_.isChunked())
     level_ = kBody;
   else

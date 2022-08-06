@@ -77,7 +77,7 @@ RecvState Server::receiveData(Server::FdType client_socket) {
 
   ProcessorType::iterator it = processor_map_.find(client_socket);
   if (it->second.parseRequest(std::string(buffer)) == -1)
-    return kRecvError;
+    return kParseError;
   return (it->second.getLevel() == kDone ? kRecvSuccess : kRecvContinuous);
 }
 
@@ -91,6 +91,10 @@ SendState Server::sendData(Server::FdType client_socket) {
   if (send_size == -1) {
     closeClient(client_socket);
     std::cout << "Send error" << std::endl;
+    return kSendError;
+  } else if (str.substr(9, 3) == "400") {
+    closeClient(client_socket);
+    std::cout << "\rConnection closed by client" << std::endl;
     return kSendError;
   } else {
     processor_map_.erase(client_socket);
