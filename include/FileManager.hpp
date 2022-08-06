@@ -1,35 +1,30 @@
-#ifndef WEBSERV_FILE_HPP
-#define WEBSERV_FILE_HPP
+#ifndef WEBSERV_FILEMANAGER_HPP
+#define WEBSERV_FILEMANAGER_HPP
 
 #include <sys/stat.h>
 
+#include <fstream>
 #include <string>
 
-class File {
+class FileManager {
  public:
   typedef std::string PathType;
   typedef std::string NameType;
   typedef std::string ExtensionType;
-  typedef int         FdType;
 
-  File();
-  File(const PathType& root, const PathType& path);
-  File(const PathType& path);
-  ~File();
+  FileManager();
+  FileManager(const PathType& root, const PathType& path);
+  FileManager(const PathType& path);
+  ~FileManager();
 
   const PathType&      getPath() const;
   const NameType&      getName() const;
   const ExtensionType& getExtension() const;
-  const FdType&        getFd() const;
 
   void setPath(const PathType& path);
   void setName(const NameType& name);
   void setExtension(const ExtensionType& extension);
-  void setFd(const FdType& fd);
 
-  bool open();
-  bool close();
-  bool create();
   bool remove();
 
   bool isExist() const;
@@ -40,6 +35,7 @@ class File {
 
   const std::string getContent() const;
   void              appendContent(const std::string& content);
+  void              createFile(const std::string& content);
 
  private:
   void parsePath(const PathType& path);
@@ -47,7 +43,6 @@ class File {
   PathType      path_;
   NameType      name_;
   ExtensionType extension_;
-  FdType        fd_;
 };
 
 #endif

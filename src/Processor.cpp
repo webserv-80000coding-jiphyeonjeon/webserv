@@ -12,7 +12,7 @@ Processor::Processor() : status_code_(200) { initMethodFuncMap(); }
 
 Processor::~Processor() {}
 
-const File&                      Processor::getFile() const { return file_; }
+const FileManager& Processor::getFileManager() const { return file_manager_; }
 const Processor::StatusCodeType& Processor::getStatusCode() const {
   return status_code_;
 }
@@ -22,7 +22,6 @@ const Processor::ResponseMessageType& Processor::getResponseMessage() const {
 }
 const Level& Processor::getLevel() const { return request_.getLevel(); }
 
-void Processor::setFile(const File& file) { file_ = file; }
 void Processor::setStatusCode(const StatusCodeType& status_code) {
   status_code_ = status_code;
 }
@@ -37,7 +36,7 @@ void Processor::process(const Config&                   total_config,
   findLocation(config_server);
   Config::printLocation(config_, "");
   // Config::printServer(config_server);
-  file_.setPath(config_.getRoot() + request_.getPath());
+  file_manager_.setPath(config_.getRoot() + request_.getPath());
   try {
     (this->*method_func_map_[request_.getMethod()])();
     response_.build();
@@ -81,13 +80,11 @@ void Processor::methodGet() {
   // default case
   // FIXME: MIME 구현 후 수정
   // - set content type
-  if (file_.isExist()) {
-    file_.open();
+  if (file_manager_.isExist()) {
     response_.setHeader("Content-Type", "text/html");
     // - set body
-    response_.setBody(file_.getContent());
+    response_.setBody(file_manager_.getContent());
     response_.setStatusCode(200);
-    file_.close();
   } else {
     response_.setStatusCode(404);
   }
@@ -99,29 +96,24 @@ void Processor::methodPost() {
   // FIXME: MIME 구현 후 수정
   // set content type
   response_.setHeader("Content-Type", "text/html");
-  if (file_.isExist() == false) {
+  if (file_manager_.isExist() == false) {
     // if file isn't exist, create file. 201
-    file_.create();
-    ::write(file_.getFd(), request_.getBody().c_str(),
-            request_.getBody().size());
+    file_manager_.createFile(request_.getBody());
     response_.setStatusCode(201);
-    file_.close();
   } else {
     // if file is exist, update file. 200
-    file_.open();
-    file_.appendContent(request_.getBody());
+    file_manager_.appendContent(request_.getBody());
     response_.setStatusCode(200);
-    file_.close();
   }
 }
 
 void Processor::methodPut() {}
 
 void Processor::methodDelete() {
-  if (file_.isExist()) {
+  if (file_manager_.isExist()) {
     // if file is exist, delete file. 200
     // 204 means no content
-    file_.remove();
+    file_manager_.remove();
     response_.setStatusCode(204);
   } else {
     // if file isn't exist, 404
@@ -130,7 +122,7 @@ void Processor::methodDelete() {
 }
 
 void Processor::methodHead() {
-  if (file_.isExist()) {
+  if (file_manager_.isExist()) {
     // - set body
     response_.setStatusCode(200);
   } else {
