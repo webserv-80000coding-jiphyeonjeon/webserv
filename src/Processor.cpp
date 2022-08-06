@@ -5,6 +5,7 @@
 #include <exception>
 #include <iostream>
 #include <string>
+#include <vector>
 
 #include "Config.hpp"
 #include "Log.hpp"
@@ -30,7 +31,7 @@ void Processor::setRequest(const Request& request) { request_ = request; }
 
 void Processor::process(const Config&                   total_config,
                         const ConfigServer::ListenType& listen) {
-  if (response_.isBuilt() != false)
+  if (response_.isBuilt())
     return;
   ft::log.writeTimeLog("[Processor] --- Set config ---");
   ConfigServer config_server = getConfigServerForRequest(total_config, listen);
@@ -49,7 +50,7 @@ void Processor::process(const Config&                   total_config,
     (this->*method_func_map_[request_.getMethod()])();
     response_.build();
   } catch (const ProcessException& e) {
-    ft::log.writeTimeLog("[Processor] --- Process method check failed ---");
+    ft::log.writeTimeLog("[Processor] --- Process failed ---");
     ft::log.writeLog("Reason: " + std::string(e.what()));
     response_.buildException(e.getStatusCode());
   }
@@ -75,6 +76,9 @@ void Processor::findLocation(const ConfigServer& config) {
 
   std::string result_path = request_.getPath();
   result_path = config_.getRoot() + result_path.erase(0, path.size());
+  if (FileManager::isDirectory(result_path) && *result_path.rbegin() != '/') {
+    result_path += '/';
+  }
   file_manager_.setPath(result_path);
   ft::log.writeTimeLog("[Processor] --- Set path ---");
   ft::log.writeLog(file_manager_.getPath());
@@ -94,18 +98,41 @@ int Processor::parseRequest(MessageType request_message) {
 std::string Processor::strRequest() { return request_.printToString(); }
 
 void Processor::methodGet() {
-  // TODO: autoindex case
+  // FIXME: MIME, autoindex
+  // 폴더
+  if (file_manager_.isDirectory()) {
+    if (config_.getAutoindex()) {
+      // autoindex: on -> 바로 autoindex page 보내주기 (200)
+      // TODO: autoindex page 보내주기
+    } else {
+      // autoindex: off
+      // getIndex()로 가져온 vector들에 해당하는 파일 확인하기 (200 / 404)
+      IndexType index_list = config_.getIndex();
 
-  // default case
-  // FIXME: MIME 구현 후 수정
-  // - set content type
-  if (file_manager_.isExist()) {
+      for (IndexType::iterator it = index_list.begin(); it != index_list.end();
+           ++it) {
+        PathType path = file_manager_.getPath() + "/" + *it;
+        if (file_manager_.isExist(path)) {
+          file_manager_.setPath(path);
+          break;
+          // 파일로 가서 보내주기 (200)
+        }
+      }
+      if (file_manager_.isDirectory()) {
+        throw ProcessException("Directory index not found", 404);
+      }
+    }
+  }
+
+  // 파일
+  // 해당 위치에 존재하는지만 판단 - (200 / 404)
+  if (file_manager_.isExist() && !file_manager_.isDirectory()) {
     response_.setHeader("Content-Type", "text/html");
     // - set body
     response_.setBody(file_manager_.getContent());
     response_.setStatusCode(200);
-  } else {
-    response_.setStatusCode(404);
+  } else if (!file_manager_.isExist()) {
+    throw ProcessException("File not found", 404);
   }
 }
 

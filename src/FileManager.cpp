@@ -9,7 +9,7 @@
 FileManager::FileManager() {}
 FileManager::FileManager(const PathType& root, const PathType& path)
     : path_(root + path) {
-  parsePath(path);
+  parsePath();
 }
 FileManager::FileManager(const PathType& path) : path_(path) {}
 FileManager::~FileManager() {}
@@ -19,8 +19,14 @@ const FileManager::NameType&      FileManager::getName() const { return name_; }
 const FileManager::ExtensionType& FileManager::getExtension() const {
   return extension_;
 }
+const FileManager::NameType FileManager::getFullName() const {
+  return name_ + extension_;
+}
 
-void FileManager::setPath(const PathType& path) { path_ = path; }
+void FileManager::setPath(const PathType& path) {
+  path_ = path;
+  parsePath();
+}
 void FileManager::setName(const NameType& name) { name_ = name; }
 void FileManager::setExtension(const ExtensionType& extension) {
   extension_ = extension;
@@ -75,9 +81,7 @@ void FileManager::createFile(const std::string& content) {
   ofs.close();
 }
 
-void FileManager::parsePath(const PathType& path) {
-  path_ = path;
-
+void FileManager::parsePath() {
   size_t name_pos = path_.find_last_of('/');
   size_t extension_pos = name_.find_last_of('.');
 

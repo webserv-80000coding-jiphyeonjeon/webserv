@@ -27,6 +27,8 @@ class Processor {
 
   typedef Response::MessageType ResponseMessageType;
 
+  typedef ConfigLocation::IndexType IndexType;
+
   class ProcessException : public ServerException {
    public:
     ProcessException(const std::string&    message,
