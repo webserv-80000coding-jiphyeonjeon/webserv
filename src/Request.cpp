@@ -388,19 +388,6 @@ void Request::parseDefaultBody() {
   return;
 }
 
-// void Request::print() const {
-//   std::cout << "Request" << std::endl;
-//   std::cout << "Method: " << getMethod() << std::endl;
-//   std::cout << "Path: " << getPath() << std::endl;
-//   std::cout << "Version: " << getVersion() << std::endl;
-//   std::cout << "Header: " << std::endl;
-//   for (HeaderMapType::const_iterator it = getHeaderMap().begin();
-//        it != getHeaderMap().end(); ++it) {
-//     std::cout << it->first << ": " << it->second << std::endl;
-//   }
-//   std::cout << "Body: " << getBody() << std::endl;
-// }
-
 std::string Request::printToString() const {
   std::stringstream ss;
   ss << "\nRequest" << std::endl;
@@ -414,4 +401,19 @@ std::string Request::printToString() const {
   }
   ss << "Body: " << getBody() << std::endl;
   return ss.str();
+}
+
+Request::RequestException::RequestException(const std::string&    message,
+                                            const StatusCodeType& status_code)
+    : message_(message), status_code_(status_code) {}
+
+Request::RequestException::~RequestException() throw() {}
+
+const char* Request::RequestException::what() const throw() {
+  return message_.c_str();
+}
+
+const Request::StatusCodeType& Request::RequestException::getStatusCode()
+    const {
+  return status_code_;
 }

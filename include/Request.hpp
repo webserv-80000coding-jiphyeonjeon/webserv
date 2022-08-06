@@ -120,11 +120,10 @@ class Request {
   class RequestException : public std::exception {
    public:
     RequestException(const std::string&    message,
-                     const StatusCodeType& status_code)
-        : message_(message), status_code_(status_code) {}
-    virtual ~RequestException() throw() {}
-    virtual const char*   what() const throw() { return message_.c_str(); }
-    const StatusCodeType& getStatusCode() const { return status_code_; }
+                     const StatusCodeType& status_code);
+    virtual ~RequestException() throw();
+    virtual const char*   what() const throw();
+    const StatusCodeType& getStatusCode() const;
 
    private:
     std::string    message_;
