@@ -73,6 +73,14 @@ void FileManager::appendContent(const std::string& content) {
   ofs.close();
 }
 
+void FileManager::updateContent(const std::string& content) {
+  std::ofstream ofs;
+
+  ofs.open(path_.c_str(), std::ofstream::out | std::ofstream::trunc);
+  ofs << content;
+  ofs.close();
+}
+
 void FileManager::createFile(const std::string& content) {
   std::ofstream ofs;
 

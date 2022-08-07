@@ -195,7 +195,7 @@ int Request::parse(MessageType& request_message) {
   // ft::log.writeTimeLog("Parsing...");
   // ft::log.writeLog(request_message_);
 
-  if (request_message_.size() > MAXIMUM_PAYLOAD_LIMIT)
+  if (level_ != kBody && request_message_.size() > MAXIMUM_PAYLOAD_LIMIT)
     throw RequestException("Request payload is too large", 413);
 
   parseStartLine();

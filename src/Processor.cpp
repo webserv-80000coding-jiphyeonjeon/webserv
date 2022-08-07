@@ -114,7 +114,7 @@ void Processor::methodGet() {
 
       for (IndexType::iterator it = index_list.begin(); it != index_list.end();
            ++it) {
-        PathType path = file_manager_.getPath() + "/" + *it;
+        PathType path = file_manager_.getPath() + *it;
         if (file_manager_.isExist(path)) {
           file_manager_.setPath(path);
           break;
@@ -140,6 +140,10 @@ void Processor::methodGet() {
 }
 
 void Processor::methodPost() {
+  if (config_.getCgi().find("." + file_manager_.getExtension()) !=
+      config_.getCgi().end()) {
+    // cgi 동작
+  }
   // set body(requested body)
   response_.setBody(request_.getBody());
   // FIXME: MIME 구현 후 수정
@@ -156,26 +160,51 @@ void Processor::methodPost() {
   }
 }
 
-void Processor::methodPut() {}
+void Processor::methodPut() {
+  if (file_manager_.isExist() == false) {
+    std::cout << file_manager_.getPath() << std::endl;
+    // if file isn't exist, create file. 201
+    file_manager_.createFile(request_.getBody());
+    response_.setStatusCode(201);
+    // response_.setBody(request_.getBody());
+  } else if (request_.getBody().empty()) {
+    file_manager_.updateContent("");
+    response_.setHeader("Content-Length", "0");
+    response_.setStatusCode(204);
+  } else {
+    // if file is exist, update file. 200
+    file_manager_.updateContent(request_.getBody());
+    // response_.setBody(request_.getBody());
+    response_.setStatusCode(200);
+  }
+}
 
 void Processor::methodDelete() {
   if (file_manager_.isExist()) {
     // if file is exist, delete file. 200
-    // 204 means no content
-    file_manager_.remove();
-    response_.setStatusCode(204);
+    if (file_manager_.getContent().empty()) {
+      response_.setStatusCode(204);
+      file_manager_.remove();
+    } else {
+      response_.setBody(file_manager_.getContent());
+      response_.setStatusCode(200);
+      file_manager_.remove();
+    }
   } else {
     // if file isn't exist, 404
-    response_.setStatusCode(404);
+    throw ProcessException("File not found", 404);
   }
 }
 
 void Processor::methodHead() {
   if (file_manager_.isExist()) {
     // - set body
+    // FIXME: MIME 구현 후 수정
+    response_.setHeader("Content-Length",
+                        ft::toString(file_manager_.getContent().size()));
     response_.setStatusCode(200);
   } else {
-    response_.setStatusCode(404);
+    throw ProcessException("File not found", 404);
   }
 }
 

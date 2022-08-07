@@ -36,6 +36,7 @@ class FileManager {
 
   const std::string getContent() const;
   void              appendContent(const std::string& content);
+  void              updateContent(const std::string& content);
   void              createFile(const std::string& content);
 
  private:
