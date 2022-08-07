@@ -46,6 +46,8 @@ Server::FdType Server::acceptClient() {
   if (client_socket == -1)
     throw std::runtime_error("Server: accept() error");
 
+  fcntl(client_socket, F_SETFL, O_NONBLOCK);
+
   // 연결된 fd와 여기에 관련된 Processor 객체를 map에 추가
   ft::log.writeTimeLog("[Server] --- Accept client ---");
   ft::log.getLogStream() << "Host: " << socket_ << "\nClient: " << client_socket

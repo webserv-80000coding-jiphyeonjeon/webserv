@@ -7,6 +7,7 @@
 #include <string>
 #include <vector>
 
+#include "CgiHandler.hpp"
 #include "Config.hpp"
 #include "Log.hpp"
 
@@ -140,9 +141,28 @@ void Processor::methodGet() {
 }
 
 void Processor::methodPost() {
-  if (config_.getCgi().find(file_manager_.getExtension()) !=
-      config_.getCgi().end()) {
-    // cgi 동작
+  const ConfigLocation::CgiType&          cgi_list = config_.getCgi();
+  ConfigLocation::CgiType::const_iterator it;
+  if ((it = cgi_list.find(file_manager_.getExtension())) != cgi_list.end()) {
+    ft::log.writeTimeLog("[Processor] --- Execute cgi ---");
+
+    // 해당 프로그램 경로에 파일이 존재하는지, 폴더자체인지 확인
+    // 실행 가능한지도 체크할 수 있으면 좋을 듯
+    if (!FileManager::isExist(it->second) ||
+        FileManager::isDirectory(it->second))
+      throw ProcessException("CGI program not found", 404);
+    try {
+      // config에 담겨있는 cgi program path, post request body가 필요
+      // request_.getBody()
+      CgiHandler cgi(it->second, request_);
+      cgi.cgiExecute();
+      // cgi 결과값을 처리하는 부분은 전부 cgi handler 내에서 진행
+      response_.setBody(cgi.getBody());
+      // response_.setStatusCode();
+    } catch (const int& e) {
+      throw ProcessException("CGI execution failed", e);
+    }
+    return;
   }
   // set body(requested body)
   response_.setBody(request_.getBody());
@@ -173,7 +193,8 @@ void Processor::methodPut() {
     file_manager_.updateContent(request_.getBody());
     response_.setStatusCode(200);
   }
-  response_.setBody(request_.getBody());
+  // response_.setBody(request_.getBody());
+  response_.setBody("");
   response_.setHeader("Content-Type",
                       ft::getMIME(file_manager_.getExtension()));
 }

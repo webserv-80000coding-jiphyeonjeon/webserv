@@ -27,7 +27,8 @@ SRCS_NAME	:=	main.cpp						\
 							Utilities.cpp				\
 							Webserv.cpp					\
 							Response.cpp				\
-							FileManager.cpp
+							FileManager.cpp			\
+							CgiHandler.cpp
 SRCS			:= $(addprefix $(SRCS_DIR)/, $(SRCS_NAME))
 
 OBJS			:=	$(SRCS:.cpp=.o)
@@ -79,4 +80,6 @@ run : all
 	@./$(NAME)
 
 test : all
+	@rm -f www/put_test/file_should_exist_after www/YoupiBanane/youpi.bla
+	@touch www/YoupiBanane/youpi.bla
 	@./$(NAME) ./config/test.conf
