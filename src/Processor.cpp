@@ -91,7 +91,8 @@ int Processor::parseRequest(MessageType request_message) {
     return request_.parse(request_message);
   } catch (RequestException& e) {
     ft::log.writeTimeLog("[Processor] --- Parsing request failed ---");
-    ft::log.writeLog("Reason: " + std::string(e.what()));
+    ft::log.writeLog(request_.getRequestMessage() +
+                     "\nReason: " + std::string(e.what()));
     response_.buildException(e.getStatusCode());
     return -1;
   }

@@ -192,8 +192,8 @@ int Request::parse(MessageType& request_message) {
     return state_;
   request_message_ += request_message;
 
-  ft::log.writeTimeLog("Parsing...");
-  ft::log.writeLog(request_message_);
+  // ft::log.writeTimeLog("Parsing...");
+  // ft::log.writeLog(request_message_);
 
   if (request_message_.size() > MAXIMUM_PAYLOAD_LIMIT)
     throw RequestException("Request payload is too large", 413);
@@ -268,6 +268,10 @@ void Request::parseHeader() {
   // If header start from CRLF, throw exception.
   if (request_message_.find("\r\n", position_) == 0)
     throw RequestException("Bad Request(header)", 400);
+
+  ft::log.writeTimeLog("[Request] --- Parse ---");
+  ft::log.writeLog(request_message_);
+
   while (request_message_.find("\r\n", position_) != std::string::npos) {
     std::string header =
         ft::getUntilDelimiter(request_message_, "\r\n", position_);
