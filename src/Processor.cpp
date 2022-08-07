@@ -75,7 +75,9 @@ void Processor::findLocation(const ConfigServer& config) {
   Config::printLocation(config_, "");
 
   std::string result_path = request_.getPath();
-  result_path = config_.getRoot() + result_path.erase(0, path.size());
+  result_path =
+      config_.getRoot() +
+      (path.size() > 1 ? result_path.erase(0, path.size()) : result_path);
   if (FileManager::isDirectory(result_path) && *result_path.rbegin() != '/') {
     result_path += '/';
   }
