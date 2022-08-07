@@ -2,6 +2,7 @@
 #define WEBSERV_UTILITIES_HPP_
 
 #include <iostream>
+#include <map>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -11,6 +12,11 @@
 #define FILE_READ_BUFFER_SIZE 8192
 
 namespace ft {
+
+typedef std::string                       ExtensionType;
+typedef std::string                       MIMEType;
+typedef std::map<ExtensionType, MIMEType> MIMEMapType;
+
 template <typename T>
 std::string toString(T value) {
   std::stringstream ss;
@@ -27,6 +33,9 @@ std::string splitUntilDelimiter(std::string& str, std::string delimiter);
 std::vector<std::string> splitByString(std::string str, std::string delimiter);
 
 bool isDigits(const std::string& str);
+
+const MIMEType& getMIME(const ExtensionType& extension);
+MIMEMapType     initMIMEMap();
 
 }  // namespace ft
 

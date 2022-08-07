@@ -101,7 +101,7 @@ int Processor::parseRequest(MessageType request_message) {
 std::string Processor::strRequest() { return request_.printToString(); }
 
 void Processor::methodGet() {
-  // FIXME: MIME, autoindex
+  // FIXME: autoindex
   // 폴더
   if (file_manager_.isDirectory()) {
     if (config_.getAutoindex()) {
@@ -130,8 +130,8 @@ void Processor::methodGet() {
   // 파일
   // 해당 위치에 존재하는지만 판단 - (200 / 404)
   if (file_manager_.isExist() && !file_manager_.isDirectory()) {
-    response_.setHeader("Content-Type", "text/html");
-    // - set body
+    response_.setHeader("Content-Type",
+                        ft::getMIME(file_manager_.getExtension()));
     response_.setBody(file_manager_.getContent());
     response_.setStatusCode(200);
   } else if (!file_manager_.isExist()) {
@@ -140,15 +140,14 @@ void Processor::methodGet() {
 }
 
 void Processor::methodPost() {
-  if (config_.getCgi().find("." + file_manager_.getExtension()) !=
+  if (config_.getCgi().find(file_manager_.getExtension()) !=
       config_.getCgi().end()) {
     // cgi 동작
   }
   // set body(requested body)
   response_.setBody(request_.getBody());
-  // FIXME: MIME 구현 후 수정
-  // set content type
-  response_.setHeader("Content-Type", "text/html");
+  response_.setHeader("Content-Type",
+                      ft::getMIME(file_manager_.getExtension()));
   if (file_manager_.isExist() == false) {
     // if file isn't exist, create file. 201
     file_manager_.createFile(request_.getBody());
@@ -166,17 +165,17 @@ void Processor::methodPut() {
     // if file isn't exist, create file. 201
     file_manager_.createFile(request_.getBody());
     response_.setStatusCode(201);
-    // response_.setBody(request_.getBody());
   } else if (request_.getBody().empty()) {
     file_manager_.updateContent("");
-    response_.setHeader("Content-Length", "0");
     response_.setStatusCode(204);
   } else {
     // if file is exist, update file. 200
     file_manager_.updateContent(request_.getBody());
-    // response_.setBody(request_.getBody());
     response_.setStatusCode(200);
   }
+  response_.setBody(request_.getBody());
+  response_.setHeader("Content-Type",
+                      ft::getMIME(file_manager_.getExtension()));
 }
 
 void Processor::methodDelete() {
@@ -187,6 +186,8 @@ void Processor::methodDelete() {
       file_manager_.remove();
     } else {
       response_.setBody(file_manager_.getContent());
+      response_.setHeader("Content-Type",
+                          ft::getMIME(file_manager_.getExtension()));
       response_.setStatusCode(200);
       file_manager_.remove();
     }

@@ -97,11 +97,11 @@ void FileManager::parsePath() {
     name_ = path_;
   } else if (name_pos == std::string::npos) {
     name_ = path_.substr(0, extension_pos);
-    extension_ = path_.substr(extension_pos + 1);
+    extension_ = path_.substr(extension_pos);
   } else if (extension_pos == std::string::npos) {
     name_ = path_.substr(name_pos + 1);
   } else {
     name_ = path_.substr(name_pos + 1, extension_pos - name_pos - 1);
-    extension_ = path_.substr(extension_pos + 1);
+    extension_ = path_.substr(extension_pos);
   }
 }
