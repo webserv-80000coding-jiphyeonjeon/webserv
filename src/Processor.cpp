@@ -148,6 +148,7 @@ void Processor::methodPost() {
   response_.setHeader("Content-Type",
                       ft::getMIME(file_manager_.getExtension()));
   if (file_manager_.isExist() == false) {
+    prepareBeforeCreate();
     // if file isn't exist, create file. 201
     file_manager_.createFile(request_.getBody());
     response_.setStatusCode(201);
@@ -164,6 +165,7 @@ void Processor::methodPut() {
                       ft::getMIME(file_manager_.getExtension()));
   if (file_manager_.isExist() == false) {
     std::cout << file_manager_.getPath() << std::endl;
+    prepareBeforeCreate();
     // if file isn't exist, create file. 201
     file_manager_.createFile(request_.getBody());
     response_.setStatusCode(201);
@@ -240,7 +242,32 @@ ConfigServer Processor::getConfigServerForRequest(
 }
 
 // TODO: createDirectory
-void Processor::createDirectoryIfNeeded() {}
+void Processor::prepareBeforeCreate() {
+  // if directory is not exist until path, create directory.
+  PathType path_until_last_dir = file_manager_.getPath().substr(
+      0, file_manager_.getPath().find_last_of("/"));
+
+  // last dir is exist
+  if (FileManager::isDirectory(path_until_last_dir))
+    return;
+
+  PathType path_for_check = path_until_last_dir.substr(
+      0, path_until_last_dir.find_first_of("/", 1) - 1);
+
+  // update path_for_check until is not exist.
+  while (FileManager::isExist(path_for_check)) {
+    if (!FileManager::isDirectory(path_for_check))
+      throw ProcessException("File is in the path", 409);
+    path_for_check = path_until_last_dir.substr(
+        0, path_until_last_dir.find_first_of("/", path_for_check.size() + 2));
+  }
+  // create directory until last dir.
+  while (path_for_check != path_until_last_dir) {
+    path_for_check = path_until_last_dir.substr(
+        0, path_until_last_dir.find_first_of("/", path_for_check.size() + 2));
+    mkdir(path_for_check.c_str(), 0755);
+  }
+}
 
 Processor::ProcessException::ProcessException(const std::string&    message,
                                               const StatusCodeType& status_code)

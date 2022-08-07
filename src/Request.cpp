@@ -348,7 +348,6 @@ void Request::parseChunkedBody() {
       recv_size += chunk_data.size();
       // TODO: Check when error occurs.(recv_size couldn't be match)
       if (recv_size == chunk_size_) {
-        chunk_size_ = 0;
         chunk_level_ = kChunkSize;
         recv_size = 0;
       }

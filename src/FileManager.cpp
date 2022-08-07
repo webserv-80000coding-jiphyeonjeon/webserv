@@ -84,6 +84,7 @@ void FileManager::updateContent(const std::string& content) {
 void FileManager::createFile(const std::string& content) {
   std::ofstream ofs;
 
+  std::cout << "createFile: " << path_ << std::endl;
   ofs.open(path_.c_str(), std::ofstream::out);
   ofs << content;
   ofs.close();

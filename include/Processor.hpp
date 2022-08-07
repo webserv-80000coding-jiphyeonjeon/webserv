@@ -63,7 +63,7 @@ class Processor {
   void methodDelete();
   void methodHead();
 
-  void createDirectoryIfNeeded();
+  void prepareBeforeCreate();
 
  private:
   MethodFuncMapType method_func_map_;
