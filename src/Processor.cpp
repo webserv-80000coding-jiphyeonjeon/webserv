@@ -126,7 +126,6 @@ void Processor::methodGet() {
       }
     }
   }
-
   // 파일
   // 해당 위치에 존재하는지만 판단 - (200 / 404)
   if (file_manager_.isExist() && !file_manager_.isDirectory()) {
@@ -160,6 +159,9 @@ void Processor::methodPost() {
 }
 
 void Processor::methodPut() {
+  response_.setBody(request_.getBody());
+  response_.setHeader("Content-Type",
+                      ft::getMIME(file_manager_.getExtension()));
   if (file_manager_.isExist() == false) {
     std::cout << file_manager_.getPath() << std::endl;
     // if file isn't exist, create file. 201
@@ -173,9 +175,6 @@ void Processor::methodPut() {
     file_manager_.updateContent(request_.getBody());
     response_.setStatusCode(200);
   }
-  response_.setBody(request_.getBody());
-  response_.setHeader("Content-Type",
-                      ft::getMIME(file_manager_.getExtension()));
 }
 
 void Processor::methodDelete() {
@@ -198,15 +197,8 @@ void Processor::methodDelete() {
 }
 
 void Processor::methodHead() {
-  if (file_manager_.isExist()) {
-    // - set body
-    // FIXME: MIME 구현 후 수정
-    response_.setHeader("Content-Length",
-                        ft::toString(file_manager_.getContent().size()));
-    response_.setStatusCode(200);
-  } else {
-    throw ProcessException("File not found", 404);
-  }
+  methodGet();
+  response_.setBody("");
 }
 
 void Processor::initMethodFuncMap() {
@@ -246,6 +238,9 @@ ConfigServer Processor::getConfigServerForRequest(
   }
   return candidate_configs[0];
 }
+
+// TODO: createDirectory
+void Processor::createDirectoryIfNeeded() {}
 
 Processor::ProcessException::ProcessException(const std::string&    message,
                                               const StatusCodeType& status_code)
