@@ -79,4 +79,6 @@ run : all
 	@./$(NAME)
 
 test : all
+	@rm -f www/put_test/file_should_exist_after www/YoupiBanane/youpi.bla
+	@touch www/YoupiBanane/youpi.bla
 	@./$(NAME) ./config/test.conf

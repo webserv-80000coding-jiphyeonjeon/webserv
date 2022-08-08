@@ -7,10 +7,11 @@
 #include <string>
 #include <vector>
 
+#include "CgiHandler.hpp"
 #include "Config.hpp"
 #include "Log.hpp"
 
-Processor::Processor() : status_code_(200) { initMethodFuncMap(); }
+Processor::Processor() : offset_(0), status_code_(200) { initMethodFuncMap(); }
 
 Processor::~Processor() {}
 
@@ -24,10 +25,14 @@ const Processor::ResponseMessageType& Processor::getResponseMessage() const {
 }
 const Level& Processor::getLevel() const { return request_.getLevel(); }
 
+const Processor::OffsetType& Processor::getOffset() const { return offset_; }
+
 void Processor::setStatusCode(const StatusCodeType& status_code) {
   status_code_ = status_code;
 }
 void Processor::setRequest(const Request& request) { request_ = request; }
+
+void Processor::setOffset(const OffsetType& offset) { offset_ = offset; }
 
 void Processor::process(const Config&                   total_config,
                         const ConfigServer::ListenType& listen) {
