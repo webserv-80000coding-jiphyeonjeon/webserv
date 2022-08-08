@@ -52,8 +52,12 @@ void Processor::process(const Config&                   total_config,
                                  method_list[request_.getMethod() - 1],
                              405);
     }
+    if (request_.getBody().size() > config_.getClientBodyBufferSize())
+      throw ProcessException("Body size over limit", 413);
+
     (this->*method_func_map_[request_.getMethod()])();
     response_.build();
+    
   } catch (const ProcessException& e) {
     ft::log.writeTimeLog("[Processor] --- Process failed ---");
     ft::log.writeLog("Reason: " + std::string(e.what()));
