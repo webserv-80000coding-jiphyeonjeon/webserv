@@ -11,7 +11,9 @@
 #include "Config.hpp"
 #include "Log.hpp"
 
-Processor::Processor() : offset_(0), status_code_(200) { initMethodFuncMap(); }
+Processor::Processor() : offset_(0), io_count_(0), status_code_(200) {
+  initMethodFuncMap();
+}
 
 Processor::~Processor() {}
 
@@ -27,12 +29,16 @@ const Level& Processor::getLevel() const { return request_.getLevel(); }
 
 const Processor::OffsetType& Processor::getOffset() const { return offset_; }
 
+const Processor::OffsetType& Processor::getIoCount() const { return io_count_; }
+
 void Processor::setStatusCode(const StatusCodeType& status_code) {
   status_code_ = status_code;
 }
 void Processor::setRequest(const Request& request) { request_ = request; }
 
 void Processor::setOffset(const OffsetType& offset) { offset_ = offset; }
+
+void Processor::setIoCount(const OffsetType& io_count) { io_count_ = io_count; }
 
 void Processor::process(const Config&                   total_config,
                         const ConfigServer::ListenType& listen) {
@@ -57,7 +63,7 @@ void Processor::process(const Config&                   total_config,
 
     (this->*method_func_map_[request_.getMethod()])();
     response_.build();
-    
+
   } catch (const ProcessException& e) {
     ft::log.writeTimeLog("[Processor] --- Process failed ---");
     ft::log.writeLog("Reason: " + std::string(e.what()));
@@ -81,7 +87,7 @@ void Processor::findLocation(const ConfigServer& config) {
 
   config_ = locations.at(path);
   ft::log.writeLog("Location: " + path);
-  Config::printLocation(config_, "");
+  // Config::printLocation(config_, "");
 
   std::string result_path = request_.getPath();
   result_path =
@@ -204,7 +210,7 @@ void Processor::methodPut() {
   response_.setHeader("Content-Type",
                       ft::getMIME(file_manager_.getExtension()));
   if (file_manager_.isExist() == false) {
-    std::cout << file_manager_.getPath() << std::endl;
+    // std::cout << file_manager_.getPath() << std::endl;
     prepareBeforeCreate();
     // if file isn't exist, create file. 201
     file_manager_.createFile(request_.getBody());

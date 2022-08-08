@@ -44,6 +44,7 @@ class Processor {
   const Request&        getRequest() const;
   const Level&          getLevel() const;
   const OffsetType&     getOffset() const;
+  const OffsetType&     getIoCount() const;
   // const Response& getResponse() const;
 
   const ResponseMessageType& getResponseMessage() const;
@@ -51,6 +52,7 @@ class Processor {
   void setStatusCode(const StatusCodeType& status_code);
   void setRequest(const Request& request);
   void setOffset(const OffsetType& offset);
+  void setIoCount(const OffsetType& io_count);
 
   void process(const Config& total_config, const ListenType& listen);
 
@@ -71,7 +73,9 @@ class Processor {
  private:
   MethodFuncMapType method_func_map_;
 
-  OffsetType     offset_;
+  OffsetType offset_;
+  OffsetType io_count_;
+
   ConfigLocation config_;
   FileManager    file_manager_;
   StatusCodeType status_code_;

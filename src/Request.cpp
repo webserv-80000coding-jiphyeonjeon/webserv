@@ -270,7 +270,9 @@ void Request::parseHeader() {
     throw RequestException("Bad Request(header)", 400);
 
   ft::log.writeTimeLog("[Request] --- Parse ---");
-  ft::log.writeLog(request_message_);
+  (request_message_.size() < 100)
+      ? ft::log.writeLog(request_message_)
+      : ft::log.writeLog(request_message_.substr(0, 100) + "...");
 
   while (request_message_.find("\r\n", position_) != std::string::npos) {
     std::string header =

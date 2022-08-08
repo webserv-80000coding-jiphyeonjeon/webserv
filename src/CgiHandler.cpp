@@ -38,7 +38,6 @@ void CgiHandler::cgiExecute() {
   if (pid == -1) {
     throw 500;
   } else if (!pid) {
-    ft::log.writeLog("[Cgi] --- Child Process ---");
     int dup_error = 0;
     int tmp_fd;
     file_manager.createFile("");
@@ -61,9 +60,7 @@ void CgiHandler::cgiExecute() {
     exit(EXIT_FAILURE);
 
   } else {
-    ft::log.writeLog("[Cgi] --- Parent Process ---");
     close(fpipe_[0]);
-    // close(bpipe_[1]);
 
     size_t offset = 0;
 
@@ -102,13 +99,9 @@ void CgiHandler::cgiExecute() {
 
     waitpid(-1, NULL, 0);
 
-    ft::log.writeLog("[Cgi] --- Child Process Finished ---");
-
     std::string cgi_response = file_manager.getContent();
     file_manager.remove();
     parseCgiResponse(cgi_response);
-    // ft::log.writeTimeLog("[CGI] --- New body ---");
-    // ft::log.writeLog(body_);
   }
 }
 
