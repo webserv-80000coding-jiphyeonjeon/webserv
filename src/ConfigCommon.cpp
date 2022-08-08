@@ -58,6 +58,10 @@ void ConfigCommon::setClientBodyBufferSize(
   client_body_buffer_size_ = value;
 }
 
+void ConfigCommon::setErrorPage(const ConfigCommon::ErrorPageType& error_page) {
+  error_page_ = error_page;
+}
+
 void ConfigCommon::addErrorPage(const ConfigCommon::ErrorPairType& value) {
   error_page_.insert(value);
 }

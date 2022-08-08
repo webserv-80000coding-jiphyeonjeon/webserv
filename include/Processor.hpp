@@ -70,6 +70,8 @@ class Processor {
 
   void prepareBeforeCreate();
 
+  std::string generateDirList();
+
  private:
   MethodFuncMapType method_func_map_;
 

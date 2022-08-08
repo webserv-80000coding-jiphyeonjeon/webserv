@@ -179,6 +179,8 @@ void Parser::fillDefaultConfigLocation(ConfigServer&               server,
       it->second.setIndex(server.getIndex());
     if (it->second.getRoot() == "")
       it->second.setRoot(server.getRoot());
+    if (it->second.getErrorPage().empty())
+      it->second.setErrorPage(server.getErrorPage());
   }
 }
 

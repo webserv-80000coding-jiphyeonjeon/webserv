@@ -66,8 +66,19 @@ void Processor::process(const Config&                   total_config,
 
   } catch (const ProcessException& e) {
     ft::log.writeTimeLog("[Processor] --- Process failed ---");
-    ft::log.writeLog("Reason: " + std::string(e.what()));
-    response_.buildException(e.getStatusCode());
+    ft::log.writeLog("Reason: " + std::string(e.what()) + " " +
+                     ft::toString(e.getStatusCode()));
+    // if there's error page, use it
+    if (config_.getErrorPage().find(e.getStatusCode()) !=
+        config_.getErrorPage().end()) {
+      file_manager_.setPath(config_.getRoot() +
+                            config_.getErrorPage().at(e.getStatusCode()));
+      response_.setBody(file_manager_.getContent());
+      response_.setStatusCode(e.getStatusCode());
+      response_.build();
+    } else {
+      response_.buildException(e.getStatusCode());
+    }
   }
 }
 
@@ -116,14 +127,23 @@ int Processor::parseRequest(MessageType request_message) {
 std::string Processor::strRequest() { return request_.printToString(); }
 
 void Processor::methodGet() {
-  // FIXME: autoindex
+  if (config_.getReturn().first) {
+    response_.setStatusCode(config_.getReturn().first);
+    response_.setHeader("Location", config_.getReturn().second);
+    return;
+  }
   // 폴더
+  // FIXME: autoindex
   if (file_manager_.isDirectory()) {
     if (access(file_manager_.getPath().c_str(), R_OK) != 0)
       throw ProcessException("Forbidden", 403);
 
     if (config_.getAutoindex()) {
       // autoindex: on -> 바로 autoindex page 보내주기 (200)
+      response_.setStatusCode(200);
+      response_.setBody(generateDirList());
+      response_.setHeader("Content-Type", "text/html");
+      return;
       // TODO: autoindex page 보내주기
     } else {
       // autoindex: off
@@ -319,6 +339,20 @@ void Processor::prepareBeforeCreate() {
         0, path_until_last_dir.find_first_of("/", path_for_check.size() + 2));
     mkdir(path_for_check.c_str(), 0755);
   }
+}
+
+std::string Processor::generateDirList() {
+  std::vector<PathType> dir_list = file_manager_.getDirList();
+  std::stringstream     ss;
+  ss << "<html><body><h1>Index of " << request_.getPath() << "</h1>";
+  ss << "<ul>";
+  for (std::vector<PathType>::iterator it = dir_list.begin();
+       it != dir_list.end(); ++it) {
+    ss << "<li><a href=\"" << *it << "\">" << *it << "</a></li>";
+  }
+  ss << "</ul>";
+  ss << "</body></html>";
+  return ss.str();
 }
 
 Processor::ProcessException::ProcessException(const std::string&    message,
