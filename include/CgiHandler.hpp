@@ -8,18 +8,27 @@
 
 class CgiHandler {
  public:
-  typedef std::string        CgiPathType;
-  typedef Response::BodyType BodyType;
+  typedef std::string              CgiPathType;
+  typedef std::string              CgiResponseType;
+  typedef Response::BodyType       BodyType;
+  typedef Response::StatusCodeType StatusCodeType;
+  typedef Request::HeaderKeyType   HeaderKeyType;
+  typedef Request::HeaderValueType HeaderValueType;
+  typedef Request::HeaderMapType   HeaderMapType;
 
   CgiHandler(const CgiPathType& cgi_path, const Request& request);
   ~CgiHandler();
 
-  const BodyType& getBody() const;
+  const StatusCodeType& getStatusCode() const;
+  const HeaderMapType&  getHeaderMap() const;
+  const BodyType&       getBody() const;
 
   void cgiExecute();
 
  private:
   static const int kCgiBufferSize = 65536;
+
+  void parseCgiResponse(CgiResponseType& cgi_response);
 
   int initEnviron(const Request& request);
   int initPipe();
@@ -27,7 +36,10 @@ class CgiHandler {
   int                fpipe_[2];
   int                bpipe_[2];
   const CgiPathType& cgi_path_;
-  BodyType           body_;
+
+  StatusCodeType status_code_;
+  HeaderMapType  header_map_;
+  BodyType       body_;
 };
 
 #endif  // CGIHANDLER_HPP_

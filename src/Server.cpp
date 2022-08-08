@@ -96,7 +96,7 @@ SendState Server::sendData(Server::FdType client_socket) {
 
   ft::log.writeTimeLog("[Server] --- Send Data ---");
   ft::log.getLogStream() << "Client: " << client_socket << std::endl;
-  ft::log.writeLog(str);
+  // ft::log.writeLog(str);
 
   const Processor::OffsetType& offset = processor.getOffset();
   ssize_t                      send_size =

@@ -7,6 +7,7 @@
 
 #include "FileManager.hpp"
 #include "Log.hpp"
+#include "Utilities.hpp"
 #include "Webserv.hpp"
 
 extern char** environ;
@@ -19,6 +20,12 @@ CgiHandler::CgiHandler(const CgiPathType& cgi_path, const Request& request)
 
 CgiHandler::~CgiHandler() {}
 
+const CgiHandler::StatusCodeType& CgiHandler::getStatusCode() const {
+  return status_code_;
+}
+const CgiHandler::HeaderMapType& CgiHandler::getHeaderMap() const {
+  return header_map_;
+}
 const CgiHandler::BodyType& CgiHandler::getBody() const { return body_; }
 
 void CgiHandler::cgiExecute() {
@@ -97,21 +104,57 @@ void CgiHandler::cgiExecute() {
 
     ft::log.writeLog("[Cgi] --- Child Process Finished ---");
 
-    body_ = file_manager.getContent();
+    std::string cgi_response = file_manager.getContent();
     file_manager.remove();
+    parseCgiResponse(cgi_response);
     // ft::log.writeTimeLog("[CGI] --- New body ---");
     // ft::log.writeLog(body_);
   }
+}
 
-  // 여기서 파싱이 진행될 듯
+void CgiHandler::parseCgiResponse(CgiResponseType& cgi_response) {
+  size_t          pos = 0;
+  HeaderKeyType   key;
+  HeaderValueType value;
+  std::string   status_line = ft::getUntilDelimiter(cgi_response, "\r\n", pos);
+  std::string   header_field;
+  HeaderMapType header_map;
+
+  status_code_ =
+      atoi(status_line.substr(status_line.find_first_of("12345"), 3).c_str());
+
+  while (cgi_response.find("\r\n", pos) != std::string::npos) {
+    std::string header = ft::getUntilDelimiter(cgi_response, "\r\n", pos);
+
+    // End of header.
+    if (header == "")
+      break;
+
+    key = ft::splitUntilDelimiter(header, ": ");
+    value = ft::strBidirectionalTrim(header, " ");
+    header_map[key] = value;
+    // std::cout << "key: " << key << " value: " << value << std::endl;
+  }
+
+  body_ = cgi_response.erase(0, pos);
+  // std::cout << body_.size() << std::endl;
 }
 
 int CgiHandler::initEnviron(const Request& request) {
   const char* method_list[] = {"GET", "POST", "PUT", "DELETE", "HEAD"};
+  bool        secret_header = false;
+
+  if (request.getHeaderMap().find("X-Secret-Header-For-Test") !=
+      request.getHeaderMap().end()) {
+    secret_header = true;
+  }
 
   if (setenv("SERVER_PROTOCOL", "HTTP/1.1", 1) ||
       setenv("REQUEST_METHOD", method_list[request.getMethod() - 1], 1) ||
-      setenv("PATH_INFO", cgi_path_.c_str(), 1))
+      setenv("PATH_INFO", cgi_path_.c_str(), 1) ||
+      (secret_header &&
+       setenv("HTTP_X_SECRET_HEADER_FOR_TEST",
+              request.getHeader("X-Secret-Header-For-Test").c_str(), 1)))
     return -1;
   return 0;
 }

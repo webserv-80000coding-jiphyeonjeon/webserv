@@ -164,9 +164,14 @@ void Processor::methodPost() {
     try {
       CgiHandler cgi(it->second, request_);
       cgi.cgiExecute();
+      response_.setStatusCode(cgi.getStatusCode());
+      response_.setHeaderMap(cgi.getHeaderMap());
       response_.setBody(cgi.getBody());
-      // response_.setStatusCode(cgi.getStatusCode());
-      // response_.setHeader("Content-Type", cgi.getContentType());
+      for (CgiHandler::HeaderMapType::const_iterator it =
+               cgi.getHeaderMap().begin();
+           it != cgi.getHeaderMap().end(); ++it) {
+        ft::log.writeLog(it->first + ": " + it->second);
+      }
     } catch (const int& e) {
       throw ProcessException("CGI execution failed", e);
     }

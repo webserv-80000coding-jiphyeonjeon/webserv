@@ -22,6 +22,10 @@ void Response::setHeader(const HeaderKeyType&   key,
   header_map_[key] = value;
 }
 
+void Response::setHeaderMap(const HeaderMapType& header_map) {
+  header_map_ = header_map;
+}
+
 void Response::setBody(const BodyType& body) {
   body_ = body;
   setHeader("Content-Length", ft::toString(body_.size()));
