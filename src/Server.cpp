@@ -82,7 +82,8 @@ RecvState Server::receiveData(Server::FdType client_socket) {
 
   if (it->second.getLevel() == kDone) {
     ft::log.writeTimeLog("[Server] --- Body received ---");
-    ft::log.writeLog("Body:\n" + it->second.getRequest().getRequestMessage());
+    // ft::log.writeLog("Body:\n" +
+    // it->second.getRequest().getRequestMessage());
     return kRecvSuccess;
   }
 

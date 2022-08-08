@@ -47,7 +47,8 @@ class ConfigCommon {
 
  private:
   static const AutoindexType            kDefaultAutoindex = false;
-  static const ClientBodyBufferSizeType kDefaultClientBodyBufferSize = 8000;
+  static const ClientBodyBufferSizeType kDefaultClientBodyBufferSize =
+      100000001;
 
   AutoindexType            autoindex_;
   ClientBodyBufferSizeType client_body_buffer_size_;
