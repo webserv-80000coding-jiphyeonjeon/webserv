@@ -34,7 +34,6 @@ class CgiHandler {
   int initPipe();
 
   int                fpipe_[2];
-  int                bpipe_[2];
   const CgiPathType& cgi_path_;
 
   StatusCodeType status_code_;

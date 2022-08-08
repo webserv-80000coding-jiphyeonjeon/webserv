@@ -44,13 +44,11 @@ void CgiHandler::cgiExecute() {
     tmp_fd = open(file_manager.getPath().c_str(), O_WRONLY);
 
     close(fpipe_[1]);
-    close(bpipe_[0]);
 
     dup_error |= dup2(fpipe_[0], STDIN_FILENO);
     dup_error |= dup2(tmp_fd, STDOUT_FILENO);
 
     close(fpipe_[0]);
-    close(bpipe_[1]);
 
     if (dup_error == -1)
       throw 500;
@@ -126,11 +124,9 @@ void CgiHandler::parseCgiResponse(CgiResponseType& cgi_response) {
     key = ft::splitUntilDelimiter(header, ": ");
     value = ft::strBidirectionalTrim(header, " ");
     header_map[key] = value;
-    // std::cout << "key: " << key << " value: " << value << std::endl;
   }
 
   body_ = cgi_response.erase(0, pos);
-  // std::cout << body_.size() << std::endl;
 }
 
 int CgiHandler::initEnviron(const Request& request) {
@@ -153,10 +149,8 @@ int CgiHandler::initEnviron(const Request& request) {
 }
 
 int CgiHandler::initPipe() {
-  if (pipe(fpipe_) || pipe(bpipe_))
+  if (pipe(fpipe_))
     return -1;
-  if (fcntl(fpipe_[1], F_SETFL, O_NONBLOCK) == -1 ||
-      fcntl(bpipe_[0], F_SETFL, O_NONBLOCK) == -1)
-    return -1;
+  fcntl(fpipe_[1], F_SETFL, O_NONBLOCK);
   return 0;
 }

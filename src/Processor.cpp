@@ -177,11 +177,6 @@ void Processor::methodPost() {
       response_.setStatusCode(cgi.getStatusCode());
       response_.setHeaderMap(cgi.getHeaderMap());
       response_.setBody(cgi.getBody());
-      for (CgiHandler::HeaderMapType::const_iterator it =
-               cgi.getHeaderMap().begin();
-           it != cgi.getHeaderMap().end(); ++it) {
-        ft::log.writeLog(it->first + ": " + it->second);
-      }
     } catch (const int& e) {
       throw ProcessException("CGI execution failed", e);
     }
