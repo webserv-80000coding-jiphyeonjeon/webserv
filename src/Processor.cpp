@@ -149,9 +149,28 @@ void Processor::methodGet() {
 }
 
 void Processor::methodPost() {
-  if (config_.getCgi().find(file_manager_.getExtension()) !=
-      config_.getCgi().end()) {
-    // cgi 동작
+  const ConfigLocation::CgiType&          cgi_list = config_.getCgi();
+  ConfigLocation::CgiType::const_iterator it;
+  if ((it = cgi_list.find(file_manager_.getExtension())) != cgi_list.end()) {
+    ft::log.writeTimeLog("[Processor] --- Execute cgi ---");
+
+    if (!FileManager::isExist(it->second) ||
+        FileManager::isDirectory(it->second))
+      throw ProcessException("CGI program not found", 404);
+
+    if (access(it->second.c_str(), X_OK) != 0)
+      throw ProcessException("Forbidden", 403);
+
+    try {
+      CgiHandler cgi(it->second, request_);
+      cgi.cgiExecute();
+      response_.setBody(cgi.getBody());
+      // response_.setStatusCode(cgi.getStatusCode());
+      // response_.setHeader("Content-Type", cgi.getContentType());
+    } catch (const int& e) {
+      throw ProcessException("CGI execution failed", e);
+    }
+    return;
   }
   // set body(requested body)
   response_.setBody(request_.getBody());

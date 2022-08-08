@@ -14,7 +14,7 @@ class Processor {
  public:
   typedef void (Processor::*MethodFuncType)();
   typedef std::map<Method, MethodFuncType> MethodFuncMapType;
-  typedef ssize_t                          OffsetType;
+  typedef size_t                           OffsetType;
 
   typedef Config::ServersType      ServersType;
   typedef Config::ServerNamesType  ServerNamesType;
