@@ -58,7 +58,9 @@ Server::FdType Server::acceptClient() {
 }
 
 RecvState Server::receiveData(Server::FdType client_socket) {
-  ft::log.getLogStream() << "recv [" << client_socket << "]" << std::endl;
+  Processor&                   processor = processor_map_.at(client_socket);
+  const Processor::OffsetType& call_count = processor.getIoCount();
+  processor.setIoCount(call_count + 1);
 
   char buffer[kBufferSize];
   memset(buffer, 0, kBufferSize);
@@ -81,11 +83,17 @@ RecvState Server::receiveData(Server::FdType client_socket) {
     return kParseError;
 
   if (it->second.getLevel() == kDone) {
-    ft::log.writeTimeLog("[Server] --- Body received ---");
-    ft::log.writeLog("Body:\n" + it->second.getRequest().getRequestMessage());
+    ft::log.writeTimeLog("[Server] --- Receive Complete ---");
+    ft::log.getLogStream() << "Client: " << client_socket
+                           << "\nCount: " << processor.getIoCount()
+                           << std::endl;
+
+    ft::log.writeLog("Body:");
+    std::string str = it->second.getRequest().getRequestMessage();
+    (str.size() < 100) ? ft::log.writeLog(str)
+                       : ft::log.writeLog(str.substr(0, 100) + "...");
     return kRecvSuccess;
   }
-
   return kRecvContinuous;
   // return (it->second.getLevel() == kDone ? kRecvSuccess : kRecvContinuous);
 }
@@ -94,12 +102,11 @@ SendState Server::sendData(Server::FdType client_socket) {
   Processor&  processor = processor_map_.at(client_socket);
   std::string str = processor.getResponseMessage();
 
-  ft::log.writeTimeLog("[Server] --- Send Data ---");
-  ft::log.getLogStream() << "Client: " << client_socket << std::endl;
-  ft::log.writeLog(str);
-
   const Processor::OffsetType& offset = processor.getOffset();
-  ssize_t                      send_size =
+  const Processor::OffsetType& call_count = processor.getIoCount();
+  processor.setIoCount(call_count + 1);
+
+  ssize_t send_size =
       send(client_socket, str.c_str() + offset, str.size() - offset, 0);
 
   if (send_size == -1) {
@@ -113,6 +120,12 @@ SendState Server::sendData(Server::FdType client_socket) {
   } else {
     processor.setOffset(offset + send_size);
     if (offset == str.size()) {
+      ft::log.writeTimeLog("[Server] --- Send Complete ---");
+      ft::log.getLogStream() << "Client: " << client_socket
+                             << "\nCount: " << call_count + 1 << std::endl;
+      (str.size() < 100) ? ft::log.writeLog(str)
+                         : ft::log.writeLog(str.substr(0, 100) + "...");
+
       processor_map_.erase(client_socket);
       processor_map_.insert(std::make_pair(client_socket, Processor()));
       return kSendSuccess;

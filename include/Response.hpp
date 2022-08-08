@@ -25,6 +25,7 @@ class Response {
   void setVersion(const VersionType& version);
   void setStatusCode(const StatusCodeType& status_code);
   void setHeader(const HeaderKeyType& key, const HeaderValueType& value);
+  void setHeaderMap(const HeaderMapType& header_map);
   void setBody(const BodyType& body);
 
   void build();

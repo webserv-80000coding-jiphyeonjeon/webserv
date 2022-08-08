@@ -12,6 +12,9 @@ class Webserv {
   typedef std::map<FdType, Server*> ConnectSocketType;
   typedef std::vector<FdType>       ReadyType;
 
+  static const int kTimeOut = 0;
+  static const int kError = -1;
+
   Webserv(const Config& config);
   ~Webserv();
 
@@ -19,9 +22,6 @@ class Webserv {
   void runWebserv();
 
  private:
-  static const int kTimeOut = 0;
-  static const int kError = -1;
-
   const Config&     config_;
   FdType            max_fd_;
   fd_set            fd_set_;

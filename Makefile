@@ -27,7 +27,8 @@ SRCS_NAME	:=	main.cpp						\
 							Utilities.cpp				\
 							Webserv.cpp					\
 							Response.cpp				\
-							FileManager.cpp
+							FileManager.cpp			\
+							CgiHandler.cpp
 SRCS			:= $(addprefix $(SRCS_DIR)/, $(SRCS_NAME))
 
 OBJS			:=	$(SRCS:.cpp=.o)
