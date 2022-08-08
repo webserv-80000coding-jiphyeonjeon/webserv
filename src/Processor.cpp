@@ -66,8 +66,19 @@ void Processor::process(const Config&                   total_config,
 
   } catch (const ProcessException& e) {
     ft::log.writeTimeLog("[Processor] --- Process failed ---");
-    ft::log.writeLog("Reason: " + std::string(e.what()));
-    response_.buildException(e.getStatusCode());
+    ft::log.writeLog("Reason: " + std::string(e.what()) + " " +
+                     ft::toString(e.getStatusCode()));
+    // if there's error page, use it
+    if (config_.getErrorPage().find(e.getStatusCode()) !=
+        config_.getErrorPage().end()) {
+      file_manager_.setPath(config_.getRoot() +
+                            config_.getErrorPage().at(e.getStatusCode()));
+      response_.setBody(file_manager_.getContent());
+      response_.setStatusCode(e.getStatusCode());
+      response_.build();
+    } else {
+      response_.buildException(e.getStatusCode());
+    }
   }
 }
 
@@ -154,7 +165,7 @@ void Processor::methodGet() {
     response_.setBody(file_manager_.getContent());
     response_.setStatusCode(200);
   } else if (!file_manager_.isExist()) {
-    throw ProcessException("File not found", 404);
+    throw ProcessException("File not found", 500);
   }
 }
 
