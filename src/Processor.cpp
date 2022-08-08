@@ -127,8 +127,13 @@ int Processor::parseRequest(MessageType request_message) {
 std::string Processor::strRequest() { return request_.printToString(); }
 
 void Processor::methodGet() {
-  // FIXME: autoindex
+  if (config_.getReturn().first) {
+    response_.setStatusCode(config_.getReturn().first);
+    response_.setHeader("Location", config_.getReturn().second);
+    return;
+  }
   // 폴더
+  // FIXME: autoindex
   if (file_manager_.isDirectory()) {
     if (access(file_manager_.getPath().c_str(), R_OK) != 0)
       throw ProcessException("Forbidden", 403);
@@ -165,7 +170,7 @@ void Processor::methodGet() {
     response_.setBody(file_manager_.getContent());
     response_.setStatusCode(200);
   } else if (!file_manager_.isExist()) {
-    throw ProcessException("File not found", 500);
+    throw ProcessException("File not found", 404);
   }
 }
 
