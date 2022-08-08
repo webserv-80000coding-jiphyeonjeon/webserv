@@ -77,6 +77,11 @@ void ConfigLocation::setClientBodyBufferSize(
   common_config_.setClientBodyBufferSize(value);
 }
 
+void ConfigLocation::setErrorPage(
+    const ConfigLocation::ErrorPageType& error_page) {
+  common_config_.setErrorPage(error_page);
+}
+
 void ConfigLocation::addErrorPage(const ConfigLocation::ErrorPairType& value) {
   common_config_.addErrorPage(value);
 }
