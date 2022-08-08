@@ -125,6 +125,13 @@ MIMEMapType initMIMEMap() {
   mime_map[".3gp"] = "video/3gpp";
   mime_map[".3g2"] = "video/3gpp2";
   mime_map[".7z"] = "application/x-7z-compressed";
+  mime_map[".mp3"] = "audio/mpeg";
+  mime_map[".mp4"] = "video/mp4";
+  mime_map[".mpeg"] = "video/mpeg";
+  mime_map[".mpg"] = "video/mpeg";
+  mime_map[".mov"] = "video/quicktime";
+  mime_map[".webm"] = "video/webm";
+  mime_map[""] = "application/octet-stream";
 
   return mime_map;
 }

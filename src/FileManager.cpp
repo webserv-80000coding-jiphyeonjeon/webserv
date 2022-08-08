@@ -92,7 +92,7 @@ void FileManager::createFile(const std::string& content) {
 
 void FileManager::parsePath() {
   size_t name_pos = path_.find_last_of('/');
-  size_t extension_pos = name_.find_last_of('.');
+  size_t extension_pos = name_pos + path_.substr(name_pos).find_last_of('.');
 
   if (name_pos == std::string::npos && extension_pos == std::string::npos) {
     name_ = path_;
