@@ -27,6 +27,8 @@ class Processor {
 
   typedef Response::MessageType ResponseMessageType;
 
+  typedef ConfigLocation::IndexType IndexType;
+
   class ProcessException : public ServerException {
    public:
     ProcessException(const std::string&    message,
@@ -60,6 +62,8 @@ class Processor {
   void methodPut();
   void methodDelete();
   void methodHead();
+
+  void prepareBeforeCreate();
 
  private:
   MethodFuncMapType method_func_map_;

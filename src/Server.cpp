@@ -56,8 +56,7 @@ Server::FdType Server::acceptClient() {
 }
 
 RecvState Server::receiveData(Server::FdType client_socket) {
-  ft::log.writeTimeLog("[Server] --- Receive data ---");
-  ft::log.getLogStream() << "Client: " << client_socket << std::endl;
+  ft::log.getLogStream() << "recv [" << client_socket << "]" << std::endl;
 
   char buffer[kBufferSize];
   memset(buffer, 0, kBufferSize);
@@ -78,7 +77,15 @@ RecvState Server::receiveData(Server::FdType client_socket) {
   ProcessorType::iterator it = processor_map_.find(client_socket);
   if (it->second.parseRequest(std::string(buffer)) == -1)
     return kParseError;
-  return (it->second.getLevel() == kDone ? kRecvSuccess : kRecvContinuous);
+
+  if (it->second.getLevel() == kDone) {
+    ft::log.writeTimeLog("[Server] --- Body received ---");
+    ft::log.writeLog("Body:\n" + it->second.getRequest().getRequestMessage());
+    return kRecvSuccess;
+  }
+
+  return kRecvContinuous;
+  // return (it->second.getLevel() == kDone ? kRecvSuccess : kRecvContinuous);
 }
 
 SendState Server::sendData(Server::FdType client_socket) {

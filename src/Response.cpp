@@ -4,6 +4,7 @@
 
 Response::Response() : version_("HTTP/1.1"), status_code_(200) {
   initStatusCodeMap();
+  setBody("");
 }
 
 Response::~Response() {}

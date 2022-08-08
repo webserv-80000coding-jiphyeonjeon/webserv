@@ -9,7 +9,7 @@
 FileManager::FileManager() {}
 FileManager::FileManager(const PathType& root, const PathType& path)
     : path_(root + path) {
-  parsePath(path);
+  parsePath();
 }
 FileManager::FileManager(const PathType& path) : path_(path) {}
 FileManager::~FileManager() {}
@@ -19,8 +19,14 @@ const FileManager::NameType&      FileManager::getName() const { return name_; }
 const FileManager::ExtensionType& FileManager::getExtension() const {
   return extension_;
 }
+const FileManager::NameType FileManager::getFullName() const {
+  return name_ + extension_;
+}
 
-void FileManager::setPath(const PathType& path) { path_ = path; }
+void FileManager::setPath(const PathType& path) {
+  path_ = path;
+  parsePath();
+}
 void FileManager::setName(const NameType& name) { name_ = name; }
 void FileManager::setExtension(const ExtensionType& extension) {
   extension_ = extension;
@@ -67,29 +73,36 @@ void FileManager::appendContent(const std::string& content) {
   ofs.close();
 }
 
+void FileManager::updateContent(const std::string& content) {
+  std::ofstream ofs;
+
+  ofs.open(path_.c_str(), std::ofstream::out | std::ofstream::trunc);
+  ofs << content;
+  ofs.close();
+}
+
 void FileManager::createFile(const std::string& content) {
   std::ofstream ofs;
 
+  std::cout << "createFile: " << path_ << std::endl;
   ofs.open(path_.c_str(), std::ofstream::out);
   ofs << content;
   ofs.close();
 }
 
-void FileManager::parsePath(const PathType& path) {
-  path_ = path;
-
+void FileManager::parsePath() {
   size_t name_pos = path_.find_last_of('/');
-  size_t extension_pos = name_.find_last_of('.');
+  size_t extension_pos = name_pos + path_.substr(name_pos).find_last_of('.');
 
   if (name_pos == std::string::npos && extension_pos == std::string::npos) {
     name_ = path_;
   } else if (name_pos == std::string::npos) {
     name_ = path_.substr(0, extension_pos);
-    extension_ = path_.substr(extension_pos + 1);
+    extension_ = path_.substr(extension_pos);
   } else if (extension_pos == std::string::npos) {
     name_ = path_.substr(name_pos + 1);
   } else {
     name_ = path_.substr(name_pos + 1, extension_pos - name_pos - 1);
-    extension_ = path_.substr(extension_pos + 1);
+    extension_ = path_.substr(extension_pos);
   }
 }
