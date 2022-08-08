@@ -104,6 +104,9 @@ void Processor::methodGet() {
   // FIXME: autoindex
   // 폴더
   if (file_manager_.isDirectory()) {
+    if (access(file_manager_.getPath().c_str(), R_OK) != 0)
+      throw ProcessException("Forbidden", 403);
+
     if (config_.getAutoindex()) {
       // autoindex: on -> 바로 autoindex page 보내주기 (200)
       // TODO: autoindex page 보내주기
@@ -129,6 +132,8 @@ void Processor::methodGet() {
   // 파일
   // 해당 위치에 존재하는지만 판단 - (200 / 404)
   if (file_manager_.isExist() && !file_manager_.isDirectory()) {
+    if (access(file_manager_.getPath().c_str(), R_OK) != 0)
+      throw ProcessException("Forbidden", 403);
     response_.setHeader("Content-Type",
                         ft::getMIME(file_manager_.getExtension()));
     response_.setBody(file_manager_.getContent());
@@ -153,6 +158,8 @@ void Processor::methodPost() {
     file_manager_.createFile(request_.getBody());
     response_.setStatusCode(201);
   } else {
+    if (file_manager_.isDirectory())
+      throw ProcessException("Is directory", 409);
     // if file is exist, update file. 200
     file_manager_.appendContent(request_.getBody());
     response_.setStatusCode(200);
@@ -173,6 +180,8 @@ void Processor::methodPut() {
     file_manager_.updateContent("");
     response_.setStatusCode(204);
   } else {
+    if (file_manager_.isDirectory())
+      throw ProcessException("Is directory", 409);
     // if file is exist, update file. 200
     file_manager_.updateContent(request_.getBody());
     response_.setStatusCode(200);
@@ -248,19 +257,28 @@ void Processor::prepareBeforeCreate() {
       0, file_manager_.getPath().find_last_of("/"));
 
   // last dir is exist
-  if (FileManager::isDirectory(path_until_last_dir))
-    return;
+  if (FileManager::isDirectory(path_until_last_dir)) {
+    if (access(path_until_last_dir.c_str(), W_OK != 0))
+      throw ProcessException("No write permission to dir", 403);
+    else
+      return;
+  }
 
   PathType path_for_check = path_until_last_dir.substr(
       0, path_until_last_dir.find_first_of("/", 1) - 1);
 
   // update path_for_check until is not exist.
   while (FileManager::isExist(path_for_check)) {
+    // if path_for_check is not dir, throw 409(conflict)
     if (!FileManager::isDirectory(path_for_check))
       throw ProcessException("File is in the path", 409);
+    // if no permission to create directory, throw exception.
+    if (access(path_for_check.c_str(), W_OK != 0))
+      throw ProcessException("No write permission to dir", 403);
     path_for_check = path_until_last_dir.substr(
         0, path_until_last_dir.find_first_of("/", path_for_check.size() + 2));
   }
+
   // create directory until last dir.
   while (path_for_check != path_until_last_dir) {
     path_for_check = path_until_last_dir.substr(
