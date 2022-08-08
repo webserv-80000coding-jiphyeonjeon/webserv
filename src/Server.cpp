@@ -46,6 +46,8 @@ Server::FdType Server::acceptClient() {
   if (client_socket == -1)
     throw std::runtime_error("Server: accept() error");
 
+  fcntl(client_socket, F_SETFL, O_NONBLOCK);
+
   // 연결된 fd와 여기에 관련된 Processor 객체를 map에 추가
   ft::log.writeTimeLog("[Server] --- Accept client ---");
   ft::log.getLogStream() << "Host: " << socket_ << "\nClient: " << client_socket
@@ -89,24 +91,33 @@ RecvState Server::receiveData(Server::FdType client_socket) {
 }
 
 SendState Server::sendData(Server::FdType client_socket) {
-  std::string str = processor_map_[client_socket].getResponseMessage();
+  Processor&  processor = processor_map_.at(client_socket);
+  std::string str = processor.getResponseMessage();
+
   ft::log.writeTimeLog("[Server] --- Send Data ---");
   ft::log.getLogStream() << "Client: " << client_socket << std::endl;
   ft::log.writeLog(str);
-  ssize_t send_size = send(client_socket, str.c_str(), str.size(), 0);
+
+  const Processor::OffsetType& offset = processor.getOffset();
+  ssize_t                      send_size =
+      send(client_socket, str.c_str() + offset, str.size() - offset, 0);
 
   if (send_size == -1) {
     closeClient(client_socket);
     std::cout << "Send error" << std::endl;
     return kSendError;
-  } else if (str.substr(9, 3) == "400") {
+  } else if (!offset && str.substr(9, 3) == "400") {
     closeClient(client_socket);
     std::cout << "\rConnection closed by client" << std::endl;
     return kSendError;
   } else {
-    processor_map_.erase(client_socket);
-    processor_map_.insert(std::make_pair(client_socket, Processor()));
-    return kSendSuccess;
+    processor.setOffset(offset + send_size);
+    if (offset == str.size()) {
+      processor_map_.erase(client_socket);
+      processor_map_.insert(std::make_pair(client_socket, Processor()));
+      return kSendSuccess;
+    }
+    return kSendContinuous;
   }
 }
 

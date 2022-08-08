@@ -16,7 +16,8 @@ enum RecvState {
   kRecvError = -1,
   kParseError = -2
 };
-enum SendState { kSendError = -1, kSendSuccess = 0 };
+
+enum SendState { kSendError = -1, kSendSuccess = 0, kSendContinuous = 1 };
 
 class Server {
  public:

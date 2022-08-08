@@ -14,6 +14,7 @@ class Processor {
  public:
   typedef void (Processor::*MethodFuncType)();
   typedef std::map<Method, MethodFuncType> MethodFuncMapType;
+  typedef ssize_t                          OffsetType;
 
   typedef Config::ServersType      ServersType;
   typedef Config::ServerNamesType  ServerNamesType;
@@ -42,12 +43,14 @@ class Processor {
   const StatusCodeType& getStatusCode() const;
   const Request&        getRequest() const;
   const Level&          getLevel() const;
+  const OffsetType&     getOffset() const;
   // const Response& getResponse() const;
 
   const ResponseMessageType& getResponseMessage() const;
 
   void setStatusCode(const StatusCodeType& status_code);
   void setRequest(const Request& request);
+  void setOffset(const OffsetType& offset);
 
   void process(const Config& total_config, const ListenType& listen);
 
@@ -68,6 +71,7 @@ class Processor {
  private:
   MethodFuncMapType method_func_map_;
 
+  OffsetType     offset_;
   ConfigLocation config_;
   FileManager    file_manager_;
   StatusCodeType status_code_;

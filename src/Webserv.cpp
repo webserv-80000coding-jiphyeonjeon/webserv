@@ -129,8 +129,10 @@ void Webserv::sendResponse(int& state, fd_set& write_fds) {
         FD_CLR(*it, &fd_set_);
         FD_CLR(*it, &write_fds);
         connect_socket_.erase(*it);
+        ready_to_write_.erase(it);
+      } else if (send_state == kSendSuccess) {
+        ready_to_write_.erase(it);
       }
-      ready_to_write_.erase(it);
       state = 0;
       break;
     }
