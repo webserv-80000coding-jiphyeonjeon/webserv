@@ -1,8 +1,11 @@
 #include "FileManager.hpp"
 
+#include <dirent.h>
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <unistd.h>
+
+#include <algorithm>
 
 #include "Log.hpp"
 #include "Utilities.hpp"
@@ -90,6 +93,25 @@ void FileManager::createFile(const std::string& content) {
   ofs.open(path_.c_str(), std::ofstream::out);
   ofs << content;
   ofs.close();
+}
+
+const std::vector<std::string> FileManager::getDirList() const {
+  std::vector<std::string> dir_list;
+  DIR*                     dir = ::opendir(path_.c_str());
+  struct dirent*           ent;
+
+  if (dir == NULL) {
+    return dir_list;
+  }
+  while ((ent = ::readdir(dir)) != NULL) {
+    if (strcmp(ent->d_name, ".") == 0 || strcmp(ent->d_name, "..") == 0) {
+      continue;
+    }
+    dir_list.push_back(ent->d_name);
+  }
+  ::closedir(dir);
+  std::sort(dir_list.begin(), dir_list.end());
+  return dir_list;
 }
 
 void FileManager::parsePath() {

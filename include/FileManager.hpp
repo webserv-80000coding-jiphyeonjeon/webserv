@@ -5,6 +5,7 @@
 
 #include <fstream>
 #include <string>
+#include <vector>
 
 class FileManager {
  public:
@@ -38,6 +39,8 @@ class FileManager {
   void              appendContent(const std::string& content);
   void              updateContent(const std::string& content);
   void              createFile(const std::string& content);
+
+  const std::vector<std::string> getDirList() const;
 
  private:
   void parsePath();

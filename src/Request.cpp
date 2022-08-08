@@ -246,10 +246,9 @@ void Request::parseStartLine() {
   // check is query_string valid
 
   // Version
-  VersionType version =
-      ft::getUntilDelimiter(request_message_, "\r\n", position_);
+  version_ = ft::getUntilDelimiter(request_message_, "\r\n", position_);
   // Webserv only support HTTP/1.1.
-  if (version_ != version)
+  if (version_ != "HTTP/1.1" && version_ != "HTTP/1.0")
     throw RequestException("Invalid version", 400);
 
   // Next level.

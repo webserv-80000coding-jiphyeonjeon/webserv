@@ -140,6 +140,10 @@ void Processor::methodGet() {
 
     if (config_.getAutoindex()) {
       // autoindex: on -> 바로 autoindex page 보내주기 (200)
+      response_.setStatusCode(200);
+      response_.setBody(generateDirList());
+      response_.setHeader("Content-Type", "text/html");
+      return;
       // TODO: autoindex page 보내주기
     } else {
       // autoindex: off
@@ -335,6 +339,20 @@ void Processor::prepareBeforeCreate() {
         0, path_until_last_dir.find_first_of("/", path_for_check.size() + 2));
     mkdir(path_for_check.c_str(), 0755);
   }
+}
+
+std::string Processor::generateDirList() {
+  std::vector<PathType> dir_list = file_manager_.getDirList();
+  std::stringstream     ss;
+  ss << "<html><body><h1>Index of " << request_.getPath() << "</h1>";
+  ss << "<ul>";
+  for (std::vector<PathType>::iterator it = dir_list.begin();
+       it != dir_list.end(); ++it) {
+    ss << "<li><a href=\"" << *it << "\">" << *it << "</a></li>";
+  }
+  ss << "</ul>";
+  ss << "</body></html>";
+  return ss.str();
 }
 
 Processor::ProcessException::ProcessException(const std::string&    message,
