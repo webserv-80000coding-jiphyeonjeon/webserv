@@ -115,18 +115,15 @@ const std::vector<std::string> FileManager::getDirList() const {
 }
 
 void FileManager::parsePath() {
-  size_t name_pos = path_.find_last_of('/');
-  size_t extension_pos = name_pos + path_.substr(name_pos).find_last_of('.');
+  if (*path_.rbegin() == '/')
+    return;
 
-  if (name_pos == std::string::npos && extension_pos == std::string::npos) {
-    name_ = path_;
-  } else if (name_pos == std::string::npos) {
-    name_ = path_.substr(0, extension_pos);
-    extension_ = path_.substr(extension_pos);
-  } else if (extension_pos == std::string::npos) {
-    name_ = path_.substr(name_pos + 1);
-  } else {
-    name_ = path_.substr(name_pos + 1, extension_pos - name_pos - 1);
-    extension_ = path_.substr(extension_pos);
+  size_t name_pos = path_.find_last_of('/');
+  name_ = path_.substr(name_pos + 1);
+  size_t extension_pos = name_.find_last_of('.');
+
+  if (extension_pos != std::string::npos) {
+    extension_ = name_.substr(extension_pos);
+    name_ = name_.substr(0, extension_pos);
   }
 }

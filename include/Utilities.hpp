@@ -7,6 +7,8 @@
 #include <string>
 #include <vector>
 
+#include "FileManager.hpp"
+
 #define MAXIMUM_URI_LIMIT 2048
 #define MAXIMUM_PAYLOAD_LIMIT 8192
 #define FILE_READ_BUFFER_SIZE 8192
@@ -35,7 +37,7 @@ std::vector<std::string> splitByString(std::string str, std::string delimiter);
 
 bool isDigits(const std::string& str);
 
-const MIMEType& getMIME(const ExtensionType& extension);
+const MIMEType& getMIME(const FileManager& file_manager);
 MIMEMapType     initMIMEMap();
 
 }  // namespace ft
