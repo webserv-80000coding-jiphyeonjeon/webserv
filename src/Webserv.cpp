@@ -61,6 +61,7 @@ void Webserv::runWebserv() {
       std::cout << "\rWaiting" << loading_dot[loading++] << std::flush;
       if (loading == 3)
         loading = 0;
+
       state = select(max_fd_ + 1, &read_fds, &write_fds, NULL, &timeout);
     }
 
@@ -73,6 +74,17 @@ void Webserv::runWebserv() {
       selectError();
     }
     loading = 0;
+
+    // TODO max_fd_ reset
+    // server 소켓의 경우 select를 돌고 있다면 무조건 존재하는 것
+    // map의 key는 fd라서 마지막 값이 곧 최대값
+    FdServerMapType::const_iterator max_server = server_map_.end();
+    max_fd_ = (--max_server)->first;
+
+    // client 소켓은 없을 수도 있으니 사이즈 체크하고 최대값 접근
+    ConnectSocketType::const_iterator max_client = connect_socket_.end();
+    if (!connect_socket_.empty() && max_fd_ < (--max_client)->first)
+      max_fd_ = max_client->first;
   }
 }
 
