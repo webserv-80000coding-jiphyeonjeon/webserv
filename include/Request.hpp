@@ -1,6 +1,7 @@
 #ifndef WEBSERV_REQUEST_HPP
 #define WEBSERV_REQUEST_HPP
 
+#include <ctime>
 #include <map>
 #include <string>
 
@@ -53,7 +54,6 @@ class RequestHeader {
 
   void parseHost(Method method, HeaderValueType value);
   void parseContentLength(Method method, HeaderValueType value);
-  void parseContentType(Method method, HeaderValueType value);
   void parseTransferCoding(Method method, HeaderValueType value);
 
   bool isChunked() const;
@@ -89,6 +89,8 @@ class Request {
   typedef unsigned int StatusCodeType;
   typedef unsigned int ChunkSizeType;
 
+  typedef clock_t TimeType;
+
   class RequestException : public ServerException {
    public:
     RequestException(const std::string&    message,
@@ -120,6 +122,9 @@ class Request {
 
   int parse(MessageType& request_message);
 
+  bool isExpired() const;
+  void updateLastConnectionTime();
+
   // void        print() const;
   std::string printToString() const;
 
@@ -142,6 +147,8 @@ class Request {
   PositionType  position_;
   ChunkLevel    chunk_level_;
   ChunkSizeType chunk_size_;
+
+  TimeType last_connection_time_;
 };
 
 #endif

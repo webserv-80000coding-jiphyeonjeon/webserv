@@ -51,6 +51,7 @@ void Webserv::runWebserv() {
 
     // select 대기
     while (state == kTimeOut) {
+      checkExpiredConnection();
       memcpy(&read_fds, &fd_set_, sizeof(fd_set_));
       FD_ZERO(&write_fds);
       for (ReadyType::iterator it = ready_to_write_.begin();
@@ -151,4 +152,17 @@ void Webserv::selectError() {
        it != server_map_.end(); ++it)
     FD_SET(it->first, &fd_set_);
   std::cout << "Server: select() error" << std::endl;
+}
+
+void Webserv::checkExpiredConnection() {
+  for (FdServerMapType::iterator it = server_map_.begin();
+       it != server_map_.end(); ++it) {
+    std::vector<FdType> expired_clients = it->second.checkExpiredConnection();
+
+    for (std::vector<FdType>::iterator it = expired_clients.begin();
+         it != expired_clients.end(); ++it) {
+      FD_CLR(*it, &fd_set_);
+      connect_socket_.erase(*it);
+    }
+  }
 }

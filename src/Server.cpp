@@ -150,3 +150,23 @@ void Server::setAddr() {
   addr_.sin_addr.s_addr = listen_.first;
   addr_.sin_port = htons(listen_.second);
 }
+
+std::vector<Server::FdType> Server::checkExpiredConnection() {
+  std::vector<Server::FdType> expired_clients;
+
+  ProcessorType::iterator it = processor_map_.begin();
+  for (; it != processor_map_.end(); it++) {
+    if (it->second.isRequestExpired()) {
+      expired_clients.push_back(it->first);
+      ft::log.writeTimeLog("[Server] --- Close client ---");
+      ft::log.getLogStream() << "Client: " << it->first << "\nReason: "
+                             << "Request expired" << std::endl;
+    }
+  }
+
+  for (std::vector<Server::FdType>::iterator it = expired_clients.begin();
+       it != expired_clients.end(); it++)
+    closeClient(*it);
+
+  return expired_clients;
+}
