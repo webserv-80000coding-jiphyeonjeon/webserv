@@ -6,6 +6,8 @@
 #include <arpa/inet.h>
 #include <sys/socket.h>
 
+#include <vector>
+
 #include "Config.hpp"
 #include "Processor.hpp"
 
@@ -39,6 +41,8 @@ class Server {
   void      closeClient(FdType client_socket);
 
   void process(FdType client_socket, const Config& total_config);
+
+  std::vector<FdType> checkExpiredConnection();
 
  private:
   static const int kBacklog = 1024;

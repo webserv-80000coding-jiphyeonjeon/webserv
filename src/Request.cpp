@@ -90,7 +90,6 @@ void RequestHeader::parseHost(Method method, HeaderValueType value) {
     server_name_ = ft::splitUntilDelimiter(value, ":");
     port_ = atoi(value.c_str());
   } else {
-    // TODO: 나중에 Host IP와 동일한 지 확인
     server_name_ = value;
     port_ = 80;
   }
@@ -101,12 +100,6 @@ void RequestHeader::parseContentLength(Method method, HeaderValueType value) {
     content_length_ = atoi(value.c_str());
   else
     content_length_ = 0;
-}
-
-// TODO: parse content type
-void RequestHeader::parseContentType(Method method, HeaderValueType value) {
-  (void)method;
-  (void)value;
 }
 
 void RequestHeader::parseTransferCoding(Method method, HeaderValueType value) {
@@ -123,7 +116,6 @@ bool RequestHeader::isChunked() const { return transfer_coding_ == kChunked; }
 void RequestHeader::initParseFuncMap() {
   parse_func_map_["Host"] = &RequestHeader::parseHost;
   parse_func_map_["Content-Length"] = &RequestHeader::parseContentLength;
-  parse_func_map_["Content-Type"] = &RequestHeader::parseContentType;
   parse_func_map_["Transfer-Encoding"] = &RequestHeader::parseTransferCoding;
 }
 
@@ -136,7 +128,9 @@ Request::Request()
       level_(kStartLine),
       position_(0),
       chunk_level_(kChunkSize),
-      chunk_size_(0) {}
+      chunk_size_(0) {
+  last_connection_time_ = time(NULL);
+}
 Request::~Request() {}
 
 const Request::MessageType& Request::getRequestMessage() const {
@@ -192,15 +186,14 @@ int Request::parse(MessageType& request_message) {
     return state_;
   request_message_ += request_message;
 
-  // ft::log.writeTimeLog("Parsing...");
-  // ft::log.writeLog(request_message_);
-
   if (level_ != kBody && request_message_.size() > MAXIMUM_PAYLOAD_LIMIT)
     throw RequestException("Request payload is too large", 413);
 
   parseStartLine();
   parseHeader();
   parseBody();
+
+  updateLastConnectionTime();
 
   return state_;
 }
@@ -392,6 +385,16 @@ void Request::parseDefaultBody() {
   return;
 }
 
+bool Request::isExpired() const {
+  if (level_ != kDone &&
+      time(NULL) - last_connection_time_ > REQUEST_HAGGING_TIME) {
+    return true;
+  } else
+    return false;
+}
+
+void Request::updateLastConnectionTime() { last_connection_time_ = time(NULL); }
+
 std::string Request::printToString() const {
   std::stringstream ss;
   ss << "\nRequest" << std::endl;
@@ -410,12 +413,3 @@ std::string Request::printToString() const {
 Request::RequestException::RequestException(const std::string&    message,
                                             const StatusCodeType& status_code)
     : ServerException(message, status_code) {}
-
-// const char* Request::RequestException::what() const throw() {
-//   return message_.c_str();
-// }
-
-// const Request::StatusCodeType& Request::RequestException::getStatusCode()
-//     const {
-//   return status_code_;
-// }

@@ -126,6 +126,8 @@ int Processor::parseRequest(MessageType request_message) {
 
 std::string Processor::strRequest() { return request_.printToString(); }
 
+bool Processor::isRequestExpired() { return request_.isExpired(); }
+
 void Processor::methodGet() {
   if (config_.getReturn().first) {
     response_.setStatusCode(config_.getReturn().first);
@@ -133,7 +135,6 @@ void Processor::methodGet() {
     return;
   }
   // 폴더
-  // FIXME: autoindex
   if (file_manager_.isDirectory()) {
     if (access(file_manager_.getPath().c_str(), R_OK) != 0)
       throw ProcessException("Forbidden", 403);
@@ -144,7 +145,6 @@ void Processor::methodGet() {
       response_.setBody(generateDirList());
       response_.setHeader("Content-Type", "text/html");
       return;
-      // TODO: autoindex page 보내주기
     } else {
       // autoindex: off
       // getIndex()로 가져온 vector들에 해당하는 파일 확인하기 (200 / 404)
@@ -304,7 +304,6 @@ ConfigServer Processor::getConfigServerForRequest(
   return candidate_configs[0];
 }
 
-// TODO: createDirectory
 void Processor::prepareBeforeCreate() {
   // if directory is not exist until path, create directory.
   PathType path_until_last_dir = file_manager_.getPath().substr(
