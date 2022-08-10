@@ -1,5 +1,3 @@
-// Copyright (c) 2022 hyojekim. All rights reserved.
-
 #ifndef CONFIG_HPP_
 #define CONFIG_HPP_
 
@@ -25,8 +23,6 @@ class Config {
                             const std::string&    indent);
   static void printCommon(const ConfigCommon& common, const std::string& indent,
                           const std::string& color);
-  static void printListen(const ListenListType& listen_list,
-                          const std::string&    indent);
 
   Config();
   ~Config();

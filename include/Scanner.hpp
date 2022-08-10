@@ -1,5 +1,3 @@
-// Copyright (c) 2022 hyojekim. All rights reserved.
-
 #ifndef SCANNER_HPP_
 #define SCANNER_HPP_
 

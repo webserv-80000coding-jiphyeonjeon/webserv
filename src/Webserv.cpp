@@ -49,7 +49,6 @@ void Webserv::runWebserv() {
     std::string loading_dot[3] = {".  ", ".. ", "..."};
     int         loading = 0;
 
-    // select 대기
     while (state == kTimeOut) {
       checkExpiredConnection();
       memcpy(&read_fds, &fd_set_, sizeof(fd_set_));
@@ -65,7 +64,6 @@ void Webserv::runWebserv() {
       state = select(max_fd_ + 1, &read_fds, &write_fds, NULL, &timeout);
     }
 
-    // 변화에 따라 write -> read -> connection 순서로 처리
     if (state > kTimeOut) {
       addConnection(state, read_fds);
       receiveRequest(state, read_fds);
@@ -75,13 +73,9 @@ void Webserv::runWebserv() {
     }
     loading = 0;
 
-    // TODO max_fd_ reset
-    // server 소켓의 경우 select를 돌고 있다면 무조건 존재하는 것
-    // map의 key는 fd라서 마지막 값이 곧 최대값
     FdServerMapType::const_iterator max_server = server_map_.end();
     max_fd_ = (--max_server)->first;
 
-    // client 소켓은 없을 수도 있으니 사이즈 체크하고 최대값 접근
     ConnectSocketType::const_iterator max_client = connect_socket_.end();
     if (!connect_socket_.empty() && max_fd_ < (--max_client)->first)
       max_fd_ = max_client->first;
@@ -125,7 +119,6 @@ void Webserv::receiveRequest(int& state, fd_set& read_fds) {
         it->second->process(receive_socket, config_);
         ready_to_write_.push_back(receive_socket);
       }
-      // kRecvContinuous: do nothing
       state = 0;
       break;
     }

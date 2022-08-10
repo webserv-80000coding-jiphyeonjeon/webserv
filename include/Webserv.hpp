@@ -1,5 +1,3 @@
-// Copyright (c) 2022 hyojekim. All rights reserved.
-
 #ifndef WEBSERV_HPP_
 #define WEBSERV_HPP_
 

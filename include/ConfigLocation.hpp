@@ -1,5 +1,3 @@
-// Copyright (c) 2022 hyojekim. All rights reserved.
-
 #ifndef CONFIGLOCATION_HPP_
 #define CONFIGLOCATION_HPP_
 

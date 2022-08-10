@@ -13,9 +13,7 @@ enum State { kContinuous, kEnd };
 enum Level { kStartLine, kHeader, kBody, kDone };
 enum ChunkLevel { kChunkSize, kChunkData, kChunkEnd };
 
-// ================================================================
-// RequestHeader
-// ================================================================
+// ANCHOR: RequestHeader
 
 class RequestHeader {
  public:
@@ -71,9 +69,7 @@ class RequestHeader {
   ParseFuncMapType parse_func_map_;
 };
 
-// ================================================================
-// Request
-// ================================================================
+// ANCHOR: Request
 
 class Request {
  public:
@@ -125,7 +121,6 @@ class Request {
   bool isExpired() const;
   void updateLastConnectionTime();
 
-  // void        print() const;
   std::string printToString() const;
 
  private:

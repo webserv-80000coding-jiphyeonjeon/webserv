@@ -45,7 +45,6 @@ class Processor {
   const Level&          getLevel() const;
   const OffsetType&     getOffset() const;
   const OffsetType&     getIoCount() const;
-  // const Response& getResponse() const;
 
   const ResponseMessageType& getResponseMessage() const;
 
@@ -61,7 +60,6 @@ class Processor {
   int         parseRequest(MessageType request_message);
   std::string strRequest();
   bool        isRequestExpired();
-  // void        printRequest();
 
   void methodGet();
   void methodPost();

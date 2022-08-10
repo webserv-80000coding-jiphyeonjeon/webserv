@@ -1,6 +1,0 @@
-Language: Cpp
-BasedOnStyle: Google
-AlignConsecutiveDeclarations: true
-AllowShortLoopsOnASingleLine: false
-AllowShortIfStatementsOnASingleLine: false
-ColumnLimit: 80

@@ -1,5 +1,3 @@
-// Copyright (c) 2022 hyojekim. All rights reserved.
-
 #ifndef CONFIGCOMMON_HPP_
 #define CONFIGCOMMON_HPP_
 

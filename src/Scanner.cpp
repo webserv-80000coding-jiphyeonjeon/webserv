@@ -47,8 +47,6 @@ void Scanner::tokenize(Scanner::TokensType& tokens, const std::string& str) {
   }
 }
 
-// TODO: meta character "{};" 앞뒤 공백이 없을 때도 구분할 수 있는 기능 추가
-// 필요 현재는 문자열 맨 뒤에 ;가 붙어있는 경우만 처리
 void Scanner::checkMetaCharacter(Scanner::TokensType& tokens,
                                  const std::string&   str) {
   if (str.rfind(";") == str.size() - 1) {

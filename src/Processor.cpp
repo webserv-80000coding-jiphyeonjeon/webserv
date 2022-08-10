@@ -46,7 +46,6 @@ void Processor::process(const Config&                   total_config,
     return;
   ft::log.writeTimeLog("[Processor] --- Set config ---");
   ConfigServer config_server = getConfigServerForRequest(total_config, listen);
-  // Config::printServer(config_server);
   findLocation(config_server);
 
   try {
@@ -98,7 +97,6 @@ void Processor::findLocation(const ConfigServer& config) {
 
   config_ = locations.at(path);
   ft::log.writeLog("Location: " + path);
-  // Config::printLocation(config_, "");
 
   std::string result_path = request_.getPath();
   result_path =
@@ -134,7 +132,7 @@ void Processor::methodGet() {
     response_.setHeader("Location", config_.getReturn().second);
     return;
   }
-  // 폴더
+  // Directory
   if (file_manager_.isDirectory()) {
     if (access(file_manager_.getPath().c_str(), R_OK) != 0)
       throw ProcessException("Forbidden", 403);
@@ -164,8 +162,8 @@ void Processor::methodGet() {
       }
     }
   }
-  // 파일
-  // 해당 위치에 존재하는지만 판단 - (200 / 404)
+
+  // File: 해당 위치에 존재하는지만 판단 - (200 / 404)
   if (file_manager_.isExist() && !file_manager_.isDirectory()) {
     if (access(file_manager_.getPath().c_str(), R_OK) != 0)
       throw ProcessException("Forbidden", 403);
@@ -222,7 +220,6 @@ void Processor::methodPut() {
   response_.setBody(request_.getBody());
   response_.setHeader("Content-Type", ft::getMIME(file_manager_));
   if (file_manager_.isExist() == false) {
-    // std::cout << file_manager_.getPath() << std::endl;
     prepareBeforeCreate();
     // if file isn't exist, create file. 201
     file_manager_.createFile(request_.getBody());
@@ -272,8 +269,6 @@ void Processor::initMethodFuncMap() {
 
 ConfigServer Processor::getConfigServerForRequest(
     const Config& total_config, const Processor::ListenType& listen) {
-  // 연결된 listen 기준으로 후보군 찾기
-  // 연결이 되어있다는 뜻은 후보가 최소 한 개 이상은 반드시 있다는 뜻
   ServersType candidate_configs;
 
   const ServersType servers = total_config.getServers();
@@ -287,7 +282,6 @@ ConfigServer Processor::getConfigServerForRequest(
     }
   }
 
-  // server_name 기준으로 찾고, 없으면 첫 번째 반환
   for (ServersType::const_iterator config = candidate_configs.begin();
        config != candidate_configs.end(); ++config) {
     const ServerNamesType server_name = config->getServerName();
@@ -316,7 +310,7 @@ void Processor::prepareBeforeCreate() {
   PathType path_for_check = path_until_last_dir.substr(
       0, path_until_last_dir.find_first_of("/", 1) - 1);
 
-  // update path_for_check until is not exist.
+  // update path_for_check until it's not exist.
   while (FileManager::isExist(path_for_check)) {
     // if path_for_check is not dir, throw 409(conflict)
     if (!FileManager::isDirectory(path_for_check))

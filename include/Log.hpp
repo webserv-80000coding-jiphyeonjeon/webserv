@@ -1,5 +1,3 @@
-// Copyright (c) 2022 hyojekim. All rights reserved.
-
 #ifndef LOG_HPP_
 #define LOG_HPP_
 

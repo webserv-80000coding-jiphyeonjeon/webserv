@@ -84,7 +84,6 @@ void RequestHeader::setTransferCoding(const TransferCoding& transfer_coding) {
 
 void RequestHeader::parseHost(Method method, HeaderValueType value) {
   (void)method;
-  // size_t pos;
 
   if (value.find(':') != std::string::npos) {
     server_name_ = ft::splitUntilDelimiter(value, ":");
@@ -212,7 +211,6 @@ void Request::parseStartLine() {
   if (request_message_.find("\r\n", position_) == std::string::npos)
     return;
 
-  // TODO: Refactor below codes.
   // Method
   method = ft::getUntilDelimiter(request_message_, " ", position_);
   // No space or start from space.
@@ -235,12 +233,10 @@ void Request::parseStartLine() {
   // Path is too long.(limit 2MB(2048))
   if (path_.length() > MAXIMUM_URI_LIMIT)
     throw RequestException("Too long URI", 414);
-  // check is path_ valid(depth)
-  // check is query_string valid
 
   // Version
   version_ = ft::getUntilDelimiter(request_message_, "\r\n", position_);
-  // Webserv only support HTTP/1.1.
+
   if (version_ != "HTTP/1.1" && version_ != "HTTP/1.0")
     throw RequestException("Invalid version", 400);
 
@@ -340,7 +336,6 @@ void Request::parseChunkedBody() {
     } else if (chunk_level_ == kChunkData) {
       body_ += chunk_data;
       recv_size += chunk_data.size();
-      // TODO: Check when error occurs.(recv_size couldn't be match)
       if (recv_size == chunk_size_) {
         chunk_level_ = kChunkSize;
         recv_size = 0;
@@ -356,7 +351,6 @@ void Request::parseChunkedBody() {
         break;
       }
 
-      // TODO: Duplicated code with parseHeader().
       key = ft::splitUntilDelimiter(chunk_data, ": ");
       // No ':' in header or space included in key.
       if (key == "" || key.find(' ') != std::string::npos)

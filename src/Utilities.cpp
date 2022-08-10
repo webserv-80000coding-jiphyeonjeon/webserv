@@ -30,7 +30,6 @@ std::string getUntilDelimiter(const std::string& str,
 
   if ((new_pos = str.find(delimiter, pos)) != std::string::npos) {
     line = str.substr(pos, new_pos - pos);
-    // O(1);
     pos = new_pos + delimiter.length();
   }
 
@@ -43,23 +42,10 @@ std::string splitUntilDelimiter(std::string& str, std::string delimiter) {
 
   if ((pos = str.find(delimiter)) != std::string::npos) {
     line = str.substr(0, pos);
-    // O(n), n is the length of new str.
     str.erase(0, pos + delimiter.length());
   }
 
   return line;
-}
-
-std::vector<std::string> splitByString(std::string str, std::string delimiter) {
-  std::vector<std::string> str_vector;
-  size_t                   pos;
-
-  while ((pos = str.find(delimiter)) != std::string::npos) {
-    str_vector.push_back(str.substr(0, pos));
-    str.erase(0, pos + delimiter.length());
-  }
-
-  return str_vector;
 }
 
 bool isDigits(const std::string& str) {

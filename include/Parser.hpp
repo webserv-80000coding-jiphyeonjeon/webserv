@@ -1,5 +1,3 @@
-// Copyright (c) 2022 hyojekim. All rights reserved.
-
 #ifndef PARSER_HPP_
 #define PARSER_HPP_
 

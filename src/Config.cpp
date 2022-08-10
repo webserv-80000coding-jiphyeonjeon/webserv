@@ -1,6 +1,5 @@
 #include "Config.hpp"
 
-// TODO 디버깅용으로 사용한 inet_ntoa() 제거 필요!!!
 #include <arpa/inet.h>
 
 #include <iostream>
@@ -53,9 +52,6 @@ void Config::printServer(const ConfigServer& server) {
        it != server_name.end(); ++it)
     ft::log.getLogStream() << "    " << *it << "\n";
   ft::log.writeEndl();
-
-  ft::log.writeLog(GRN "  [listen]" END);
-  printListen(server.getListen(), "    ");
 
   printCommon(server.getCommon(), "  ", GRN);
   ft::log.writeEndl();
@@ -119,17 +115,5 @@ void Config::printCommon(const ConfigCommon& common, const std::string& indent,
        it != error_page.end(); ++it)
     ft::log.getLogStream() << indent << "  " << it->first << " -> "
                            << it->second << "\n";
-  ft::log.writeEndl();
-}
-
-void Config::printListen(const Config::ListenListType& listen_list,
-                         const std::string&            indent) {
-  for (ListenListType::const_iterator it = listen_list.begin();
-       it != listen_list.end(); ++it) {
-    sockaddr_in addr;
-    addr.sin_addr.s_addr = it->first;
-    ft::log.getLogStream() << indent << inet_ntoa(addr.sin_addr) << ":"
-                           << it->second << "\n";
-  }
   ft::log.writeEndl();
 }
