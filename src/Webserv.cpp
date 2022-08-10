@@ -99,8 +99,8 @@ void Webserv::addConnection(int& state, fd_set& read_fds) {
         if (client_socket > max_fd_)
           max_fd_ = client_socket;
       }
-      std::cout << "\r" GRN "Connected to port " << it->second.getPort() << END
-                << std::endl;
+      std::cout << "\r" BYEL "🔌 Accept " END << it->second.getPort() << END
+                << " max_fd_ : " << max_fd_ << std::endl;
       state = 0;
       break;
     }
@@ -163,7 +163,7 @@ void Webserv::selectError() {
   for (FdServerMapType::iterator it = server_map_.begin();
        it != server_map_.end(); ++it)
     FD_SET(it->first, &fd_set_);
-  std::cout << "Server: select() error" << std::endl;
+  std::cout << "\rServer: select() error " << std::endl;
 }
 
 void Webserv::checkExpiredConnection() {

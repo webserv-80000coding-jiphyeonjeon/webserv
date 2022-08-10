@@ -7,6 +7,7 @@
 #include <iostream>
 
 #include "Log.hpp"
+#include "color.hpp"
 
 Server::Server(const Server::ListenType& listen)
     : listen_(listen), socket_(-1), processor_map_() {
@@ -68,7 +69,8 @@ RecvState Server::receiveData(Server::FdType client_socket) {
 
   if (recv_size == 0 || recv_size == -1) {
     closeClient(client_socket);
-    std::cout << (!recv_size ? "\rConnection closed by client" : "\rRead error")
+    std::cout << (!recv_size ? BRED "\r🔌 Close  " END
+                             : "\rRead error -> Close client")
               << std::endl;
     ft::log.writeTimeLog("[Server] --- Close client ---");
     ft::log.getLogStream() << "Client: " << client_socket << "\nReason: "
@@ -83,6 +85,7 @@ RecvState Server::receiveData(Server::FdType client_socket) {
     return kParseError;
 
   if (it->second.getLevel() == kDone) {
+    std::cout << "\r" BCYN "📩 Receive" END << std::endl;
     ft::log.writeTimeLog("[Server] --- Receive Complete ---");
     ft::log.getLogStream() << "Client: " << client_socket
                            << "\nCount: " << processor.getIoCount()
@@ -115,11 +118,12 @@ SendState Server::sendData(Server::FdType client_socket) {
     return kSendError;
   } else if (!offset && str.substr(9, 3) == "400") {
     closeClient(client_socket);
-    std::cout << "\rConnection closed by client" << std::endl;
+    std::cout << "\rConnection " RED "closed" END << std::endl;
     return kSendError;
   } else {
     processor.setOffset(offset + send_size);
     if (offset == str.size()) {
+      std::cout << "\r" BGRN "📤 Send " END << std::endl;
       ft::log.writeTimeLog("[Server] --- Send Complete ---");
       ft::log.getLogStream() << "Client: " << client_socket
                              << "\nCount: " << call_count + 1 << std::endl;

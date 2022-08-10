@@ -339,14 +339,14 @@ void Processor::prepareBeforeCreate() {
 std::string Processor::generateDirList() {
   std::vector<PathType> dir_list = file_manager_.getDirList();
   std::stringstream     ss;
-  ss << "<html><body><h1>Index of " << request_.getPath() << "</h1>";
-  ss << "<ul>";
+  ss << "<html>\n<body>\n<h1>Index of " << request_.getPath() << "</h1>\n";
+  ss << "<ul>\n";
   for (std::vector<PathType>::iterator it = dir_list.begin();
        it != dir_list.end(); ++it) {
-    ss << "<li><a href=\"" << *it << "\">" << *it << "</a></li>";
+    ss << "<li><a href=\"" << *it << "\">" << *it << "</a></li>\n";
   }
-  ss << "</ul>";
-  ss << "</body></html>";
+  ss << "</ul>\n";
+  ss << "</body>\n</html>\n";
   return ss.str();
 }
 
