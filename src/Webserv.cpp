@@ -67,9 +67,9 @@ void Webserv::runWebserv() {
 
     // 변화에 따라 write -> read -> connection 순서로 처리
     if (state > kTimeOut) {
-      sendResponse(state, write_fds);
-      receiveRequest(state, read_fds);
       addConnection(state, read_fds);
+      receiveRequest(state, read_fds);
+      sendResponse(state, write_fds);
     } else {
       selectError();
     }
