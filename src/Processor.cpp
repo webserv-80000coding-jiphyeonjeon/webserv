@@ -343,7 +343,7 @@ std::string Processor::generateDirList() {
   ss << "<ul>\n";
   for (std::vector<PathType>::iterator it = dir_list.begin();
        it != dir_list.end(); ++it) {
-    ss << "<li><a href=\"" << *it << "\">" << *it << "</a></li>\n";
+    ss << "<li>" << *it << "</li>\n";
   }
   ss << "</ul>\n";
   ss << "</body>\n</html>\n";
