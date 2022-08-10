@@ -60,6 +60,7 @@ class Processor {
 
   int         parseRequest(MessageType request_message);
   std::string strRequest();
+  bool        isRequestExpired();
   // void        printRequest();
 
   void methodGet();

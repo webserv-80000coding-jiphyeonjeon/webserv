@@ -126,6 +126,8 @@ int Processor::parseRequest(MessageType request_message) {
 
 std::string Processor::strRequest() { return request_.printToString(); }
 
+bool Processor::isRequestExpired() { return request_.isExpired(); }
+
 void Processor::methodGet() {
   if (config_.getReturn().first) {
     response_.setStatusCode(config_.getReturn().first);
@@ -133,7 +135,6 @@ void Processor::methodGet() {
     return;
   }
   // 폴더
-  // FIXME: autoindex
   if (file_manager_.isDirectory()) {
     if (access(file_manager_.getPath().c_str(), R_OK) != 0)
       throw ProcessException("Forbidden", 403);
@@ -144,7 +145,6 @@ void Processor::methodGet() {
       response_.setBody(generateDirList());
       response_.setHeader("Content-Type", "text/html");
       return;
-      // TODO: autoindex page 보내주기
     } else {
       // autoindex: off
       // getIndex()로 가져온 vector들에 해당하는 파일 확인하기 (200 / 404)
@@ -169,8 +169,7 @@ void Processor::methodGet() {
   if (file_manager_.isExist() && !file_manager_.isDirectory()) {
     if (access(file_manager_.getPath().c_str(), R_OK) != 0)
       throw ProcessException("Forbidden", 403);
-    response_.setHeader("Content-Type",
-                        ft::getMIME(file_manager_.getExtension()));
+    response_.setHeader("Content-Type", ft::getMIME(file_manager_));
     response_.setBody(file_manager_.getContent());
     response_.setStatusCode(200);
   } else if (!file_manager_.isExist()) {
@@ -204,8 +203,7 @@ void Processor::methodPost() {
   }
   // set body(requested body)
   response_.setBody(request_.getBody());
-  response_.setHeader("Content-Type",
-                      ft::getMIME(file_manager_.getExtension()));
+  response_.setHeader("Content-Type", ft::getMIME(file_manager_));
   if (file_manager_.isExist() == false) {
     prepareBeforeCreate();
     // if file isn't exist, create file. 201
@@ -222,8 +220,7 @@ void Processor::methodPost() {
 
 void Processor::methodPut() {
   response_.setBody(request_.getBody());
-  response_.setHeader("Content-Type",
-                      ft::getMIME(file_manager_.getExtension()));
+  response_.setHeader("Content-Type", ft::getMIME(file_manager_));
   if (file_manager_.isExist() == false) {
     // std::cout << file_manager_.getPath() << std::endl;
     prepareBeforeCreate();
@@ -250,8 +247,7 @@ void Processor::methodDelete() {
       file_manager_.remove();
     } else {
       response_.setBody(file_manager_.getContent());
-      response_.setHeader("Content-Type",
-                          ft::getMIME(file_manager_.getExtension()));
+      response_.setHeader("Content-Type", ft::getMIME(file_manager_));
       response_.setStatusCode(200);
       file_manager_.remove();
     }
@@ -304,7 +300,6 @@ ConfigServer Processor::getConfigServerForRequest(
   return candidate_configs[0];
 }
 
-// TODO: createDirectory
 void Processor::prepareBeforeCreate() {
   // if directory is not exist until path, create directory.
   PathType path_until_last_dir = file_manager_.getPath().substr(

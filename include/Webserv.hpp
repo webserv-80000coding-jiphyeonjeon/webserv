@@ -33,6 +33,7 @@ class Webserv {
   void receiveRequest(int& state, fd_set& read_fds);
   void sendResponse(int& state, fd_set& write_fds);
   void selectError();
+  void checkExpiredConnection();
 };
 
 #endif  // WEBSERV_HPP_

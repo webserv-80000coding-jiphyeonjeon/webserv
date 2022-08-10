@@ -1,5 +1,7 @@
 #include "Utilities.hpp"
 
+#include <fstream>
+
 namespace ft {
 
 unsigned int hexStringToInt(const std::string& hex_string) {
@@ -131,16 +133,29 @@ MIMEMapType initMIMEMap() {
   mime_map[".mpg"] = "video/mpeg";
   mime_map[".mov"] = "video/quicktime";
   mime_map[".webm"] = "video/webm";
-  mime_map[""] = "application/octet-stream";
+  mime_map[""] = "text/plain";
+  mime_map[".bin"] = "application/octet-stream";
 
   return mime_map;
 }
 
 MIMEMapType mime_map_ = initMIMEMap();
 
-const MIMEType& getMIME(const ExtensionType& extension) {
+const MIMEType& getMIME(const FileManager& file_manager) {
+  std::string extension = file_manager.getExtension();
+  // check is binary(octet-stream) or text/plain
+  if (extension == "" || extension == ".") {
+    int           c;
+    std::ifstream a(file_manager.getFullName());
+    while ((c = a.get()) != EOF && c <= 127)
+      ;
+    if (c == EOF)
+      return mime_map_[""];
+    return mime_map_[".bin"];
+  }
+  // if extension is not in mime_map_, return application/octet-stream
   if (mime_map_.find(extension) == mime_map_.end())
-    return mime_map_[""];
+    return mime_map_[".bin"];
   return mime_map_[extension];
 }
 
