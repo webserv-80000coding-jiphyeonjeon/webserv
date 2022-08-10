@@ -344,6 +344,8 @@ void Request::parseChunkedBody() {
       if (recv_size == chunk_size_) {
         chunk_level_ = kChunkSize;
         recv_size = 0;
+      } else if (recv_size > chunk_size_) {
+        throw RequestException("Bad Request(chunked body)", 400);
       }
     } else if (chunk_level_ == kChunkEnd) {
       HeaderKeyType   key;
@@ -362,7 +364,6 @@ void Request::parseChunkedBody() {
       // Duplicated header.
       if (getHeaderMap().find(key) != getHeaderMap().end())
         throw RequestException("Bad Request(duplicated header)", 400);
-      std::cout << key << std::endl;
 
       value = ft::strBidirectionalTrim(chunk_data, " ");
       // No value in header.
@@ -379,7 +380,6 @@ void Request::parseDefaultBody() {
     body_ = request_message_;
     level_ = kDone;
   } else if (request_message_.size() > header_.getContentLength()) {
-    std::cout << header_.getContentLength() << std::endl;
     throw RequestException("Bad Request(Body longer than content-length)", 400);
   }
   return;
