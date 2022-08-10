@@ -100,7 +100,7 @@ void Webserv::addConnection(int& state, fd_set& read_fds) {
           max_fd_ = client_socket;
       }
       std::cout << "\r" BYEL "🔌 Accept " END << it->second.getPort() << END
-                << " max_fd_ : " << max_fd_ << std::endl;
+                << std::endl;
       state = 0;
       break;
     }

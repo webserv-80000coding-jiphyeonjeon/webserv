@@ -66,9 +66,9 @@ INDEX = 0
 %.o : %.cpp
 	$(eval INDEX = $(shell expr $(INDEX) + 1))
 	@if [ $(INDEX) = 1 ] ; then \
-		echo -en "$(FG_TEXT)Creating $(CL_BOLD)$(NAME) ◼︎︎︎︎︎︎︎︎◼︎︎︎︎︎︎◼︎︎︎︎︎︎︎︎◼︎︎︎︎︎︎◼︎︎︎︎︎︎︎︎◼︎︎︎︎︎︎◼︎︎︎︎︎︎︎︎◼︎︎︎︎︎︎◼︎︎︎︎︎︎︎︎◼︎︎︎︎︎︎◼︎︎︎︎︎︎︎︎◼︎︎︎︎︎︎" ; \
+		echo -en "$(FG_TEXT)Creating $(CL_BOLD)$(NAME) ◼︎︎︎︎︎︎︎︎◼︎︎︎︎︎︎◼︎︎︎︎︎︎︎◼" ; \
 	else \
-		echo -en "$(FG_TEXT)◼︎︎︎︎︎︎◼︎︎︎︎︎◼︎︎︎︎︎︎◼︎︎︎︎︎" ; \
+		echo -en "$(FG_TEXT)◼︎︎︎︎︎︎◼︎︎︎︎︎" ; \
 	fi
 	@$(CXX) $(CXXFLAGS) $(INCD) -c $< -o $@ -g
 
