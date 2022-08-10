@@ -103,6 +103,7 @@ MIMEMapType initMIMEMap() {
   mime_map[".ogv"] = "video/ogg";
   mime_map[".ogx"] = "application/ogg";
   mime_map[".pdf"] = "application/pdf";
+  mime_map[".png"] = "image/png";
   mime_map[".ppt"] = "application/vnd.ms-powerpoint";
   mime_map[".rar"] = "application/x-rar-compressed";
   mime_map[".rtf"] = "application/rtf";
